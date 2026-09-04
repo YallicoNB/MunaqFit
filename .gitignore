@@ -1,0 +1,30 @@
+# ---- Java / Maven / Spring Boot ----
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/**/target/
+*.class
+
+# ---- IDEs ----
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ---- OS ----
+Thumbs.db
+.DS_Store
+
+# ---- Logs ----
+*.log
