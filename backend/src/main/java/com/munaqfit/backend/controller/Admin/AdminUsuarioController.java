@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,13 +58,24 @@ public class AdminUsuarioController {
 
     // REQ-008: Eliminar (Soft Delete) a un empleado
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarEmpleado(@PathVariable Long id) {
-        // En una app real, aqui validamos que el adminId no sea igual al ID a eliminar
-        Usuario usuario = usuarioRepository.findById(id)
+    public ResponseEntity<?> eliminarEmpleado(@PathVariable Long id, Authentication authentication) {
+        
+        // 1. Obtenemos quién está haciendo la petición
+        String dniAdmin = authentication.getName();
+        Usuario adminLogueado = usuarioRepository.findByDni(dniAdmin)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+        
+        // 2. VALIDACIÓN REQ-008: Impedir que se elimine a sí mismo
+        if (adminLogueado.getId().equals(id)) {
+            return ResponseEntity.badRequest().body("Error de seguridad: No puedes eliminar tu propia cuenta de administrador.");
+        }
+
+        // 3. Si pasa la validación, procedemos a eliminar (inactivar)
+        Usuario usuarioAEliminar = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        usuario.setEstado(Usuario.EstadoUsuario.INACTIVO);
-        usuarioRepository.save(usuario);
+        usuarioAEliminar.setEstado(Usuario.EstadoUsuario.INACTIVO);
+        usuarioRepository.save(usuarioAEliminar);
         
         return ResponseEntity.ok("Empleado eliminado (inactivado) exitosamente.");
     }
