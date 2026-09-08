@@ -31,4 +31,6 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
         @Param("estado") EstadoVenta estado
     );
 
+    List<Venta> findAllByOrderByFechaHoraDesc();
+
 }

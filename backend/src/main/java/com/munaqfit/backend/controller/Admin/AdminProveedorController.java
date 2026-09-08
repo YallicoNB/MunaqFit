@@ -1,4 +1,4 @@
-package com.munaqfit.backend.controller;
+package com.munaqfit.backend.controller.Admin;
 
 import com.munaqfit.backend.model.Proveedor;
 import com.munaqfit.backend.repository.ProveedorRepository;
@@ -36,7 +36,7 @@ public class AdminProveedorController {
         proveedor.setRuc(proveedorDetalles.getRuc());
         proveedor.setTelefono(proveedorDetalles.getTelefono());
         proveedor.setDireccion(proveedorDetalles.getDireccion());
-        proveedor.setContacto(proveedorDetalles.getContacto());
+        proveedor.setContactoNombre(proveedorDetalles.getContactoNombre());
         proveedor.setEstado(proveedorDetalles.getEstado());
         
         return ResponseEntity.ok(proveedorRepository.save(proveedor));

@@ -1,4 +1,4 @@
-package com.munaqfit.backend.controller;
+package com.munaqfit.backend.controller.Admin;
 
 import com.munaqfit.backend.dto.RankingBebidaDTO;
 import com.munaqfit.backend.dto.ReporteVentasDTO;
