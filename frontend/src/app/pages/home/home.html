@@ -1,1 +1,37 @@
-<p>home works!</p>
+<app-navbar />
+
+<section class="news-container">
+  <div class="home-header">
+    <h1 class="news-title">Novedades</h1>
+    <button type="button" class="logout-button" (click)="eliminarToken()">Eliminar token</button>
+  </div>
+
+  <div class="news-grid">
+    <article class="news-card">
+      <img class="news-image" src="assets/noticia-1.jpg" alt="Bebida nueva" />
+      <h2 class="news-card-title">Nueva bebida refrescante</h2>
+      <p class="news-card-text">
+        Lanzamos una nueva línea de bebidas saludables sin azúcar. Disponible en
+        todas las sucursales a partir de esta semana.
+      </p>
+    </article>
+
+    <article class="news-card">
+      <img class="news-image" src="assets/noticia-2.jpg" alt="Promoción" />
+      <h2 class="news-card-title">Promoción 2x1</h2>
+      <p class="news-card-text">
+        Aprovecha la promoción 2x1 en toda la gama de zumos naturales solo por
+        tiempo limitado.
+      </p>
+    </article>
+
+    <article class="news-card">
+      <img class="news-image" src="assets/noticia-3.jpg" alt="Nuevo local" />
+      <h2 class="news-card-title">Nuevo local en Ate</h2>
+      <p class="news-card-text">
+        Estrenamos un nuevo punto de venta en la Av. Independencia 198 con
+        horario extendido los fines de semana.
+      </p>
+    </article>
+  </div>
+</section>

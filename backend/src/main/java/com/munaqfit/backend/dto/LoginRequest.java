@@ -16,5 +16,5 @@ public class LoginRequest {
     private String dni;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    private String password;
+    private String password;    
 }

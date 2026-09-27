@@ -7,11 +7,11 @@ import { RespuestaLogin } from '../../models/respuesta-login';
   providedIn: 'root',
 })
 export class Login {
-  private apiUrl = 'xxxxxx';
+  private apiUrlLogin = 'http://localhost:8080/api/auth/login';
 
   constructor(private http: HttpClient) {}
 
   iniciarSesion(dni: string, password: string): Observable<RespuestaLogin> {
-    return this.http.post<RespuestaLogin>(this.apiUrl, { dni, password });
+    return this.http.post<RespuestaLogin>(this.apiUrlLogin, { dni, password });
   }
 }
