@@ -35,13 +35,21 @@ public class Venta {
     @Column(name = "tipo_venta", nullable = false, length = 20)
     private TipoVenta tipoVenta = TipoVenta.LOCAL;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    /**
+     * Tasa de IGV que se aplico a ESTA venta. Es una instantanea: si
+     * mañana la tasa sube, los reportes de hoy siguen siendo correctos.
+     * El valor vigente se lee de la tabla parametro.
+     */
+    @Column(name = "igv_tasa", nullable = false, precision = 5, scale = 4)
+    private BigDecimal igvTasa = new BigDecimal("0.1800");
+
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal igv = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -51,7 +59,8 @@ public class Venta {
     @Column(length = 255)
     private String notas;
 
-    @Column(name = "numero_pedido", length = 30)
+    /** Identificador legible del ticket (PED-000001). Obligatorio y unico. */
+    @Column(name = "numero_pedido", nullable = false, length = 30)
     private String numeroPedido;
 
     @JsonIgnore

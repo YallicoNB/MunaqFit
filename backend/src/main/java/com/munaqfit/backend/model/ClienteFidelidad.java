@@ -24,6 +24,14 @@ public class ClienteFidelidad {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    /**
+     * Permite reconocer al cliente que vuelve. Antes no habia forma de
+     * saber si "Luis Perez" de la calle A era el mismo de la calle B, y
+     * el mismo cliente podia acumular visitas infinitas.
+     */
+    @Column(length = 20, unique = true)
+    private String dni;
+
     @Column(length = 20)
     private String telefono;
 

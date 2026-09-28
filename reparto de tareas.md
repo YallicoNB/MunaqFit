@@ -92,6 +92,102 @@
 
 ---
 
+## Estado de avance
+
+Actualizado tras integrar las ramas de los 4 developers en `main`.
+
+| Developer | Tarea | Estado |
+|:---|:---|:---|
+| **Dev 1** | 1.1 – 1.7 Backend base | Completado |
+| **Dev 1** | Extra: `GET /api/auth/validar-token` | Completado |
+| **Dev 1** | Extra: API de productos (`/api/productos/**`) | Completado |
+| **Dev 2** | 2.1 – 2.3, 2.5 – 2.7 Controladores admin y servicios | Completado |
+| **Dev 2** | 2.4 `DELETE` de proveedores (faltaba en el CRUD) | Completado |
+| **Dev 2** | Arreglo: `porcentajeTotal` del ranking venía `null` | Completado |
+| **Dev 2** | Arreglo: `ingresosPorMetodoPago` venía siempre vacío | Completado |
+| **Dev 3** | 3.1 – 3.4, 3.4 fidelidad Controladores de empleado | Completado |
+| **Dev 3** | 3.5 `VentaService`: faltaba descontar stock y guardar el kardex | Completado |
+| **Dev 3** | 3.6 `PagoService`: faltaba guardar el pago y marcar la venta `PAGADO` | Completado |
+| **Dev 3** | Arreglo: el detalle de orden devolvía un texto en vez de los datos | Completado |
+| **Dev 3** | Arreglo: la receta se buscaba por `id` en vez de por `bebidaId` | Completado |
+| **Dev 4** | 4.1 Configuración Angular (proyecto, rutas, guards) | Ya existía |
+| **Dev 4** | 4.2 Servicios API (producto, venta, admin, reporte, auth) | Completado |
+| **Dev 4** | 4.3 `auth.interceptor.ts` y `role.guard.ts` | Completado |
+| **Dev 4** | 4.4 Login | Ya existía |
+| **Dev 4** | 4.5 Navbar, footer, sidebar y dashboard | Completado |
+| **Dev 4** | 4.6 Módulo empleado: menú y órdenes | Completado |
+| **Dev 4** | 4.7 Módulo admin: inventario, usuarios y reportes | Completado |
+| **Dev 4** | 4.8 Integración con la API | Completado |
+| — | Arreglo: datos de `seed.sql` no permitían vender 2 bebidas | Completado |
+| **Dev 1** | Arreglo: la recuperación de contraseña devolvía 200 **sin cambiar la clave** | Completado |
+| **Dev 1** | Arreglo: la respuesta revelaba qué correos estaban registrados | Completado |
+| — | `Mi cuenta`: perfil del usuario con los datos de la sesión | Completado |
+| — | Eliminada la página `/register` y su `permitAll` (el backend nunca tuvo ese endpoint) | Completado |
+
+### Auditoría y normalización de la base de datos
+
+Revisión completa de `schema.sql` contra práctica real (3FN, claves foráneas,
+restricciones, tipos de fecha). 12 problemas encontrados y corregidos. Ver la
+sección **"Modelo de datos"** del `README.md` para el detalle.
+
+| Cambio | Por qué |
+|:---|:---|
+| `categoria_bebida` (nueva) + `bebida.categoria_id` como FK | `bebida.categoria` era texto suelto con 8 valores que no coincidían con ninguno de los 6 de `categoria`. Cero integridad. |
+| Se eliminó `receta.unidad` | La cantidad va en la unidad canónica de `producto.unidad_medida`. Borró ~115 líneas de conversión G↔KG / ML↔L. |
+| Se eliminó `pago.monto_total` | Dependencia transitiva y violación de 3FN. Ahora se lee de `venta.total`. |
+| Se eliminó `producto.precio_venta` | Columna muerta: el insumo no se vende solo. |
+| Tabla `parametro` (nueva) con la tasa de IGV | Estaba fija como constante en `VentaService`. Ahora es configurable sin recompilar. |
+| `venta.igv_tasa` (nueva) | Instantánea: si la tasa sube, los reportes viejos siguen siendo correctos. |
+| 33 restricciones `CHECK` (antes 0) | `stock_actual >= 0`, `stock_critico <= stock_minimo`, `receta.cantidad > 0`, `total = subtotal + igv`, `monto_pagado > 0`… |
+| 10 restricciones `UNIQUE` (antes 2) | Un pago por venta, una visita por venta, un insumo por bebida, DNI de cliente único, entre otras. |
+| `cliente_fidelidad.dni` (nuevo, `UNIQUE`) | Sin DNI el mismo cliente podía registrarse Infinity veces. |
+| `venta.numero_pedido` pasó a `NOT NULL UNIQUE` | Un ticket sin número no es un ticket, y el número se repitía si se borraba una venta. |
+| `movimiento_inventario.tipo_referencia` (nuevo) | `referencia_id` es polimórfica y no puede tener FK; el tipo le da sentido. |
+| 10 `TIMESTAMP` → `DATETIME` | `TIMESTAMP` acaba en 2038 y se desplaza solo si cambia la zona horaria del servidor. |
+| `Categoria`: quitar `CascadeType.ALL` | Borrar una categoría arrastraba el stock de todos sus productos. |
+| `PagoService`: el vuelto solo en efectivo | Con Yape/Plin/QR no hay billetes que devolver; el monto debe ser exacto. |
+| 404/400/405/401 en vez de 500 | Errores del cliente se reportaban como caída del servidor, y el 500 filtraba detalles internos. |
+| `numero_pedido` usa `MAX(id)+1` en vez de `count()+1` | `count()` baja si se borra una venta y el número se repite. |
+
+### Pendiente: pantallas de relleno de Dev 4
+
+Estas dos páginas se generaron con `ng generate` y nunca se Desarrollaron. Su HTML es
+literalmente `<p>ventas works!</p>` y `<p>empleados works!</p>`, y ambas tienen su `.css`
+en 0 bytes. Se conservaron tal cual, sin desarrollar.
+
+| Página | Ruta | Contexto |
+|:---|:---|:---|
+| `pages/ventas/` | `/ventas` | Duplica el flujo de venta de `pages/ordenes/`, que ya lo cubre completo. No está en el sidebar. |
+| `pages/empleados/` | `/empleados` | Duplica la gestión de empleados de `pages/admin/usuarios/`. No está en el sidebar. |
+
+⚠️ **Los dos siguen enlazados desde el navbar de `pages/home`** (`navbar.html`), que solo los
+muestra cuando el rol es `ADMIN`. Para cerrarlo del todo hay que quitar esas dos líneas
+del navbar o rellenar las páginas.
+
+### Reglas de venta
+
+- El empleado que registra la venta se toma del **token JWT**, no del cuerpo del request.
+- El IGV es **18%**.
+- Cada venta descuenta el stock de los insumos **según la receta** de la bebida y
+  deja un movimiento `SALIDA` en el kardex. La cantidad de la receta va siempre en
+  la **unidad canónica** del insumo (`producto.unidad_medida`), así que **no hace
+  falta convertir entre `G`/`KG` ni `ML`/`L`**: la columna `receta.unidad` ya no
+  existe. Ver la sección «Auditoría y normalización de la base de datos».
+- Si un insumo queda sin stock la venta se rechaza y no se guarda nada.
+- No se puede pagar dos veces la misma venta, ni con monto menor al total.
+
+### Reglas de recuperación de contraseña
+
+- La respuesta de `POST /api/auth/forgot-password` es **siempre la misma**, exista o no el
+  correo. Antes devolvía `400` cuando el correo no estaba registrado, lo que permitía
+  enumerar qué correos hay en el sistema.
+- El token de recuperación es de **un solo uso** y expira a los **60 minutos**. Se guarda
+  en memoria (`ConcurrentHashMap`) porque el proyecto no incluye envío de correo.
+- `POST /api/auth/reset-password` **sí cambia la contraseña** (antes validaba los datos
+  y devolvía `200` sin hacer nada). También limpia el bloqueo por intentos fallidos.
+
+---
+
 ## Resumen de Tareas por Developer
 
 | Developer | Responsabilidad | Tareas | Prioridad |

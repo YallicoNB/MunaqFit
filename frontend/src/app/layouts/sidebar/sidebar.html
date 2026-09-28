@@ -1,0 +1,16 @@
+<div class="sidebar">
+  <div class="sidebar-titulo">MunaqFit</div>
+
+  <nav class="sidebar-menu">
+    <a
+      *ngFor="let enlace of enlaces"
+      class="sidebar-link"
+      [routerLink]="enlace.ruta"
+      routerLinkActive="activo"
+      (click)="cerrar.emit()"
+    >
+      <span class="icono">{{ enlace.icono }}</span>
+      <span>{{ enlace.texto }}</span>
+    </a>
+  </nav>
+</div>

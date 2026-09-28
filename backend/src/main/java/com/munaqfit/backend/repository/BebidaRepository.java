@@ -9,7 +9,7 @@ public interface BebidaRepository extends JpaRepository<Bebida, Long> {
 
     List<Bebida> findByActivoTrue();
 
-    List<Bebida> findByCategoria(String categoria);
+    List<Bebida> findByCategoriaBebidaNombreIgnoreCase(String nombreCategoria);
 
     List<Bebida> findByNombreContainingIgnoreCase(String nombre);
 }

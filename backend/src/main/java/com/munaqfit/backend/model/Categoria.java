@@ -20,13 +20,20 @@ public class Categoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String nombre;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
+    /**
+     * Sin cascade a proposito. Con CascadeType.ALL, borrar una categoria
+     * arrastraba tambien el stock de todos sus productos: la base perdia
+     * historial de inventario y pedidos por un DELETE de una fila de
+     * configuracion. La FK en producto.categoria_id ya impide borrar una
+     * categoria que siga en uso.
+     */
     @JsonIgnore
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "categoria")
     private List<Producto> productos = new ArrayList<>();
 }

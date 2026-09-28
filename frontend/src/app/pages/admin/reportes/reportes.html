@@ -1,0 +1,66 @@
+<div class="reportes">
+  <h1 class="titulo">Reportes</h1>
+
+  <div class="filtros">
+    <label>Desde <input type="date" [(ngModel)]="desde" /></label>
+    <label>Hasta <input type="date" [(ngModel)]="hasta" /></label>
+    <button class="btn" (click)="cargar()" [disabled]="cargando">
+      {{ cargando ? 'Consultando...' : 'Consultar' }}
+    </button>
+  </div>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <div class="paneles" *ngIf="filtrado && !cargando">
+    <section class="panel">
+      <h2>Resumen de ventas</h2>
+      <ul class="datos" *ngIf="reporte as r">
+        <li><span>Ingresos totales</span><strong>S/ {{ r.totalIngresos | number: '1.2-2' }}</strong></li>
+        <li><span>Transacciones</span><strong>{{ r.totalTransacciones }}</strong></li>
+        <li><span>Promedio diario</span><strong>S/ {{ r.promedioDiario | number: '1.2-2' }}</strong></li>
+        <li><span>Bebida mas vendida</span><strong>{{ r.productoMasVendido }}</strong></li>
+        <li><span>Valor del inventario</span><strong>S/ {{ valorInventario | number: '1.2-2' }}</strong></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Ingresos por metodo de pago</h2>
+      <ul class="datos" *ngIf="clavesPago.length; else sinPagos">
+        <li *ngFor="let metodo of clavesPago">
+          <span>{{ metodo }}</span>
+          <strong>S/ {{ reporte?.ingresosPorMetodoPago?.[metodo] | number: '1.2-2' }}</strong>
+        </li>
+      </ul>
+      <ng-template #sinPagos>
+        <p class="vacio">No hay pagos registrados en este periodo.</p>
+      </ng-template>
+    </section>
+  </div>
+
+  <section class="panel ancho" *ngIf="filtrado && !cargando">
+    <h2>Ranking de bebidas mas vendidas</h2>
+    <table class="tabla" *ngIf="ranking.length; else sinRanking">
+      <thead>
+        <tr>
+          <th>Posicion</th>
+          <th>Bebida</th>
+          <th>Cantidad</th>
+          <th>Recaudado</th>
+          <th>Participacion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of ranking">
+          <td>{{ item.posicion }}</td>
+          <td>{{ item.nombreBebida }}</td>
+          <td>{{ item.cantidadVendida }}</td>
+          <td>S/ {{ item.totalRecaudado | number: '1.2-2' }}</td>
+          <td>{{ item.porcentajeTotal | number: '1.1-1' }}%</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #sinRanking>
+      <p class="vacio">No hay ventas pagadas en el periodo seleccionado.</p>
+    </ng-template>
+  </section>
+</div>

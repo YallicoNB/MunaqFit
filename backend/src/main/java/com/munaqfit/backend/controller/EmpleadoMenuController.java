@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/empleado/menu")
@@ -35,11 +34,13 @@ public class EmpleadoMenuController {
     // 2. Consultar recetas de una bebida específica (para preparación)
     @GetMapping("/receta/{bebidaId}")
     public ResponseEntity<?> consultarRecetaPorBebida(@PathVariable Long bebidaId) {
-        Optional<Receta> receta = recetaRepository.findById(bebidaId); 
-        if (receta.isPresent()) {
-            return ResponseEntity.ok(receta.get());
+        // Ojo: se busca por bebidaId y no por id, porque una bebida tiene
+        // varias recetas (una por insumo) y antes se confundian los dos id.
+        List<Receta> recetas = recetaRepository.findByBebidaId(bebidaId);
+        if (!recetas.isEmpty()) {
+            return ResponseEntity.ok(recetas);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
     }
 }

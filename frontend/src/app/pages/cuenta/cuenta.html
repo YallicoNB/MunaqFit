@@ -1,1 +1,36 @@
-<p>cuenta works!</p>
+<div class="cuenta">
+  <div class="cabecera">
+    <h1 class="titulo">Mi cuenta</h1>
+    <p class="subtitulo">Datos del usuario con la sesion iniciada</p>
+  </div>
+
+  <div class="perfil">
+    <div class="avatar">{{ nombre.charAt(0) || '?' }}</div>
+
+    <div class="datos">
+      <div class="fila">
+        <span class="etiqueta">Nombre completo</span>
+        <span class="valor">{{ nombre }}</span>
+      </div>
+      <div class="fila">
+        <span class="etiqueta">DNI</span>
+        <span class="valor">{{ dni }}</span>
+      </div>
+      <div class="fila">
+        <span class="etiqueta">Correo electronico</span>
+        <span class="valor">{{ email }}</span>
+      </div>
+      <div class="fila">
+        <span class="etiqueta">Rol</span>
+        <span class="valor">
+          <span class="rol">{{ rolLegible }}</span>
+          <span class="rol-codigo">{{ rol }}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button class="btn-cerrar" (click)="cerrarSesion()">Cerrar sesion</button>
+  </div>
+</div>

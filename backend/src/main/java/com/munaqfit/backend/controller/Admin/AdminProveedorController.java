@@ -41,4 +41,22 @@ public class AdminProveedorController {
         
         return ResponseEntity.ok(proveedorRepository.save(proveedor));
     }
+
+    // Elimina un proveedor. Si tiene productos o pagos asociados se da de
+    // baja logica (estado = INACTIVO) para no romper las referencias.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarProveedor(@PathVariable Long id) {
+        Proveedor proveedor = proveedorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+        if (proveedor.getProductos() != null && !proveedor.getProductos().isEmpty()) {
+            proveedor.setEstado(Proveedor.EstadoContrato.INACTIVO);
+            proveedorRepository.save(proveedor);
+            return ResponseEntity.ok("El proveedor tiene productos o pagos asociados, "
+                    + "se dio de baja logicamente (estado INACTIVO)");
+        }
+
+        proveedorRepository.delete(proveedor);
+        return ResponseEntity.ok("Proveedor eliminado correctamente");
+    }
 }

@@ -1,0 +1,31 @@
+export interface Producto {
+  id: number;
+  nombre: string;
+  categoria: { id: number; nombre: string } | null;
+  proveedor: { id: number; nombre: string } | null;
+  stockActual: number;
+  stockMinimo: number;
+  stockCritico: number;
+  unidadMedida: 'KG' | 'G' | 'L' | 'ML' | 'UNIDAD';
+  costoUnitario: number;
+  fechaCaducidad: string | null;
+  ultimaReposicion: string | null;
+}
+
+export interface Receta {
+  id: number;
+  producto: Producto;
+  cantidad: number;
+  pasoInstruccion: string;
+}
+
+export interface Bebida {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  categoria: string;
+  imagenUrl: string;
+  tiempoPreparacion: number;
+  activo: boolean;
+}

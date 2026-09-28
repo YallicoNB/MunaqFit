@@ -1,0 +1,91 @@
+.ordenes {
+  font-family: Arial, sans-serif;
+  color: #1c2b2d;
+  padding: 24px;
+}
+
+.titulo {
+  margin: 0 0 20px;
+  font-size: 26px;
+  color: #203a43;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #dce6e8;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 11px 12px;
+  border-bottom: 1px solid #eef3f4;
+}
+
+.tabla th {
+  background: #f4f8f9;
+  color: #2c5364;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.estado {
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado.pagado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.detalle-celda {
+  background: #f4f8f9;
+  padding: 14px 12px !important;
+}
+
+.detalle {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+}
+
+.detalle li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.vacio,
+.cargando {
+  color: #6b7f82;
+  font-size: 14px;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}

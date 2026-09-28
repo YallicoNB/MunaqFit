@@ -1,0 +1,76 @@
+<div class="dashboard">
+  <h1 class="titulo">Dashboard</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="cargando" class="cargando">Cargando informacion...</p>
+
+  <div class="tarjetas" *ngIf="metricas as m">
+    <div class="tarjeta">
+      <div class="tarjeta-valor">S/ {{ m.ventasHoy | number: '1.2-2' }}</div>
+      <div class="tarjeta-etiqueta">Ventas de hoy</div>
+    </div>
+    <div class="tarjeta">
+      <div class="tarjeta-valor">{{ m.totalClientes }}</div>
+      <div class="tarjeta-etiqueta">Clientes fidelity</div>
+    </div>
+    <div class="tarjeta">
+      <div class="tarjeta-valor">{{ m.productosActivos }}</div>
+      <div class="tarjeta-etiqueta">Insumos</div>
+    </div>
+    <div class="tarjeta" [class.peligro]="m.alertasStockCritico > 0">
+      <div class="tarjeta-valor">{{ m.alertasStockCritico }}</div>
+      <div class="tarjeta-etiqueta">Alertas de stock</div>
+    </div>
+  </div>
+
+  <div class="filas" *ngIf="!cargando">
+    <section class="panel">
+      <h2>Ventas del ultimo mes</h2>
+      <ul class="datos" *ngIf="reporte as r">
+        <li><span>Ingresos totales</span><strong>S/ {{ r.totalIngresos | number: '1.2-2' }}</strong></li>
+        <li><span>Transacciones</span><strong>{{ r.totalTransacciones }}</strong></li>
+        <li><span>Promedio diario</span><strong>S/ {{ r.promedioDiario | number: '1.2-2' }}</strong></li>
+        <li><span>Mas vendido</span><strong>{{ r.productoMasVendido }}</strong></li>
+        <li *ngIf="valorInventario">
+          <span>Valor del inventario</span>
+          <strong>S/ {{ valorInventario | number: '1.2-2' }}</strong>
+        </li>
+      </ul>
+
+      <h3 *ngIf="clavesPago.length">Ingresos por metodo de pago</h3>
+      <ul class="datos">
+        <li *ngFor="let metodo of clavesPago">
+          <span>{{ metodo }}</span>
+          <strong>S/ {{ reporte?.ingresosPorMetodoPago?.[metodo] | number: '1.2-2' }}</strong>
+        </li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Ranking de bebidas</h2>
+      <table class="tabla" *ngIf="ranking.length; else sinRanking">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Bebida</th>
+            <th>Vendidas</th>
+            <th>Recaudado</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of ranking">
+            <td>{{ item.posicion }}</td>
+            <td>{{ item.nombreBebida }}</td>
+            <td>{{ item.cantidadVendida }}</td>
+            <td>S/ {{ item.totalRecaudado | number: '1.2-2' }}</td>
+            <td>{{ item.porcentajeTotal | number: '1.1-1' }}%</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #sinRanking>
+        <p class="vacio">Todavia no hay ventas registradas.</p>
+      </ng-template>
+    </section>
+  </div>
+</div>

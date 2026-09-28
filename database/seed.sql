@@ -16,9 +16,18 @@ TRUNCATE TABLE receta;
 TRUNCATE TABLE bebida;
 TRUNCATE TABLE producto;
 TRUNCATE TABLE proveedor;
+TRUNCATE TABLE categoria_bebida;
 TRUNCATE TABLE categoria;
+TRUNCATE TABLE parametro;
 TRUNCATE TABLE usuario;
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- PARAMETROS
+-- La tasa de IGV vive aqui; VentaService la lee de esta tabla.
+-- ============================================================
+INSERT INTO parametro (codigo, nombre, valor, tipo_dato, descripcion) VALUES
+('IGV', 'Impuesto General a las Ventas', '0.18', 'DECIMAL', 'Tasa de IGV vigente (Peru)');
 
 -- ============================================================
 -- USUARIOS (password de todos: 12345678)
@@ -30,15 +39,30 @@ INSERT INTO usuario (dni, nombre_completo, email, password, rol, estado) VALUES
 ('22222222', 'Carlos Ruiz',   'carlos@munaqfit.com', '$2a$10$DmdWOt7RK2QS4l4xH5l4NeVCICTMTLD2RnIhu.U8lBHWqpPfLyIB2', 'EMPLEADO', 'INACTIVO');
 
 -- ============================================================
--- CATEGORIAS
+-- CATEGORIAS DE INSUMO
 -- ============================================================
-INSERT INTO categoria (nombre, descripcion) VALUES
-('Frutas', 'Frutas frescas'),
-('Lacteos', 'Leches y derivados'),
-('Proteinas', 'Suplementos de proteina'),
-('Granos', 'Avena, chia, linaza'),
-('Endulzantes', 'Miel, stevia, azucar'),
-('Otros', 'Insumos varios');
+INSERT INTO categoria (id, nombre, descripcion) VALUES
+(1, 'Frutas',      'Frutas frescas'),
+(2, 'Lacteos',     'Leches y derivados'),
+(3, 'Proteinas',   'Suplementos de proteina'),
+(4, 'Granos',      'Avena, chia, linaza'),
+(5, 'Endulzantes', 'Miel, stevia, azucar'),
+(6, 'Otros',       'Insumos varios');
+
+-- ============================================================
+-- CATEGORIAS DE BEBIDA
+-- Taxonomia propia de las bebidas, por beneficio. Antes vivia como
+-- texto suelto en bebida.categoria y no coincidia con la de insumos.
+-- ============================================================
+INSERT INTO categoria_bebida (id, nombre, descripcion) VALUES
+(1, 'Energizante',     'Aportan energia inmediata'),
+(2, 'Detox',           'Desintoxican y depuran'),
+(3, 'Relajante',       'Ayudan a descansar y a dormir mejor'),
+(4, 'Proteico',        'Altas en proteina para recuperacion muscular'),
+(5, 'Hidratante',      'Reponen liquidos y vitaminas'),
+(6, 'Antiinflamatorio','Apoyan la recuperacion de inflamaciones'),
+(7, 'Clasico',         'Recetas de siempre, la Favorita del publico'),
+(8, 'Base',            'Bases de proteina para otras preparaciones');
 
 -- ============================================================
 -- PROVEEDORES
@@ -50,57 +74,64 @@ INSERT INTO proveedor (nombre, ruc, telefono, direccion, contacto_nombre, estado
 
 -- ============================================================
 -- PRODUCTOS (Insumos)
+-- La cantidad de cada receta se expresa en esta misma unidad, por eso
+-- ya no hace falta columna 'unidad' en receta.
 -- ============================================================
-INSERT INTO producto (nombre, categoria_id, proveedor_id, stock_actual, stock_minimo, stock_critico, unidad_medida, costo_unitario, precio_venta) VALUES
-('Platano',        1, 2, 50.00, 10.00, 5.00,  'UNIDAD', 0.80, NULL),
-('Fresa',          1, 2, 30.00, 8.00,  4.00,  'G',      0.05, NULL),
-('Naranja',        1, 2, 40.00, 10.00, 5.00,  'UNIDAD', 0.60, NULL),
-('Manzana',        1, 2, 35.00, 8.00,  4.00,  'UNIDAD', 0.70, NULL),
-('Pina',           1, 2, 20.00, 5.00,  3.00,  'UNIDAD', 2.50, NULL),
-('Leche',          2, 1, 15.00, 5.00,  2.00,  'L',      3.80, NULL),
-('Yogurt griego',  2, 1, 12.00, 4.00,  2.00,  'KG',     12.00, NULL),
-('Proteina whey',  3, 3, 20.00, 5.00,  2.00,  'KG',     90.00, NULL),
-('Avena',          4, 1, 18.00, 5.00,  2.00,  'KG',     6.50, NULL),
-('Chia',           4, 1, 10.00, 3.00,  1.00,  'KG',     18.00, NULL),
-('Miel',           5, 1, 8.00,  2.00,  1.00,  'L',      22.00, NULL),
-('Espinaca',       1, 2, 25.00, 8.00,  4.00,  'G',      0.02, NULL);
+INSERT INTO producto (id, nombre, categoria_id, proveedor_id, stock_actual, stock_minimo, stock_critico, unidad_medida, costo_unitario) VALUES
+(1,  'Platano',        1, 2, 50.000,  10.00,  5.00,  'UNIDAD', 0.80),
+(2,  'Fresa',          1, 2, 500.000, 150.00, 80.00, 'G',      0.015),
+(3,  'Naranja',        1, 2, 40.000,  10.00,  5.00,  'UNIDAD', 0.60),
+(4,  'Manzana',        1, 2, 35.000,   8.00,  4.00,  'UNIDAD', 0.70),
+(5,  'Pina',           1, 2, 20.000,   5.00,  3.00,  'UNIDAD', 2.50),
+(6,  'Leche',          2, 1, 15.000,   5.00,  2.00,  'L',      3.80),
+(7,  'Yogurt griego',  2, 1, 12.000,   4.00,  2.00,  'KG',    12.00),
+(8,  'Proteina whey',  3, 3, 20.000,   5.00,  2.00,  'KG',    90.00),
+(9,  'Avena',          4, 1, 18.000,   5.00,  2.00,  'KG',     6.50),
+(10, 'Chia',           4, 1, 10.000,   3.00,  1.00,  'KG',    18.00),
+(11, 'Miel',           5, 1, 8.000,    2.00,  1.00,  'L',     22.00),
+(12, 'Espinaca',       1, 2, 400.000, 100.00, 50.00, 'G',      0.008);
 
 -- ============================================================
 -- BEBIDAS
 -- ============================================================
-INSERT INTO bebida (nombre, descripcion, precio, categoria, tiempo_preparacion, activo) VALUES
-('Atomic',    'Saborear a naranja, shot de energia', 16.00, 'Energizante', 3, TRUE),
-('Detox',     'Verde desintoxicante con espinaca',   16.00, 'Detox', 4, TRUE),
-('Relax',     'Relajante con platano, calma y sueno', 16.00, 'Relajante', 3, TRUE),
-('Pink Protein', 'Proteico rosa con fresa',          16.00, 'Proteico', 4, TRUE),
-('Hydrate',   'Hidratante con pina y coco',          16.00, 'Hidratante', 3, TRUE),
-('Golden Glow', 'Antiinflamatorio con mango',        16.00, 'Antiinflamatorio', 4, TRUE),
-('Classic',   'Batido clasico de platano',           16.00, 'Clasico', 3, TRUE),
-('Cheese',    'Batido con queso',                    16.00, 'Clasico', 3, TRUE),
-('Pizza',     'Batido especial pizza',               16.00, 'Clasico', 4, TRUE),
-('Base Manjar',  'Base de proteina manjar',          16.00, 'Base', 2, TRUE),
-('Base Queso',   'Base de proteina queso',           16.00, 'Base', 2, TRUE),
-('Base Chocolate','Base de proteina chocolate',      16.00, 'Base', 2, TRUE);
+INSERT INTO bebida (id, nombre, descripcion, precio, categoria_id, tiempo_preparacion, activo) VALUES
+(1,  'Atomic',         'Saborear a naranja, shot de energia',   16.00, 1, 3, TRUE),
+(2,  'Detox',          'Verde desintoxicante con espinaca',     16.00, 2, 4, TRUE),
+(3,  'Relax',          'Relajante con platano, calma y sueno',  16.00, 3, 3, TRUE),
+(4,  'Pink Protein',   'Proteico rosa con fresa',                16.00, 4, 4, TRUE),
+(5,  'Hydrate',        'Hidratante con pina y coco',             16.00, 5, 3, TRUE),
+(6,  'Golden Glow',    'Antiinflamatorio con mango',             16.00, 6, 4, TRUE),
+(7,  'Classic',        'Batido clasico de platano',              16.00, 7, 3, TRUE),
+(8,  'Cheese',         'Batido con queso',                       16.00, 7, 3, TRUE),
+(9,  'Pizza',          'Batido especial pizza',                  16.00, 7, 4, TRUE),
+(10, 'Base Manjar',    'Base de proteina manjar',                16.00, 8, 2, TRUE),
+(11, 'Base Queso',     'Base de proteina queso',                 16.00, 8, 2, TRUE),
+(12, 'Base Chocolate', 'Base de proteina chocolate',              16.00, 8, 2, TRUE);
 
 -- ============================================================
 -- RECETAS
+-- Sin columna 'unidad': cada cantidad ya esta en la unidad_medida del
+-- producto (Leche en L, Espinaca en G, Avena en KG, etc).
+-- UNIQUE (bebida_id, producto_id) impide repetir un insumo.
 -- ============================================================
-INSERT INTO receta (bebida_id, producto_id, cantidad, unidad, paso_instruccion) VALUES
-(1, 3, 2.00, 'UNIDAD', 'Exprimir jugo de naranja y mezclar con shot de energia'),
-(1, 6, 0.30, 'L',      'Agregar leche y batir'),
-(2, 12, 80.00, 'G',    'Licuar espinaca con agua'),
-(2, 1, 1.00, 'UNIDAD', 'Anadir platano'),
-(3, 1, 2.00, 'UNIDAD', 'Usar platano maduro para efecto relajante'),
-(3, 9, 0.05, 'KG',     'Avena en la mezcla'),
-(4, 8, 0.03, 'KG',     'Proteina whey sabor fresa'),
-(4, 2, 80.00, 'G',     'Fresas frescas'),
-(5, 5, 0.20, 'UNIDAD', 'Pina en trozos'),
-(6, 11, 0.03, 'L',     'Miel para endulzar');
+INSERT INTO receta (bebida_id, producto_id, cantidad, paso_instruccion) VALUES
+(1, 3,  2.00,  'Exprimir jugo de naranja y mezclar con shot de energia'),
+(1, 6,  0.30,  'Agregar leche y batir'),
+(2, 12, 30.00, 'Licuar espinaca con agua'),
+(2, 1,  1.00,  'Anadir platano'),
+(3, 1,  2.00,  'Usar platano maduro para efecto relajante'),
+(3, 9,  0.05,  'Avena en la mezcla'),
+(4, 8,  0.03,  'Proteina whey sabor fresa'),
+(4, 2,  50.00, 'Fresas frescas'),
+(5, 5,  0.20,  'Pina en trozos'),
+(6, 11, 0.03,  'Miel para endulzar');
 
 -- ============================================================
 -- CLIENTES FIDELIDAD
+-- dni permite detectar clientes repetidos.
+-- Luis Perez ya llego a su umbral: su proxima visita aplica el premio.
 -- ============================================================
-INSERT INTO cliente_fidelidad (nombre, telefono, email, visitas, umbral_premio) VALUES
-('Ana Torres', '987654321', 'ana@gmail.com', 8, 10),
-('Luis Perez', '912345678', 'luis@gmail.com', 10, 10),
-('Sofia Diaz', '954321987', NULL, 3, 10);
+INSERT INTO cliente_fidelidad (dni, nombre, telefono, email, visitas, umbral_premio) VALUES
+('44555111', 'Ana Torres', '987654321', 'ana@gmail.com',   8,  10),
+('44555222', 'Luis Perez', '912345678', 'luis@gmail.com',  10, 10),
+('44555333', 'Sofia Diaz', '954321987', NULL,              3,  10);
