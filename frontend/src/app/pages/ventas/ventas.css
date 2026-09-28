@@ -1,0 +1,56 @@
+.pos {
+  font-family: Arial, sans-serif;
+  color: #1c2b2d;
+  padding: 24px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 26px;
+  color: #203a43;
+}
+
+.bebida-card {
+  border: 1px solid #dce6e8;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.bebida-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(15, 32, 39, 0.12);
+  border-color: #2c5364;
+}
+
+.bebida-card:active {
+  transform: translateY(0);
+}
+
+.card-title {
+  color: #2c5364;
+}
+
+.w-100px {
+  width: 100px;
+}
+
+/* Overlay del modal de cobro: oscurece el fondo y centra la tarjeta. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 32, 39, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-caja {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+}

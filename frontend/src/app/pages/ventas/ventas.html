@@ -1,1 +1,276 @@
-<p>ventas works!</p>
+<app-navbar />
+
+<div class="pos">
+  <header class="pos-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h1 class="titulo mb-0">Punto de venta</h1>
+    <span *ngIf="cargando" class="badge text-bg-secondary">Cargando menu...</span>
+    <span class="badge text-bg-light border">{{ cantidadTotal() }} bebida(s) en el pedido</span>
+  </header>
+
+  <p *ngIf="errorCarga" class="alert alert-danger py-2">{{ errorCarga }}</p>
+
+  <div class="pos-body row g-3" *ngIf="!cargando">
+    <!-- ====== Catalogo de bebidas ====== -->
+    <section class="col-lg-8">
+      <p class="text-muted small mb-2">Toca una bebida para agregarla al pedido.</p>
+      <div class="row g-3" *ngIf="bebidas.length else sinMenu">
+        <article
+          *ngFor="let bebida of bebidas"
+          class="col-sm-6 col-md-4"
+        >
+          <button
+            type="button"
+            class="bebida-card card h-100 w-100 text-start"
+            (click)="agregar(bebida)"
+          >
+            <div class="card-body d-flex flex-column">
+              <h2 class="card-title h6 mb-1">{{ bebida.nombre }}</h2>
+              <p class="card-text text-muted small flex-grow-1 mb-2">{{ bebida.descripcion }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge text-bg-light border">{{ bebida.categoria }}</span>
+                <span class="fw-bold">S/ {{ bebida.precio | number: '1.2-2' }}</span>
+              </div>
+            </div>
+          </button>
+        </article>
+      </div>
+      <ng-template #sinMenu>
+        <p class="text-muted">No hay bebidas activas en el menu.</p>
+      </ng-template>
+    </section>
+
+    <!-- ====== Pedido (carrito) ====== -->
+    <aside class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">Pedido actual</span>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="vaciar()"
+            [disabled]="!carrito().length"
+          >
+            Vaciar
+          </button>
+        </div>
+
+        <div class="card-body" *ngIf="carrito().length else carritoVacio">
+          <ul class="list-group list-group-flush" *ngIf="carrito().length">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-start px-2"
+              *ngFor="let item of carrito(); trackBy: rastrearLinea"
+            >
+              <div class="flex-grow-1 me-2">
+                <div class="fw-semibold small">{{ item.bebida.nombre }}</div>
+                <div class="text-muted small">S/ {{ item.bebida.precio | number: '1.2-2' }} c/u</div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="disminuir(item.bebida.id)"
+                    aria-label="Restar"
+                  >
+                    −
+                  </button>
+                  <span class="btn btn-light disabled">{{ item.cantidad }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="aumentar(item.bebida.id)"
+                    aria-label="Sumar"
+                  >
+                    +
+                  </button>
+                </div>
+                <span class="small fw-bold w-100px text-end">
+                  S/ {{ item.bebida.precio * item.cantidad | number: '1.2-2' }}
+                </span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link text-danger p-0"
+                  (click)="quitarLinea(item.bebida.id)"
+                  aria-label="Quitar"
+                >
+                  ✕
+                </button>
+              </div>
+            </li>
+          </ul>
+
+          <div class="mt-3">
+            <label class="form-label small text-muted mb-1" for="mesa">Mesa (opcional)</label>
+            <input
+              id="mesa"
+              type="number"
+              min="1"
+              class="form-control form-control-sm mb-2"
+              [(ngModel)]="mesa"
+              placeholder="Ej. 3"
+            />
+            <label class="form-label small text-muted mb-1" for="tipoVenta">Tipo de venta</label>
+            <select
+              id="tipoVenta"
+              class="form-select form-select-sm mb-2"
+              [(ngModel)]="tipoVenta"
+            >
+              <option value="LOCAL">En local</option>
+              <option value="DELIVERY">Delivery</option>
+            </select>
+            <label class="form-label small text-muted mb-1" for="notas">Notas</label>
+            <textarea
+              id="notas"
+              rows="2"
+              class="form-control form-control-sm mb-2"
+              [(ngModel)]="notas"
+              placeholder="Opcional...">
+            </textarea>
+          </div>
+
+          <div class="border-top pt-2 mt-2 small">
+            <div class="d-flex justify-content-between text-muted">
+              <span>Subtotal</span><span>S/ {{ subtotal() | number: '1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted">
+              <span>IGV (18 %)</span><span>S/ {{ igv() | number: '1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold fs-5 mt-1">
+              <span>Total</span><span>S/ {{ total() | number: '1.2-2' }}</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-success w-100 mt-3"
+            (click)="abrirCobro()"
+          >
+            Cobrar S/ {{ total() | number: '1.2-2' }}
+          </button>
+        </div>
+
+        <ng-template #carritoVacio>
+          <div class="card-body text-center text-muted py-5">
+            <p class="mb-1 fw-semibold">El pedido esta vacio</p>
+            <p class="small mb-0">Agrega bebidas desde el catalogo para empezar.</p>
+          </div>
+        </ng-template>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ====== Modal de cobro (overlay propio, sin dependencia del JS de Bootstrap) ====== -->
+<div class="overlay" *ngIf="cobroAbierto" (click)="cerrarCobro()">
+  <div class="modal-caja card shadow-lg" (click)="$event.stopPropagation()">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">Cobrar pedido</span>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar"
+        (click)="cerrarCobro()"
+        [disabled]="estadoCobro === 'procesando'"
+      ></button>
+    </div>
+
+    <!-- ---- Espera: datos del pago ---- -->
+    <div class="card-body" *ngIf="estadoCobro === 'espera'">
+      <div class="text-center mb-3">
+        <div class="text-muted small">Total a cobrar</div>
+        <div class="fs-3 fw-bold">S/ {{ total() | number: '1.2-2' }}</div>
+      </div>
+
+      <label class="form-label small text-muted mb-1">Metodo de pago</label>
+      <div class="btn-group w-100 mb-3" role="group">
+        <button
+          *ngFor="let metodo of metodosDePago"
+          type="button"
+          class="btn btn-sm"
+          [class.btn-primary]="tipoPago === metodo"
+          [class.btn-outline-primary]="tipoPago !== metodo"
+          (click)="elegirMetodo(metodo)"
+        >
+          {{ metodo }}
+        </button>
+      </div>
+
+      <div *ngIf="tipoPago === 'EFECTIVO'" class="mb-3">
+        <label class="form-label small text-muted mb-1" for="montoRecibido">
+          Monto recibido del cliente
+        </label>
+        <input
+          id="montoRecibido"
+          type="number"
+          min="0"
+          step="0.10"
+          class="form-control"
+          [(ngModel)]="montoRecibido"
+        />
+        <div class="small text-muted mt-1">
+          Vuelto: <strong>S/ {{ vueltoPrevisto() | number: '1.2-2' }}</strong>
+          <span *ngIf="montoRecibido != null && montoRecibido < total()" class="text-danger">
+            (falta S/ {{ total() - montoRecibido | number: '1.2-2' }})
+          </span>
+        </div>
+      </div>
+      <p *ngIf="tipoPago !== 'EFECTIVO'" class="small text-muted mb-3">
+        Para pagos digitales se cobra el monto exacto del pedido.
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-success w-100"
+        (click)="confirmarPago()"
+      >
+        Confirmar pago
+      </button>
+    </div>
+
+    <!-- ---- Procesando ---- -->
+    <div class="card-body text-center py-4" *ngIf="estadoCobro === 'procesando'">
+      <div class="spinner-border text-success mb-2" role="status"></div>
+      <p class="mb-0 text-muted">Registrando pedido y cobrando...</p>
+    </div>
+
+    <!-- ---- Error ---- -->
+    <div class="card-body" *ngIf="estadoCobro === 'error'">
+      <div class="alert alert-danger py-2 mb-3">{{ mensajeError }}</div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary flex-fill" (click)="cerrarCobro()">
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-primary flex-fill" (click)="estadoCobro = 'espera'">
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <!-- ---- Exito ---- -->
+    <div class="card-body" *ngIf="estadoCobro === 'exito' && pagoCobrado">
+      <div class="text-center mb-3">
+        <span class="display-6">✅</span>
+        <h2 class="h5 mt-2 mb-0">Pago completado</h2>
+      </div>
+      <dl class="row small mb-3">
+        <dt class="col-sm-5 text-muted">Pedido</dt>
+        <dd class="col-sm-7 fw-semibold">{{ pagoCobrado.numeroPedido }}</dd>
+        <dt class="col-sm-5 text-muted">Monto total</dt>
+        <dd class="col-sm-7">S/ {{ pagoCobrado.montoTotal | number: '1.2-2' }}</dd>
+        <dt class="col-sm-5 text-muted">Recibido</dt>
+        <dd class="col-sm-7">S/ {{ pagoCobrado.montoPagado | number: '1.2-2' }}</dd>
+        <dt class="col-sm-5 text-muted">Vuelto</dt>
+        <dd class="col-sm-7" [class.text-success]="pagoCobrado.vuelto > 0">
+          S/ {{ pagoCobrado.vuelto | number: '1.2-2' }}
+        </dd>
+        <dt class="col-sm-5 text-muted">Estado</dt>
+        <dd class="col-sm-7">
+          <span class="badge text-bg-success">{{ pagoCobrado.estadoVenta }}</span>
+        </dd>
+      </dl>
+      <button type="button" class="btn btn-primary w-100" (click)="nuevoPedido()">
+        Nuevo pedido
+      </button>
+    </div>
+  </div>
+</div>
