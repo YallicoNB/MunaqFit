@@ -8,6 +8,26 @@
 
 ---
 
+## Estado al inicio de esta iteración
+
+**Developer 1 entregó el 100% de su bloque (1.1 – 1.12), todo verificado en vivo,
+junto con los préstamos de Dev 3 que lo desbloqueaban (3.1, 3.5 y 3.6).** El
+backend quedó migrado con Flyway V1–V4, la relación N-N funciona, el POS cobra
+y el 409 de concurrencia responde correctamente. Commits de referencia:
+
+| Commit | Qué entrega |
+|:---|:---|
+| `0fa4469` | 3.1 Bootstrap 5 · 3.5 servicio de Toast · 3.6 `<app-toast>` |
+| `bb41c79` | 1.1–1.5 Flyway (V1/V2) + tabla puente `producto_proveedor` + `ProductoResponseDTO` |
+| `d5a5b03` | 1.10–1.11 Concurrencia (`@Version` → 409) y formato `PED-{fecha}-{secuencia}` · 1.12 `V3` columnas nutricionales · **`V4`** bloqueo optimista |
+| `f5d2c2a` | 1.6–1.9 POS de ventas con carrito (Signals), modal de cobro y link en el navbar |
+
+> Nada fue pusheado: los cuatro commits viven en la rama local `feat/dev1-etapa-2`.
+> **Dev 2, Dev 3 y Dev 4 arrancan sin esperar nada de Dev 1.** Solo deben respetar
+> la propiedad de archivos y la regla de maquetado con `shared/` (ver abajo).
+
+---
+
 ## ¿Por qué empezar por el esquema de datos?
 
 | Razón | Explicación |
@@ -23,6 +43,9 @@
 ---
 
 ## Auditoría de brechas: qué requisito sigue sin cumplirse
+
+> Resueltos por Dev 1 en esta iteración: **#3** (concurrencia RNF-008),
+> **#4** (pantalla de Ventas REQ-010), **#7** (Bootstrap RNF-009) y **#10** (Toast RNF-015).
 
 | # | Requisito | Dónde lo pide | Estado actual | Developer |
 |:---|:---|:---|:---|:---|
@@ -50,9 +73,21 @@
 
 ---
 
-### Developer 1 (Elvis) — Núcleo del Negocio + Modelo de Datos
+### Developer 1 (Elvis) — Núcleo del Negocio + Modelo de Datos — ✅ COMPLETO (1.1 – 1.12)
 
 **Objetivo:** Cerrar el flujo que hace que el sistema realmente venda, y modelar los datos correctamente. Es la parte más difícil y la más visible en la sustentación.
+
+> **Estado: bloque entregado íntegro** (`bb41c79`, `d5a5b03`, `f5d2c2a`). No re-hagas
+> ninguna tarea de esta tabla; si necesitas ajustar algo, avisa a Dev 1 (los archivos
+> conservan su propiedad).
+>
+> **Notas de implementación (deltas menores del reparto, sin impacto funcional):**
+> - 1.7: el carrito con Signals vive dentro de `pages/ventas/ventas.ts` (no hay
+>   `service/carrito.service.ts`) y el IGV de vista previa es una constante `0.18`;
+>   el total definitivo lo calcula el backend leyendo el parámetro `IGV` de la BD.
+> - 1.8: el modal cobra EFECTIVO con vuelto automático y pagos digitales por el monto
+>   exacto; en Transferencia todavía no pide N° de operación/banco (el modelo
+>   `PagoRequest` ya lo soporta).
 
 | # | Task | Archivos | Descripción |
 |:---|:---|:---|:---|
@@ -75,6 +110,11 @@
 
 **Objetivo:** Implementar el reporte Kardex completo, que es el requisito que el docente nombró explícitamente.
 
+> Puedes arrancar ya, sin esperar nada. Tu pantalla (2.6) **maqueta con los
+> componentes `shared/` de Dev 3** (Tabla, Boton, EstadoVacio, Spinner): si no
+> existen todavía, primero haces el backend (2.1–2.5) y consumes `shared/` cuando
+> llegue, o le pides a Dev 3 los que necesites. No dupliques markup a mano.
+
 | # | Task | Archivos | Descripción |
 |:---|:---|:---|:---|
 | 2.1 | Servicio de Kardex | `service/ReporteKardexService.java` (nuevo) | Consulta de `movimiento_inventario` con los 4 filtros de REQ-022.3: rango de fechas, insumo, tipo de movimiento y usuario |
@@ -82,8 +122,8 @@
 | 2.3 | DTO de respuesta | `dto/KardexFilaDTO.java` (nuevo) | Record con los 8 campos del reporte. **Devolver DTOs, no la entidad `MovimientoInventario`**, que arrastra la relación con `Producto` y `Usuario` |
 | 2.4 | Endpoint del reporte | `controller/ReporteKardexController.java` (nuevo) | `GET /api/admin/reportes/kardex?fechaDesde=&fechaHasta=&productoId=&tipo=&usuarioId=`. Solo rol ADMIN |
 | 2.5 | Exportación a CSV | `controller/ReporteKardexController.java` | `GET /api/admin/reportes/kardex/csv` con los mismos filtros. `Content-Type: text/csv`, `Content-Disposition: attachment`, separador `;` (así lo abre Excel en español) y BOM UTF-8 para los acentos |
-| 2.6 | Pantalla del Kardex | `pages/admin/kardex/*` (nuevo) | Ruta `/admin/kardex`. Tabla con los 8 campos, panel de filtros, botón "Descargar CSV" y estados de carga / vacío / error |
-| 2.7 | Cliente HTTP y ruta | `service/reporte.service.ts`, `app.routes.ts` | Agregar los 2 métodos al servicio y la ruta protegida con `adminGuard`. Link en el sidebar de admin |
+| 2.6 | Pantalla del Kardex | `pages/admin/kardex/*` (nuevo) | Ruta `/admin/kardex`. Tabla con los 8 campos, panel de filtros, botón "Descargar CSV" y estados de carga / vacío / error — **con los componentes `shared/` de Dev 3** |
+| 2.7 | Cliente HTTP y ruta | `service/reporte.service.ts`, `app.routes.ts` | Agregar los 2 métodos al servicio (ya existe el archivo; solo agrega los métodos del Kardex) y la ruta protegida con `adminGuard`. Link en el sidebar de admin |
 
 ---
 
@@ -91,15 +131,23 @@
 
 **Objetivo:** Sentar las bases de UI que los demás developers reutilizan. Es lo primero que hay que entregar porque bloquea a los otros tres.
 
+> **Ya entregado por Dev 1 (préstamo):** 3.1 (Bootstrap 5), 3.5 (servicio de Toast)
+> y 3.6 (`<app-toast>` en `app/shared/toast/`) — **no se vuelven a hacer.**
+> Tu trabajo restante es **3.2, 3.3, 3.4 y 3.7**.
+>
+> **Regla:** construyes los componentes de `shared/` para que Dev 2 y Dev 4 los
+> consuman — **no maquetes a mano las vistas de ellos**, y `pages/ventas/*` es
+> propiedad de Dev 1 (POS ya entregado): pídelo antes de migrarlo en 3.7.
+
 | # | Task | Archivos | Descripción |
 |:---|:---|:---|:---|
-| 3.1 | Instalar Bootstrap 5 | `package.json`, `angular.json` | `npm i bootstrap@5 @popperjs/core`, y registrar los CSS en el arreglo `styles` de `angular.json`. Cubre RNF-009 |
+| 3.1 | Instalar Bootstrap 5 | `package.json`, `angular.json` | ~~`npm i bootstrap@5 @popperjs/core`, y registrar los CSS en el arreglo `styles` de `angular.json`. Cubre RNF-009~~ — ✅ entregado por Dev 1 (`0fa4469`) |
 | 3.2 | Diseño responsivo | `src/styles.css`, CSS de las 15 vistas | `@media` para los 4 tamaños de RNF-013: 1920×1080, 1366×768, 768×1024 y **375×667 (móvil)**. Hoy no hay un solo `@media` en el proyecto |
-| 3.3 | Grid y utilidades | CSS de las vistas | Reemplazar los CSS a mano por clases de Bootstrap (grid, flex, espaciado, tarjetas) |
-| 3.4 | Componentes reutilizables | `app/shared/*` (nuevo) | `Tabla`, `Modal`, `Boton`, `Input`, `Badge`, `Card`, `EstadoVacio` y `Spinner`. Todos con `@Input`/`@Output` y `selector` propio. Cubre 3.7 "componentes reutilizables" |
-| 3.5 | Servicio de Toast | `service/toast.service.ts` (nuevo) | `exito()` / `error()` / `info()` / `warning()` con un `signal` para la cola de mensajes |
-| 3.6 | Componente `<app-toast>` | `app/shared/toast/*` (nuevo) | Renderiza la cola en una esquina con `aria-live="polite"`. Declararlo una vez en `app.ts` |
-| 3.7 | Migrar vistas a `shared/` | Vistas existentes | Reemplazar HTML repetido (tarjetas de tabla, botones, spinners) por los componentes nuevos |
+| 3.3 | Grid y utilidades | CSS de las vistas | Reemplazar los CSS a mano por clases de Bootstrap (grid, flex, espaciado, tarjetas). Las vistas de Dev 2 y Dev 4 las maquetan **ellos** con tus componentes; coordina para no pisarte |
+| 3.4 | Componentes reutilizables | `app/shared/*` (nuevo) | `Tabla`, `Modal`, `Boton`, `Input`, `Badge`, `Card`, `EstadoVacio` y `Spinner`. Todos con `@Input`/`@Output`, `selector` propio y `aria-`/`<label>`/`role` incorporados (le ahorra accesibilidad a Dev 4). **Es el entregable que consumen Dev 2 y Dev 4** |
+| 3.5 | Servicio de Toast | `service/toast.service.ts` (nuevo) | ~~`exito()` / `error()` / `info()` / `warning()` con un `signal` para la cola de mensajes~~ — ✅ entregado por Dev 1 (`0fa4469`) |
+| 3.6 | Componente `<app-toast>` | `app/shared/toast/*` (nuevo) | ~~Renderiza la cola en una esquina con `aria-live="polite"`. Declararlo una vez en `app.ts`~~ — ✅ entregado por Dev 1 (`0fa4469`) |
+| 3.7 | Migrar vistas a `shared/` | Vistas existentes | Reemplazar HTML repetido (tarjetas de tabla, botones, spinners) por los componentes nuevos. Consultar a Dev 1 antes de tocar `pages/ventas/*` y a Dev 4 antes de sus vistas en curso |
 
 ---
 
@@ -107,16 +155,22 @@
 
 **Objetivo:** Cerrar los huecos del backend, el diseño accesible y los formularios validados. Todos los items son mecánicos y de bajo riesgo.
 
+> **Regla de maquetado (importante):** las tareas **4.4, 4.5 y 4.8 se construyen
+> sobre los componentes `shared/` de Dev 3** (Tabla, Modal, Boton, Input, Badge,
+> Card, EstadoVacio, Spinner) — **no se maqueta a mano**. Si un componente no
+> existe aún, se lo pides a Dev 3; no lo duplicas. El arranque de esas tres espera
+> la entrega de 3.4/3.7 de Dev 3; las demás (4.1, 4.2, 4.3, 4.6, 4.7) no esperan a nadie.
+
 | # | Task | Archivos | Descripción |
 |:---|:---|:---|:---|
-| 4.1 | DTOs de producto | `dto/ProductoRequestDTO.java`, `dto/ProductoResponseDTO.java` (nuevo) | `ProductoResponseDTO` lo crea Dev 1 en 1.5 — **coordinarse antes de empezar**. El de request sí es de Dev 4 |
-| 4.2 | CRUD de productos | `controller/ProductoController.java` | Hoy es **solo lectura**. Agregar `POST /api/productos`, `PUT /api/productos/{id}` y `DELETE /api/productos/{id}`, con `@Valid` y errores claros |
+| 4.1 | DTOs de producto | `dto/ProductoRequestDTO.java` (nuevo), `dto/ProductoResponseDTO.java` | `ProductoResponseDTO` **ya lo creó Dev 1 en 1.5** (`bb41c79`) — úsalo tal cual. El de request sí es de Dev 4 |
+| 4.2 | CRUD de productos | `controller/ProductoController.java` | Hoy es **solo lectura**. Agregar `POST /api/productos`, `PUT /api/productos/{id}` y `DELETE /api/productos/{id}`, con `@Valid` y errores claros, devolviendo `ProductoResponseDTO` |
 | 4.3 | Actualizar usuario | `controller/AdminUsuarioController.java` | Falta `PUT /api/admin/usuarios/{id}`. Validar que el DNI no se duplique |
-| 4.4 | Accesibilidad | Todas las vistas | `aria-label` en botones de solo icono, `role` en nav/tabla/modal, `<label>` real en cada input (hoy no hay ninguno), foco visible, contraste AA y `aria-live` en mensajes de error |
-| 4.5 | Formularios reactivos | `pages/auth/login/*`, `pages/admin/usuarios/*`, `pages/admin/inventario/*`, `pages/admin/reportes/*` | Migrar de `FormsModule` a `ReactiveFormsModule` con validadores: requerido, email, DNI de 8 dígitos, mínimo de contraseña. Mensajes de error en español |
-| 4.6 | Info nutricional | `pages/menu/menu.html` | REQ-018: mostrar calorías, proteínas, carbohidratos, grasas, fibra y azúcares en la vista de receta, con el mensaje **"Información nutricional no disponible"** cuando no haya datos |
-| 4.7 | Links muertos del navbar | `layouts/navbar/navbar.html` | Quitar el link a `/empleados`: esa página es un stub que duplica `pages/admin/usuarios/` y ningún requisito la pide. El de `/ventas` lo reemplaza Dev 1 en 1.9 |
-| 4.8 | Estados consistentes | Todas las vistas | Unificar `cargando` / `error` / `vacío`. Hoy cada vista lo maneja a su manera |
+| 4.4 | Accesibilidad | Componentes `shared/` de Dev 3 + restos de las vistas | `aria-label` en botones de solo icono, `role` en nav/tabla/modal, `<label>` real en cada input, foco visible, contraste AA y `aria-live` en mensajes de error — **dentro de los componentes de Dev 3**, para que llegue a todas las vistas de una vez |
+| 4.5 | Formularios reactivos | `pages/auth/login/*`, `pages/admin/usuarios/*`, `pages/admin/inventario/*`, `pages/admin/reportes/*` | Migrar de `FormsModule` a `ReactiveFormsModule` con validadores: requerido, email, DNI de 8 dígitos, mínimo de contraseña. Mensajes de error en español, renderizados con **`<app-input>` de Dev 3** (no con `<input>` sueltos) |
+| 4.6 | Info nutricional | `pages/menu/menu.html`, `models/producto.ts` | REQ-018: los campos `calorias`, `proteinas`, `carbohidratos`, `grasas`, `fibra`, `azucares` **ya los expone `/menu/bebidas` desde `V3`** — extiende el modelo `Bebida` y muéstralos en la vista de receta, con **"Información nutricional no disponible"** cuando no haya datos |
+| 4.7 | Links muertos del navbar | `layouts/navbar/navbar.html` | Quitar **solo** el link a `/empleados` (página stub que duplica `pages/admin/usuarios/`). El link "Punto de venta" ya lo puso Dev 1 (1.9, `f5d2c2a`) — **no lo toques** |
+| 4.8 | Estados consistentes | Todas las vistas | Unificar `cargando` / `error` / `vacío` usando `EstadoVacio`, `Spinner` y `Badge` de Dev 3 — no CSS suelto por vista |
 
 ---
 
@@ -124,37 +178,44 @@
 
 | Dependencia | Quién depende | Qué necesita |
 |:---|:---|:---|
-| 3.1 Bootstrap | Devs 1, 2, 4 | Las clases de Bootstrap para maquetar. **Se entrega el día 1** |
-| 3.4 `shared/` | Devs 1, 2, 4 | Tabla, modal, botón, toast. Se puede empezar a consumir en el sprint 1 |
-| 1.3 / 1.5 N-N | Dev 4 | El DTO de producto que devuelve la respuesta. **Dev 4 empieza su CRUD en el sprint 1, después de 1.5** |
-| 1.1 / 1.2 Flyway | Devs 2, 3, 4 | Nadie debe tocar `database/` ni `application.properties` |
-| 3.5 Toast | Devs 1, 2, 4 | Para avisar éxito y error en cada acción (RNF-015) |
+| 3.1 Bootstrap | Devs 1, 2, 4 | ~~Las clases de Bootstrap para maquetar~~ — ✅ entregado (Dev 1, `0fa4469`) |
+| 3.4 `shared/` | Devs 2, 4 | Tabla, modal, botón, input, toast. **Dev 4 no puede maquetar a mano: sus tareas 4.4/4.5/4.8 se construyen sobre estos componentes** |
+| 1.3 / 1.5 N-N | Dev 4 | `ProductoResponseDTO` — ✅ ya entregado (Dev 1, `bb41c79`). Dev 4 empieza su CRUD sin esperar |
+| 1.10 / 1.12 | Dev 4 | Concurrencia y columnas nutricionales — ✅ entregados (`d5a5b03`): 4.6 ya tiene los campos `V3` expuestos por `/menu/bebidas` |
+| 1.1 / 1.2 Flyway | Devs 2, 3, 4 | Nadie debe tocar `database/` ni `application.properties` (hay V1–V4 aplicadas, `success=1`) |
+| 3.5 Toast | Devs 1, 2, 4 | ✅ entregado (Dev 1, `0fa4469`) — no se vuelve a crear |
 
 > **Regla de propiedad de archivos:** cada tabla de la sección anterior indica qué
 > archivos puede tocar cada developer. Si necesitas un archivo de otro, avisa; no
 > lo edites. Así no hay conflictos al integrar.
+>
+> **Regla de maquetado:** Dev 2 y Dev 4 consumen los componentes `shared/` de Dev 3;
+> no se escribe markup/estilos duplicados en vistas nuevas.
 
 ---
 
 ## Estado de avance
 
-Punto de partida de esta segunda etapa: **todo lo siguiente está pendiente.**
+Punto de partida de esta segunda etapa: todo lo siguiente estaba pendiente.
+**Estado actualizado tras la entrega de Dev 1:**
 
 | Developer | Tarea | Estado |
 |:---|:---|:---|
-| **Dev 1** | 1.1 – 1.5 Migraciones Flyway + relación N-N `producto ↔ proveedor` | Pendiente |
-| **Dev 1** | 1.6 – 1.9 Pantalla de Ventas (POS) con Signals | Pendiente |
-| **Dev 1** | 1.10 – 1.11 Concurrencia (`@Version`) y formato `PED-{fecha}-{secuencia}` | Pendiente |
-| **Dev 1** | 1.12 Columnas nutricionales en `V3` | Pendiente |
+| **Dev 1** | 1.1 – 1.5 Migraciones Flyway + relación N-N `producto ↔ proveedor` | ✅ Completado (`bb41c79`) |
+| **Dev 1** | 1.6 – 1.9 Pantalla de Ventas (POS) con Signals | ✅ Completado (`f5d2c2a`) |
+| **Dev 1** | 1.10 – 1.11 Concurrencia (`@Version`) y formato `PED-{fecha}-{secuencia}` | ✅ Completado (`d5a5b03`) |
+| **Dev 1** | 1.12 Columnas nutricionales en `V3` | ✅ Completado (`d5a5b03`) |
 | **Dev 2** | 2.1 – 2.5 Reporte Kardex con filtros y export CSV | Pendiente |
-| **Dev 2** | 2.6 – 2.7 Pantalla `/admin/kardex` | Pendiente |
-| **Dev 3** | 3.1 – 3.3 Bootstrap 5 y diseño responsivo | Pendiente |
-| **Dev 3** | 3.4 – 3.6 Componentes `shared/` y servicio de Toast | Pendiente |
+| **Dev 2** | 2.6 – 2.7 Pantalla `/admin/kardex` | Pendiente (maqueta con `shared/` de Dev 3) |
+| **Dev 3** | 3.1 Bootstrap 5 | ✅ Completado por Dev 1 (`0fa4469`) |
+| **Dev 3** | 3.2 – 3.3 Diseño responsivo y grid/utilidades | Pendiente |
+| **Dev 3** | 3.4 Componentes `shared/` (Tabla, Modal, Boton, Input, Badge, Card, EstadoVacio, Spinner) | Pendiente — **bloquea a Dev 2 y Dev 4** |
+| **Dev 3** | 3.5 – 3.6 Servicio de Toast y `<app-toast>` | ✅ Completado por Dev 1 (`0fa4469`) |
 | **Dev 3** | 3.7 Migración de vistas a `shared/` | Pendiente |
-| **Dev 4** | 4.1 – 4.3 DTOs, CRUD de productos y `PUT` de usuarios | Pendiente |
-| **Dev 4** | 4.4 Accesibilidad | Pendiente |
-| **Dev 4** | 4.5 – 4.6 Formularios reactivos e info nutricional | Pendiente |
-| **Dev 4** | 4.7 – 4.8 Links muertos y estados consistentes | Pendiente |
+| **Dev 4** | 4.1 – 4.3 DTOs, CRUD de productos y `PUT` de usuarios | Pendiente (dependencia 1.5 ya resuelta) |
+| **Dev 4** | 4.4 Accesibilidad | Pendiente — sobre los componentes `shared/` de Dev 3 |
+| **Dev 4** | 4.5 – 4.6 Formularios reactivos e info nutricional | Pendiente (4.5 usa `<app-input>` de Dev 3; 4.6 ya tiene la `V3`) |
+| **Dev 4** | 4.7 – 4.8 Links muertos y estados consistentes | Pendiente (4.8 usa `EstadoVacio`/`Spinner`/`Badge` de Dev 3) |
 
 ### Verificación de cierre
 
@@ -162,12 +223,13 @@ Punto de partida de esta segunda etapa: **todo lo siguiente está pendiente.**
 |:---|:---|:---|
 | Backend compila | `mvn clean compile` en `backend/` | Sin errores |
 | Frontend compila | `ng build` en `frontend/` | Sin errores ni warnings |
-| Base migrada | Arrancar con Flyway activo | `V1`, `V2` y `V3` aplicadas, datos intactos |
+| Base migrada | Arrancar con Flyway activo | `V1`, `V2`, `V3` y **`V4`** aplicadas con `success=1`, datos intactos |
 | N-N funciona | `SELECT * FROM producto_proveedor` | 12 filas migradas desde `producto.proveedor_id` |
 | Kardex filtra | `GET /api/admin/reportes/kardex?tipo=SALIDA` | Solo salidas, con stock anterior y nuevo |
 | CSV descarga | `GET /api/admin/reportes/kardex/csv` | Archivo con acentos correctos |
 | POS registra | Login → `/ventas` → 2 bebidas → cobrar | Venta `PED-20260928-0001`, stock descontado, kardex con la salida |
 | Concurrencia | Dos ventas simultáneas sobre el mismo insumo | La segunda devuelve **409** |
+| Sustentación | ✅ Probado por Dev 1 en vivo: POS cobró `PED-0001` (EFECTIVO, vuelto 4.48) y `PED-0002` (YAPE), 409 en doble pago y en choque paralelo, stock siempre coherente | Listo para sustentar |
 
 ---
 
@@ -185,7 +247,7 @@ Punto de partida de esta segunda etapa: **todo lo siguiente está pendiente.**
 
 ## Reglas de negocio que se mantienen
 
-No cambian, pero se日系 más código, así que conviene tenerlas presentes:
+No cambian, pero se escribe más código, así que conviene tenerlas presentes:
 
 - El empleado que registra la venta se toma del **token JWT**, nunca del cuerpo del request.
 - El IGV sale de la tabla `parametro` (**18%**), no de una constante en el código.
@@ -206,7 +268,7 @@ No cambian, pero se日系 más código, así que conviene tenerlas presentes:
 | **Developer 1 (Elvis)** | POS + modelo de datos + concurrencia | 1.1 – 1.12 | **ALTA** | — |
 | **Developer 2** | Kardex y exportación | 2.1 – 2.7 | **MEDIA** | — |
 | **Developer 3** | Bootstrap, `shared/`, Toast | 3.1 – 3.7 | **MEDIA-BAJA** | — |
-| **Developer 4** | CRUD faltante, accesibilidad, formularios | 4.1 – 4.8 | **BAJA** | Dev 1 (1.5) |
+| **Developer 4** | CRUD faltante, accesibilidad, formularios | 4.1 – 4.8 | **BAJA** | Dev 1 (1.5) · Dev 3 (3.4/3.7 para 4.4/4.5/4.8) |
 
 > El reparto es **deliberadamente desigual**: Dev 1 carga con el flujo que hace que el
 > sistema venda y con el modelado de datos, que es lo más difícil de revertir. Dev 4
@@ -218,31 +280,33 @@ No cambian, pero se日系 más código, así que conviene tenerlas presentes:
 
 ```
 backend/
-└── src/main/resources/db/migration/          ← NUEVO (Dev 1)
-    ├── V1__baseline.sql
-    ├── V2__n_n_proveedor.sql
-    └── V3__datos_nutricionales.sql
+└── src/main/resources/db/migration/          ← NUEVO (Dev 1) ✅ aplicadas
+    ├── V1__baseline.sql                      ✅
+    ├── V2__n_n_proveedor.sql                 ✅
+    ├── V3__datos_nutricionales.sql           ✅
+    └── V4__version_optimista.sql             ✅ (creada en 1.10)
 
 backend/src/main/java/com/munaqfit/backend/
-├── model/ProductoProveedor.java              ← NUEVO (Dev 1)
-├── repository/ProductoProveedorRepository.java  ← NUEVO (Dev 1)
+├── model/ProductoProveedor.java              ✅ (Dev 1)
+├── repository/ProductoProveedorRepository.java  ✅ (Dev 1)
 ├── repository/MovimientoInventarioRepository.java  ← Dev 2 (agrega @Query)
 ├── service/ReporteKardexService.java         ← NUEVO (Dev 2)
 ├── controller/ReporteKardexController.java   ← NUEVO (Dev 2)
 ├── dto/KardexFilaDTO.java                    ← NUEVO (Dev 2)
 ├── dto/ProductoRequestDTO.java               ← NUEVO (Dev 4)
-└── dto/ProductoResponseDTO.java              ← NUEVO (Dev 1, compartido con Dev 4)
+└── dto/ProductoResponseDTO.java              ✅ (Dev 1, compartido con Dev 4)
 
 frontend/src/app/
-├── pages/ventas/                             ← Dev 1 (reemplaza el stub)
-├── pages/admin/kardex/                       ← NUEVO (Dev 2)
-├── service/carrito.service.ts                ← NUEVO (Dev 1)
-├── service/toast.service.ts                  ← NUEVO (Dev 3)
-├── shared/                                   ← NUEVO (Dev 3)
-│   ├── tabla/  modal/  boton/  input/
-│   ├── badge/  card/   toast/
-│   └── estado-vacio/  spinner/
-└── layouts/navbar/navbar.html                ← Devs 1 y 4 (coordinar)
+├── pages/ventas/                             ✅ (Dev 1, POS terminado)
+├── pages/admin/kardex/                       ← NUEVO (Dev 2, maquetado con shared/)
+├── service/toast.service.ts                  ✅ (Dev 1, `0fa4469`)
+├── shared/                                   ← Dev 3
+│   ├── toast/                                ✅ (Dev 1, `0fa4469`)
+│   ├── tabla/  modal/  boton/  input/        ← NUEVO (Dev 3, bloquea a Dev 2/4)
+│   └── badge/  card/   estado-vacio/  spinner/  ← NUEVO (Dev 3)
+└── layouts/navbar/navbar.html                ← Devs 1 y 4 (coordinar): el link
+                                                "Punto de venta" es de Dev 1; Dev 4
+                                                solo quita `/empleados`
 ```
 
 ---
@@ -250,6 +314,8 @@ frontend/src/app/
 ## Contratos de API que fija Dev 1 y consume Dev 4
 
 Estos nombres no se cambian sin avisar, para que el frontend y el backend no se separen.
+
+> Todos los contratos de esta tabla ya fueron verificados en vivo por Dev 1.
 
 | Endpoint | Método | Cuerpo | Respuesta |
 |:---|:---|:---|:---|
@@ -264,9 +330,10 @@ Estos nombres no se cambian sin avisar, para que el frontend y el backend no se 
 
 ---
 
-## Primera Acción para Developer 1 (Elvis)
+## Primera Acción para Developer 1 (Elvis) — ✅ Cumplida
 
-**Hoy mismo:**
+**Estado:** los 4 pasos de abajo ya están hechos y verificados en `feat/dev1-etapa-2`.
+Esta sección se conserva como registro de cómo se desbloqueó a los demás developers.
 
 1. **Instala Bootstrap 5** y regístralo en `angular.json` (es lo que desbloquea a los
    otros tres). Si lo haces tú, Dev 3 empieza con la parte 2 de su tarea 3.1.
