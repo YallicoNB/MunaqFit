@@ -1,1 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales de MunaqFit.
+   Bootstrap 5 se importa desde angular.json (node_modules/bootstrap/dist/css/bootstrap.min.css).
+   Aqui viven los ajustes que aplican a toda la aplicacion. */
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f4f6f8;
+  color: #1f2937;
+}
