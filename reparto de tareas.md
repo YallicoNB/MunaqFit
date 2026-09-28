@@ -35,12 +35,12 @@
 | # | Task | Archivos | Descripción |
 |:---|:---|:---|:---|
 | 1.1 | Configurar proyecto Spring Boot | `pom.xml`, `application.properties` | Dependencias: Spring Web, JPA, MySQL, Security, JWT, Lombok |
-| 1.2 | Crear entidades base | `model/Usuario.java`, `model/Bebida.java`, `model/Venta.java`, `mo   del/DetalleVenta.java`, `model/Producto.java`, `model/Proveedor.java`, `model/Categoria.java`, `model/Pago.java`, `model/MovimientoInventario.java`, `model/ClienteFidelidad.java`, `model/VisitaCliente.java` | Todas las entidades del modelo de datos |
+| 1.2 | Crear entidades base | `model/Usuario.java`, `model/Bebida.java`, `model/Venta.java`, `model/DetalleVenta.java`, `model/Producto.java`, `model/Proveedor.java`, `model/Categoria.java`, `model/Pago.java`, `model/MovimientoInventario.java`, `model/ClienteFidelidad.java`, `model/VisitaCliente.java` | Todas las entidades del modelo de datos |
 | 1.3 | Crear repositorios JPA | `repository/*Repository.java` | Interfaces para CRUD de cada entidad |
 | 1.4 | Configurar seguridad | `config/SecurityConfig.java`, `config/JwtConfig.java`, `security/JwtAuthenticationFilter.java`, `security/JwtTokenProvider.java`, `security/CustomUserDetailsService.java` | Spring Security + JWT |
 | 1.5 | Implementar AuthController | `controller/AuthController.java` | Login, recuperación de contraseña, logout |
 | 1.6 | Crear DTOs base | `dto/LoginRequest.java`, `dto/LoginResponse.java`, `dto/UsuarioDTO.java` | Data Transfer Objects |
-| 1.7 | Scripts de base de datos | `database/schema.sql`, `database/seed.sql` | Creación de tabla   s y datos de prueba |
+| 1.7 | Scripts de base de datos | `database/schema.sql`, `database/seed.sql` | Creación de tablas y datos de prueba |
 
 ---
 
