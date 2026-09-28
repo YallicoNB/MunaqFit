@@ -1,6 +1,11 @@
 -- ============================================================
 -- MUNAQ FIT MANAGER - SEED (datos de prueba)
 -- Motor: MySQL 8.0+
+--
+-- HOY EL ESQUEMA LO CREA FLYWAY (backend/src/main/resources/db/migration).
+-- Este archivo solo carga los datos: se ejecuta DESPUES de arrancar el
+-- backend una vez (Flyway deja las tablas listas). Es re-ejecutable:
+-- los TRUNCATE lo reinician siempre al mismo estado.
 -- ============================================================
 
 USE munaqfit;
@@ -14,6 +19,7 @@ TRUNCATE TABLE detalle_venta;
 TRUNCATE TABLE venta;
 TRUNCATE TABLE receta;
 TRUNCATE TABLE bebida;
+TRUNCATE TABLE producto_proveedor;
 TRUNCATE TABLE producto;
 TRUNCATE TABLE proveedor;
 TRUNCATE TABLE categoria_bebida;
@@ -51,8 +57,6 @@ INSERT INTO categoria (id, nombre, descripcion) VALUES
 
 -- ============================================================
 -- CATEGORIAS DE BEBIDA
--- Taxonomia propia de las bebidas, por beneficio. Antes vivia como
--- texto suelto en bebida.categoria y no coincidia con la de insumos.
 -- ============================================================
 INSERT INTO categoria_bebida (id, nombre, descripcion) VALUES
 (1, 'Energizante',     'Aportan energia inmediata'),
@@ -74,22 +78,41 @@ INSERT INTO proveedor (nombre, ruc, telefono, direccion, contacto_nombre, estado
 
 -- ============================================================
 -- PRODUCTOS (Insumos)
--- La cantidad de cada receta se expresa en esta misma unidad, por eso
--- ya no hace falta columna 'unidad' en receta.
+-- Sin proveedor_id: desde V2 la relacion con proveedores vive en
+-- producto_proveedor (un insumo puede comprarse a varios).
 -- ============================================================
-INSERT INTO producto (id, nombre, categoria_id, proveedor_id, stock_actual, stock_minimo, stock_critico, unidad_medida, costo_unitario) VALUES
-(1,  'Platano',        1, 2, 50.000,  10.00,  5.00,  'UNIDAD', 0.80),
-(2,  'Fresa',          1, 2, 500.000, 150.00, 80.00, 'G',      0.015),
-(3,  'Naranja',        1, 2, 40.000,  10.00,  5.00,  'UNIDAD', 0.60),
-(4,  'Manzana',        1, 2, 35.000,   8.00,  4.00,  'UNIDAD', 0.70),
-(5,  'Pina',           1, 2, 20.000,   5.00,  3.00,  'UNIDAD', 2.50),
-(6,  'Leche',          2, 1, 15.000,   5.00,  2.00,  'L',      3.80),
-(7,  'Yogurt griego',  2, 1, 12.000,   4.00,  2.00,  'KG',    12.00),
-(8,  'Proteina whey',  3, 3, 20.000,   5.00,  2.00,  'KG',    90.00),
-(9,  'Avena',          4, 1, 18.000,   5.00,  2.00,  'KG',     6.50),
-(10, 'Chia',           4, 1, 10.000,   3.00,  1.00,  'KG',    18.00),
-(11, 'Miel',           5, 1, 8.000,    2.00,  1.00,  'L',     22.00),
-(12, 'Espinaca',       1, 2, 400.000, 100.00, 50.00, 'G',      0.008);
+INSERT INTO producto (id, nombre, categoria_id, stock_actual, stock_minimo, stock_critico, unidad_medida, costo_unitario) VALUES
+(1,  'Platano',        1, 50.000,  10.00,  5.00,  'UNIDAD', 0.80),
+(2,  'Fresa',          1, 500.000, 150.00, 80.00, 'G',      0.015),
+(3,  'Naranja',        1, 40.000,  10.00,  5.00,  'UNIDAD', 0.60),
+(4,  'Manzana',        1, 35.000,   8.00,  4.00,  'UNIDAD', 0.70),
+(5,  'Pina',           1, 20.000,   5.00,  3.00,  'UNIDAD', 2.50),
+(6,  'Leche',          2, 15.000,   5.00,  2.00,  'L',      3.80),
+(7,  'Yogurt griego',  2, 12.000,   4.00,  2.00,  'KG',    12.00),
+(8,  'Proteina whey',  3, 20.000,   5.00,  2.00,  'KG',    90.00),
+(9,  'Avena',          4, 18.000,   5.00,  2.00,  'KG',     6.50),
+(10, 'Chia',           4, 10.000,   3.00,  1.00,  'KG',    18.00),
+(11, 'Miel',           5, 8.000,    2.00,  1.00,  'L',     22.00),
+(12, 'Espinaca',       1, 400.000, 100.00, 50.00, 'G',      0.008);
+
+-- ============================================================
+-- PRODUCTO_PROVEEDOR (puente N-N)
+-- Cada insumo conserva su proveedor de la etapa 1 como principal,
+-- con el mismo precio al que se compraba (precio_unitario).
+-- ============================================================
+INSERT INTO producto_proveedor (producto_id, proveedor_id, precio_unitario, es_principal) VALUES
+(1,  2, 0.8000, 1),
+(2,  2, 0.0150, 1),
+(3,  2, 0.6000, 1),
+(4,  2, 0.7000, 1),
+(5,  2, 2.5000, 1),
+(6,  1, 3.8000, 1),
+(7,  1, 12.0000, 1),
+(8,  3, 90.0000, 1),
+(9,  1, 6.5000, 1),
+(10, 1, 18.0000, 1),
+(11, 1, 22.0000, 1),
+(12, 2, 0.0080, 1);
 
 -- ============================================================
 -- BEBIDAS
@@ -110,9 +133,6 @@ INSERT INTO bebida (id, nombre, descripcion, precio, categoria_id, tiempo_prepar
 
 -- ============================================================
 -- RECETAS
--- Sin columna 'unidad': cada cantidad ya esta en la unidad_medida del
--- producto (Leche en L, Espinaca en G, Avena en KG, etc).
--- UNIQUE (bebida_id, producto_id) impide repetir un insumo.
 -- ============================================================
 INSERT INTO receta (bebida_id, producto_id, cantidad, paso_instruccion) VALUES
 (1, 3,  2.00,  'Exprimir jugo de naranja y mezclar con shot de energia'),
@@ -128,8 +148,6 @@ INSERT INTO receta (bebida_id, producto_id, cantidad, paso_instruccion) VALUES
 
 -- ============================================================
 -- CLIENTES FIDELIDAD
--- dni permite detectar clientes repetidos.
--- Luis Perez ya llego a su umbral: su proxima visita aplica el premio.
 -- ============================================================
 INSERT INTO cliente_fidelidad (dni, nombre, telefono, email, visitas, umbral_premio) VALUES
 ('44555111', 'Ana Torres', '987654321', 'ana@gmail.com',   8,  10),

@@ -45,7 +45,7 @@ public class Proveedor {
 
     @JsonIgnore
     @OneToMany(mappedBy = "proveedor")
-    private List<Producto> productos = new ArrayList<>();
+    private List<ProductoProveedor> productoProveedores = new ArrayList<>();
 
     public enum EstadoContrato {
         ACTIVO, INACTIVO

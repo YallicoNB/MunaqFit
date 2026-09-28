@@ -17,8 +17,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     List<Producto> findByCategoriaId(Long categoriaId);
 
-    List<Producto> findByProveedorId(Long proveedorId);
-
     //Consultas "personalizadas"
 
     @Query("SELECT p FROM Producto p WHERE p.stockActual <= p.stockCritico")

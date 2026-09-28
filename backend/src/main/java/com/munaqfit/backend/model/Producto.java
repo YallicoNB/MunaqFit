@@ -30,9 +30,14 @@ public class Producto {
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proveedor_id")
-    private Proveedor proveedor;
+    /**
+     * Proveedores del insumo (N-N vía producto_proveedor).
+     * La serializacion de esta lista va por ProductoResponseDTO: la entidad
+     * no se expone al JSON para no arrastrar lazy loading ni recursion.
+     */
+    @JsonIgnore
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductoProveedor> productoProveedores = new ArrayList<>();
 
     @Column(name = "stock_actual", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockActual = BigDecimal.ZERO;

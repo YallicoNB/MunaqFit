@@ -2,7 +2,12 @@ export interface Producto {
   id: number;
   nombre: string;
   categoria: { id: number; nombre: string } | null;
-  proveedor: { id: number; nombre: string } | null;
+  proveedores: Array<{
+    id: number;
+    nombre: string;
+    precioUnitario: number;
+    esPrincipal: boolean;
+  }>;
   stockActual: number;
   stockMinimo: number;
   stockCritico: number;

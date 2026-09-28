@@ -49,7 +49,7 @@ public class AdminProveedorController {
         Proveedor proveedor = proveedorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
-        if (proveedor.getProductos() != null && !proveedor.getProductos().isEmpty()) {
+        if (proveedor.getProductoProveedores() != null && !proveedor.getProductoProveedores().isEmpty()) {
             proveedor.setEstado(Proveedor.EstadoContrato.INACTIVO);
             proveedorRepository.save(proveedor);
             return ResponseEntity.ok("El proveedor tiene productos o pagos asociados, "
