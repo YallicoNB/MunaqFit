@@ -1,0 +1,7 @@
+<nav class="navbar">
+  <a routerLink="/home" class="navbar-item">Home</a>
+  <a routerLink="/register" class="navbar-item">Registro</a>
+  <a routerLink="/cuenta" class="navbar-item">Cuenta</a>
+  <a routerLink="/ventas" *ngIf="esAdmin" class="navbar-item">Ventas</a>
+  <a routerLink="/empleados" *ngIf="esAdmin" class="navbar-item">Empleados</a>
+</nav>

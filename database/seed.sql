@@ -3,8 +3,8 @@
 -- Motor: MySQL 8.0+
 -- ============================================================
 
+ create database munaqfid;
 USE munaqfit;
-
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE visita_cliente;
 TRUNCATE TABLE cliente_fidelidad;
