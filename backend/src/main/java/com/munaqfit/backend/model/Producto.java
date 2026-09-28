@@ -34,24 +34,25 @@ public class Producto {
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 
-    @Column(name = "stock_actual", nullable = false, precision = 10, scale = 2)
+    @Column(name = "stock_actual", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockActual = BigDecimal.ZERO;
 
-    @Column(name = "stock_minimo", nullable = false, precision = 10, scale = 2)
+    @Column(name = "stock_minimo", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockMinimo = BigDecimal.ZERO;
 
-    @Column(name = "stock_critico", nullable = false, precision = 10, scale = 2)
+    @Column(name = "stock_critico", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockCritico = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "unidad_medida", nullable = false, length = 20)
     private UnidadMedida unidadMedida = UnidadMedida.UNIDAD;
 
-    @Column(name = "costo_unitario", nullable = false, precision = 10, scale = 2)
+    @Column(name = "costo_unitario", nullable = false, precision = 10, scale = 4)
     private BigDecimal costoUnitario = BigDecimal.ZERO;
 
-    @Column(name = "precio_venta", precision = 10, scale = 2)
-    private BigDecimal precioVenta;
+    // precio_venta se elimino de la tabla: el insumo no se vende solo, se
+    // vende a traves de una bebida, y ese precio vive en bebida.precio.
+    // Tenerlo aqui era una columna que nadie llenaba.
 
     @Column(name = "fecha_caducidad")
     private LocalDate fechaCaducidad;

@@ -9,12 +9,17 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clasificacion de las bebidas por beneficio (Detox, Energizante...).
+ * Es una taxonomia distinta a la de los insumos: por eso vive en su
+ * propia tabla en vez de mezclarse en {@link Categoria}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "categoria")
-public class Categoria {
+@Table(name = "categoria_bebida")
+public class CategoriaBebida {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +31,7 @@ public class Categoria {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    /**
-     * Sin cascade a proposito. Con CascadeType.ALL, borrar una categoria
-     * arrastraba tambien el stock de todos sus productos: la base perdia
-     * historial de inventario y pedidos por un DELETE de una fila de
-     * configuracion. La FK en producto.categoria_id ya impide borrar una
-     * categoria que siga en uso.
-     */
     @JsonIgnore
-    @OneToMany(mappedBy = "categoria")
-    private List<Producto> productos = new ArrayList<>();
+    @OneToMany(mappedBy = "categoriaBebida")
+    private List<Bebida> bebidas = new ArrayList<>();
 }

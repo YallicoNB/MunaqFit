@@ -33,4 +33,12 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     List<Venta> findAllByOrderByFechaHoraDesc();
 
+    /**
+     * Ultimo id asignado, para numerar los pedidos. No se usa count()+1
+     * porque si alguna venta se cancela y se borra, el conteo baja y el
+     * siguiente numero repetiria uno ya emitido.
+     */
+    @Query("SELECT COALESCE(MAX(v.id), 0) FROM Venta v")
+    Long findMaxId();
+
 }

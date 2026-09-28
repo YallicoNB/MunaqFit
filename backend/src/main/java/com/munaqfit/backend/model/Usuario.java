@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,8 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    // El hash nunca debe salir en las respuestas de la API
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 

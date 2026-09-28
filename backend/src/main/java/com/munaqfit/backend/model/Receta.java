@@ -26,11 +26,13 @@ public class Receta {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    /**
+     * Cantidad en la unidad canonica del producto (producto.unidad_medida).
+     * La columna 'unidad' se elimino: al duplicar la unidad habia que
+     * convertir G<->KG y ML<->L, y una receta podia contradecir al insumo.
+     */
+    @Column(nullable = false, precision = 12, scale = 3)
     private BigDecimal cantidad;
-
-    @Column(length = 20)
-    private String unidad;
 
     @Column(name = "paso_instruccion", columnDefinition = "TEXT")
     private String pasoInstruccion;

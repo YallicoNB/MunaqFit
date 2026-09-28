@@ -27,17 +27,27 @@ public class MovimientoInventario {
     @Column(name = "tipo_movimiento", nullable = false, length = 20)
     private TipoMovimiento tipoMovimiento;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 3)
     private BigDecimal cantidad;
 
-    @Column(name = "stock_anterior", nullable = false, precision = 10, scale = 2)
+    @Column(name = "stock_anterior", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockAnterior;
 
-    @Column(name = "stock_nuevo", nullable = false, precision = 10, scale = 2)
+    @Column(name = "stock_nuevo", nullable = false, precision = 12, scale = 3)
     private BigDecimal stockNuevo;
 
     @Column(length = 100)
     private String motivo;
+
+    /**
+     * referencia_id es polimorfica (apunta a venta, a un ajuste o a un
+     * pedido a proveedor), asi que MySQL no le puede poner clave foranea.
+     * tipo_referencia es la que le da sentido, y el CHECK del schema
+     * obliga a que la pareja vaya junta o no vaya.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_referencia", length = 20)
+    private TipoReferencia tipoReferencia;
 
     @Column(name = "referencia_id")
     private Long referenciaId;
@@ -51,5 +61,10 @@ public class MovimientoInventario {
 
     public enum TipoMovimiento {
         INGRESO, SALIDA
+    }
+
+    /** Que clase de registro es el que apunta referencia_id. */
+    public enum TipoReferencia {
+        VENTA, REABASTECIMIENTO, AJUSTE_MANUAL, OTRO
     }
 }

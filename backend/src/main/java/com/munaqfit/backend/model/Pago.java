@@ -23,13 +23,14 @@ public class Pago {
     @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
 
-    @Column(name = "monto_total", nullable = false, precision = 10, scale = 2)
-    private BigDecimal montoTotal;
-
-    @Column(name = "monto_pagado", nullable = false, precision = 10, scale = 2)
+    /**
+     * No existe monto_total: se deriva de venta.total. Guardarlo aqui
+     * duplicaba el dato y permitia que ambos dejaran de coincidir.
+     */
+    @Column(name = "monto_pagado", nullable = false, precision = 12, scale = 2)
     private BigDecimal montoPagado;
 
-    @Column(name = "monto_cambio", nullable = false, precision = 10, scale = 2)
+    @Column(name = "monto_cambio", nullable = false, precision = 12, scale = 2)
     private BigDecimal montoCambio = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
