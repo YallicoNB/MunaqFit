@@ -22,6 +22,15 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Bloqueo optimista (V4): si dos empleados cobran o modifican la
+     * misma venta a la vez, el segundo UPDATE falle con 409 en vez de
+     * sobrescribir el estado de un cobro.
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;

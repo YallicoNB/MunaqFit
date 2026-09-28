@@ -1,8 +1,14 @@
 -- ============================================================
--- MUNAQ FIT MANAGER - SCHEMA
+-- MUNAQ FIT MANAGER - SCHEMA (recreacion completa)
 -- Motor: MySQL 8.0.16+ (requiere CHECK constraints)
 -- ============================================================
--- Convenciones:
+-- ESTE ARCHIVO YA NO ES LA FUENTE DE VERDAD: las migraciones viven en
+-- backend/src/main/resources/db/migration (V1..V4) y Spring las aplica
+-- solo al arrancar. Este schema.js es la recreacion EQUIVALENTE en un
+-- solo archivo: sirve como respaldo y para reconstruir la base a mano
+-- sin arrancar el backend.
+--
+-- Convenciones (heredadas de la auditoria):
 --   * Toda fecha/hora es DATETIME (rango 1000-9999, sin conversion por
 --     timezone). TIMESTAMP esta limitado a 2038 y se corre si cambia la
 --     zona horaria del servidor.
@@ -11,10 +17,9 @@
 --   * Las referencias entre dominios distintos usan claves foraneas.
 -- ============================================================
 
--- ⚠️  ATENCION: esta línea BORRA la base de datos completa.
--- Es intencional para que el schema sea la única fuente de verdad y se
--- pueda reconstruir desde cero. NO la ejecutes contra una base con datos
--- reales sin respaldarla antes.
+-- ⚠️  ATENCION: esta linea BORRA la base de datos completa.
+-- Es intencional para poder reconstruir desde cero. NO la ejecutes contra
+-- una base con datos reales sin respaldarla antes.
 DROP DATABASE IF EXISTS munaqfit;
 
 CREATE DATABASE IF NOT EXISTS munaqfit
@@ -26,9 +31,8 @@ USE munaqfit;
 -- ============================================================
 -- PARAMETRO
 -- Configuracion del negocio que antes vivia hardcodeada en el codigo.
--- Permite cambiar la tasa de IGV sin recompilar.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS parametro (
+CREATE TABLE parametro (
   id              BIGINT AUTO_INCREMENT PRIMARY KEY,
   codigo          VARCHAR(50)   NOT NULL UNIQUE,
   nombre          VARCHAR(100)  NOT NULL,
@@ -42,7 +46,7 @@ CREATE TABLE IF NOT EXISTS parametro (
 -- ============================================================
 -- USUARIO
 -- ============================================================
-CREATE TABLE IF NOT EXISTS usuario (
+CREATE TABLE usuario (
   id               BIGINT AUTO_INCREMENT PRIMARY KEY,
   dni              VARCHAR(20)  NOT NULL UNIQUE,
   nombre_completo  VARCHAR(100) NOT NULL,
@@ -60,11 +64,9 @@ CREATE TABLE IF NOT EXISTS usuario (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- CATEGORIA  (clasificacion de INSUMOS)
--- Las bebidas tienen su propia taxonomia en categoria_bebida: son
--- dominios distintos y no deben mezclarse en la misma tabla.
+-- CATEGORIA (clasificacion de INSUMOS)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS categoria (
+CREATE TABLE categoria (
   id          BIGINT AUTO_INCREMENT PRIMARY KEY,
   nombre      VARCHAR(50) NOT NULL UNIQUE,
   descripcion TEXT        NULL,
@@ -72,9 +74,9 @@ CREATE TABLE IF NOT EXISTS categoria (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- CATEGORIA_BEBIDA  (clasificacion de BEBIDAS por beneficio)
+-- CATEGORIA_BEBIDA (clasificacion de BEBIDAS por beneficio)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS categoria_bebida (
+CREATE TABLE categoria_bebida (
   id          BIGINT AUTO_INCREMENT PRIMARY KEY,
   nombre      VARCHAR(50) NOT NULL UNIQUE,
   descripcion TEXT        NULL,
@@ -84,7 +86,7 @@ CREATE TABLE IF NOT EXISTS categoria_bebida (
 -- ============================================================
 -- PROVEEDOR
 -- ============================================================
-CREATE TABLE IF NOT EXISTS proveedor (
+CREATE TABLE proveedor (
   id              BIGINT AUTO_INCREMENT PRIMARY KEY,
   nombre          VARCHAR(100) NOT NULL,
   ruc             VARCHAR(20)  NULL,
@@ -98,14 +100,15 @@ CREATE TABLE IF NOT EXISTS proveedor (
 
 -- ============================================================
 -- PRODUCTO (Insumo)
--- stock_actual es un cache: la fuente de verdad es el kardex
--- (movimiento_inventario). Se mantiene en la misma transaccion.
+-- La relacion con proveedores es N-N y vive en producto_proveedor
+-- (V2 elimino producto.proveedor_id). stock_actual es cache: la fuente
+-- de verdad es el kardex. version es el bloqueo optimista (V4).
 -- ============================================================
-CREATE TABLE IF NOT EXISTS producto (
+CREATE TABLE producto (
   id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+  version           BIGINT       NOT NULL DEFAULT 0,
   nombre            VARCHAR(100) NOT NULL,
   categoria_id      BIGINT NULL,
-  proveedor_id      BIGINT NULL,
   stock_actual      DECIMAL(12,3) NOT NULL DEFAULT 0,
   stock_minimo      DECIMAL(12,3) NOT NULL DEFAULT 0,
   stock_critico     DECIMAL(12,3) NOT NULL DEFAULT 0,
@@ -114,7 +117,6 @@ CREATE TABLE IF NOT EXISTS producto (
   fecha_caducidad   DATE        NULL,
   ultima_reposicion DATETIME    NULL,
   CONSTRAINT fk_producto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria(id),
-  CONSTRAINT fk_producto_proveedor FOREIGN KEY (proveedor_id) REFERENCES proveedor(id),
   CONSTRAINT chk_producto_nombre     CHECK (nombre <> ''),
   CONSTRAINT chk_producto_stock_actual  CHECK (stock_actual  >= 0),
   CONSTRAINT chk_producto_stock_minimo  CHECK (stock_minimo  >= 0),
@@ -124,11 +126,26 @@ CREATE TABLE IF NOT EXISTS producto (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- BEBIDA
--- categoria_id es clave foranea: la categoria de una bebida ya no es
--- texto libre, por lo que no puede quedar huerfana ni duplicada.
+-- PRODUCTO_PROVEEDOR (puente N-N de V2)
+-- precio_unitario = precio al que ese proveedor vende el insumo;
+-- es_principal marca el proveedor de cabecera.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS bebida (
+CREATE TABLE producto_proveedor (
+  producto_id     BIGINT        NOT NULL,
+  proveedor_id    BIGINT        NOT NULL,
+  precio_unitario DECIMAL(10,4) NOT NULL,
+  es_principal    TINYINT(1)    NOT NULL DEFAULT 1,
+  PRIMARY KEY (producto_id, proveedor_id),
+  CONSTRAINT fk_pp_producto  FOREIGN KEY (producto_id)  REFERENCES producto(id),
+  CONSTRAINT fk_pp_proveedor FOREIGN KEY (proveedor_id) REFERENCES proveedor(id),
+  CONSTRAINT chk_pp_precio   CHECK (precio_unitario >= 0)
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- BEBIDA
+-- Columnas nutricionales (V3): nacen NULL, Dev 4 completa el dato.
+-- ============================================================
+CREATE TABLE bebida (
   id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
   nombre             VARCHAR(100) NOT NULL,
   descripcion        TEXT         NULL,
@@ -136,21 +153,30 @@ CREATE TABLE IF NOT EXISTS bebida (
   categoria_id       BIGINT        NULL,
   imagen_url         VARCHAR(255)  NULL,
   tiempo_preparacion INT           NULL,
+  calorias           DECIMAL(8,2)  NULL,
+  proteinas          DECIMAL(8,2)  NULL,
+  carbohidratos      DECIMAL(8,2)  NULL,
+  grasas             DECIMAL(8,2)  NULL,
+  fibra              DECIMAL(8,2)  NULL,
+  azucares           DECIMAL(8,2)  NULL,
   activo             BOOLEAN       NOT NULL DEFAULT TRUE,
   CONSTRAINT fk_bebida_categoria_bebida FOREIGN KEY (categoria_id) REFERENCES categoria_bebida(id),
   CONSTRAINT chk_bebida_nombre CHECK (nombre <> ''),
-  CONSTRAINT chk_bebida_precio CHECK (precio >= 0)
+  CONSTRAINT chk_bebida_precio CHECK (precio >= 0),
+  CONSTRAINT chk_bebida_calorias      CHECK (calorias      IS NULL OR calorias      >= 0),
+  CONSTRAINT chk_bebida_proteinas     CHECK (proteinas     IS NULL OR proteinas     >= 0),
+  CONSTRAINT chk_bebida_carbohidratos CHECK (carbohidratos IS NULL OR carbohidratos >= 0),
+  CONSTRAINT chk_bebida_grasas        CHECK (grasas        IS NULL OR grasas        >= 0),
+  CONSTRAINT chk_bebida_fibra         CHECK (fibra         IS NULL OR fibra         >= 0),
+  CONSTRAINT chk_bebida_azucares      CHECK (azucares      IS NULL OR azucares      >= 0)
 ) ENGINE=InnoDB;
 
 -- ============================================================
 -- RECETA
--- La cantidad va siempre en la unidad canonica del producto
--- (producto.unidad_medida). Por eso no existe columna 'unidad':
--- duplicarla era lo que obligaba a convertir G<->KG y ML<->L.
--- UNIQUE impide que un insumo se repita dentro de la misma bebida,
--- que habria descontado el stock dos veces.
+-- la cantidad va en la unidad canonica del producto; no existe
+-- columna 'unidad' para no obligar a convertir G<->KG / ML<->L.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS receta (
+CREATE TABLE receta (
   id               BIGINT AUTO_INCREMENT PRIMARY KEY,
   bebida_id        BIGINT         NOT NULL,
   producto_id      BIGINT         NOT NULL,
@@ -164,14 +190,13 @@ CREATE TABLE IF NOT EXISTS receta (
 
 -- ============================================================
 -- VENTA
--- subtotal/igv/total e igv_tasa son instantaneas: se guardan para que
--- un reporte historico siga siendo interpretable aunque la tasa de IGV
--- cambie. igv_tasa es la que estaba hardcodeada en VentaService.
--- numero_pedido es obligatorio y unico: un ticket sin numero no es
--- un ticket.
+-- subtotal/igv/total/igv_tasa son instantaneas para que un reporte
+-- historico siga siendo correcto aunque la tasa cambie. version es
+-- el bloqueo optimista (V4).
 -- ============================================================
-CREATE TABLE IF NOT EXISTS venta (
+CREATE TABLE venta (
   id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+  version       BIGINT         NOT NULL DEFAULT 0,
   usuario_id    BIGINT         NOT NULL,
   fecha_hora    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   mesa          INT            NULL,
@@ -194,11 +219,8 @@ CREATE TABLE IF NOT EXISTS venta (
 
 -- ============================================================
 -- DETALLE_VENTA
--- precio_unitario y subtotal son instantaneas del precio al momento
--- de la venta: cambiar el precio de una bebida no debe alterar las
--- ventas ya emitidas.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS detalle_venta (
+CREATE TABLE detalle_venta (
   id              BIGINT AUTO_INCREMENT PRIMARY KEY,
   venta_id        BIGINT        NOT NULL,
   bebida_id       BIGINT        NOT NULL,
@@ -214,12 +236,9 @@ CREATE TABLE IF NOT EXISTS detalle_venta (
 
 -- ============================================================
 -- PAGO
--- NO se guarda monto_total: se deriva de venta.total (pago -> venta ->
--- total era una dependencia transitiva y una 3FN). Tampoco se guarda
--- el vuelto, que es monto_pagado - venta.total. MySQL no permite
--- CHECK con subconsultas, asi que esa consistencia la valida PagoService.
+-- no se guarda monto_total: se deriva de venta.total (3FN).
 -- ============================================================
-CREATE TABLE IF NOT EXISTS pago (
+CREATE TABLE pago (
   id               BIGINT AUTO_INCREMENT PRIMARY KEY,
   venta_id         BIGINT        NOT NULL,
   monto_pagado     DECIMAL(12,2) NOT NULL,
@@ -237,11 +256,10 @@ CREATE TABLE IF NOT EXISTS pago (
 
 -- ============================================================
 -- MOVIMIENTO_INVENTARIO (Kardex)
--- Fuente de verdad del stock. referencia_id es polimorfica (por eso no
--- puede tener FK), pero tipo_referencia la hace interpretable y el
--- CHECK obliga a que la pareja vaya junta o no vaya.
+-- referencia_id es polimorfica (sin FK), pero tipo_referencia la
+-- hace interpretable y el CHECK obliga a que vayan juntos o no vayan.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS movimiento_inventario (
+CREATE TABLE movimiento_inventario (
   id               BIGINT AUTO_INCREMENT PRIMARY KEY,
   producto_id      BIGINT        NOT NULL,
   tipo_movimiento  ENUM('INGRESO','SALIDA') NOT NULL,
@@ -265,10 +283,8 @@ CREATE TABLE IF NOT EXISTS movimiento_inventario (
 
 -- ============================================================
 -- CLIENTE_FIDELIDAD
--- dni permite deduplicar: sin el, el mismo cliente podia registrarse
--- tantas veces como el empleado quisiera.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS cliente_fidelidad (
+CREATE TABLE cliente_fidelidad (
   id             BIGINT AUTO_INCREMENT PRIMARY KEY,
   dni            VARCHAR(20)  NULL UNIQUE,
   nombre         VARCHAR(100) NOT NULL,
@@ -285,11 +301,8 @@ CREATE TABLE IF NOT EXISTS cliente_fidelidad (
 
 -- ============================================================
 -- VISITA_CLIENTE
--- UNIQUE en venta_id impide que una misma venta cuente para fidelidad
--- mas de una vez. MySQL admite varios NULL en un indice unico, asi que
--- las visitas sin venta asociada siguen siendo posibles.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS visita_cliente (
+CREATE TABLE visita_cliente (
   id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
   cliente_fidelidad_id BIGINT NOT NULL,
   venta_id             BIGINT NULL,
@@ -300,19 +313,18 @@ CREATE TABLE IF NOT EXISTS visita_cliente (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- INDICES
--- Los indices de las claves foraneas los crea InnoDB solo; aqui van
--- los que corresponden a las consultas de los reportes.
+-- INDICES (los de las FK los crea InnoDB solo)
 -- ============================================================
-CREATE INDEX idx_producto_nombre        ON producto(nombre);
-CREATE INDEX idx_producto_categoria      ON producto(categoria_id, nombre);
-CREATE INDEX idx_bebida_nombre          ON bebida(nombre);
-CREATE INDEX idx_bebida_categoria       ON bebida(categoria_id);
-CREATE INDEX idx_receta_producto        ON receta(producto_id);
-CREATE INDEX idx_venta_fecha            ON venta(fecha_hora);
-CREATE INDEX idx_venta_estado_fecha     ON venta(estado, fecha_hora);
-CREATE INDEX idx_detalle_bebida         ON detalle_venta(bebida_id);
-CREATE INDEX idx_pago_tipo_fecha        ON pago(tipo_pago, fecha_pago);
-CREATE INDEX idx_mov_producto_fecha     ON movimiento_inventario(producto_id, fecha_movimiento);
-CREATE INDEX idx_mov_fecha              ON movimiento_inventario(fecha_movimiento);
-CREATE INDEX idx_visita_cliente_fecha   ON visita_cliente(cliente_fidelidad_id, fecha_visita);
+CREATE INDEX idx_producto_nombre      ON producto(nombre);
+CREATE INDEX idx_producto_categoria   ON producto(categoria_id, nombre);
+CREATE INDEX idx_pp_proveedor         ON producto_proveedor(proveedor_id);
+CREATE INDEX idx_bebida_nombre        ON bebida(nombre);
+CREATE INDEX idx_bebida_categoria     ON bebida(categoria_id);
+CREATE INDEX idx_receta_producto      ON receta(producto_id);
+CREATE INDEX idx_venta_fecha          ON venta(fecha_hora);
+CREATE INDEX idx_venta_estado_fecha   ON venta(estado, fecha_hora);
+CREATE INDEX idx_detalle_bebida       ON detalle_venta(bebida_id);
+CREATE INDEX idx_pago_tipo_fecha      ON pago(tipo_pago, fecha_pago);
+CREATE INDEX idx_mov_producto_fecha   ON movimiento_inventario(producto_id, fecha_movimiento);
+CREATE INDEX idx_mov_fecha            ON movimiento_inventario(fecha_movimiento);
+CREATE INDEX idx_visita_cliente_fecha ON visita_cliente(cliente_fidelidad_id, fecha_visita);

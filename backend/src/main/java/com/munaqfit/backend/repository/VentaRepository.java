@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
@@ -34,11 +35,13 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     List<Venta> findAllByOrderByFechaHoraDesc();
 
     /**
-     * Ultimo id asignado, para numerar los pedidos. No se usa count()+1
-     * porque si alguna venta se cancela y se borra, el conteo baja y el
-     * siguiente numero repetiria uno ya emitido.
+     * Ultimos numeros de pedido emitidos hoy, para continuar la secuencia
+     * del dia (PED-YYYYMMDD-####). El prefijo ya trae la fecha, asi que
+     * con ordenar descendentemente y limitarlo a 1 alcanza el mas reciente.
+     * JPQL explicito porque un findTop derivado seleccionaba la entidad
+     * entera en vez de proyectar solo la columna de texto.
      */
-    @Query("SELECT COALESCE(MAX(v.id), 0) FROM Venta v")
-    Long findMaxId();
+    @Query("SELECT v.numeroPedido FROM Venta v WHERE v.numeroPedido LIKE :prefijo ORDER BY v.numeroPedido DESC")
+    List<String> findUltimosNumeroPedido(@Param("prefijo") String prefijo, Pageable pageable);
 
 }

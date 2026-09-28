@@ -12,12 +12,15 @@ import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.repository.RecetaRepository;
 import com.munaqfit.backend.repository.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,9 @@ public class VentaService {
 
     /** Codigo del parametro que guarda la tasa de IGV vigente. */
     private static final String PARAMETRO_IGV = "IGV";
+
+    /** Formato de fecha del numero de pedido: PED-20260928-0001 */
+    private static final DateTimeFormatter FORMATO_FECHA_PEDIDO = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** Se usa solo si el parametro no esta cargado en la base. */
     private static final BigDecimal IGV_POR_DEFECTO = new BigDecimal("0.18");
@@ -204,7 +210,25 @@ public class VentaService {
         }
     }
 
+    /**
+     * Numero de pedido legible para el cliente: PED-YYYYMMDD-####.
+     * La secuencia se reinicia cada dia y se deriva del ultimo pedido
+     * emitido hoy (la columna es UNIQUE: si dos empleados chocan en el
+     * mismo instante, el segundo transaccion falla y se reintenta).
+     */
     private String generarNumeroPedido() {
-        return String.format("PED-%06d", ventaRepository.findMaxId() + 1);
+        String prefijo = "PED-" + LocalDate.now().format(FORMATO_FECHA_PEDIDO) + "-";
+        List<String> ultimos = ventaRepository.findUltimosNumeroPedido(prefijo + "%", PageRequest.of(0, 1));
+        String ultimoDeHoy = ultimos.isEmpty() ? null : ultimos.get(0);
+
+        int secuencia = 1;
+        if (ultimoDeHoy != null && ultimoDeHoy.length() > prefijo.length()) {
+            try {
+                secuencia = Integer.parseInt(ultimoDeHoy.substring(prefijo.length())) + 1;
+            } catch (NumberFormatException ignorado) {
+                // El ultimo pedido no termina en numeros: se reinicia en 1.
+            }
+        }
+        return String.format("%s%04d", prefijo, secuencia);
     }
 }

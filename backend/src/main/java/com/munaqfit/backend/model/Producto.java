@@ -23,6 +23,15 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Bloqueo optimista (V4): si dos ventas descuentan el mismo insumo a
+     * la vez, la segunda transaccion recibe 409 en vez de dejar el stock
+     * incoherente.
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     @Column(nullable = false, length = 100)
     private String nombre;
 

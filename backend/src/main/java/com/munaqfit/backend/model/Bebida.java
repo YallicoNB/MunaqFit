@@ -57,6 +57,28 @@ public class Bebida {
     @Column(name = "tiempo_preparacion")
     private Integer tiempoPreparacion;
 
+    // ---- Info nutricional (REQ-018). La columna la crea V3 NULL a
+    // proposito: Dev 4 llena los valores y hace el render. Null = el dato
+    // no esta cargado ("Informacion nutricional no disponible").
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal calorias;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal proteinas;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal carbohidratos;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal grasas;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal fibra;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal azucares;
+
     @Column(nullable = false)
     private Boolean activo = true;
 

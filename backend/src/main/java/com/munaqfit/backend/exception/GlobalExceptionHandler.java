@@ -3,6 +3,7 @@ package com.munaqfit.backend.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -77,6 +78,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
         return build("Violación de integridad de datos", HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Regla de negocio violada por el estado actual de los datos: stock
+     * insuficiente, venta ya pagada o cancelada. Es un conflicto de
+     * proceso (409) para que el empleado reintente o cancele, no un
+     * error de servidor.
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleEstadoInvalido(IllegalStateException ex) {
+        log.warn("Regla de negocio rechazada: {}", ex.getMessage());
+        return build(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Dos transacciones escribieron el mismo registro con la version ya
+     * cambiada por la otra (bloqueo optimista del @Version). Es un choque
+     * esperado de concurrencia: 409 para que el cliente reintente, no 500.
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLock(OptimisticLockingFailureException ex) {
+        log.warn("Conflicto de concurrencia detectado: {}", ex.getMessage());
+        return build("El registro fue modificado por otra operacion mientras se procesaba. Reintente.",
+                HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

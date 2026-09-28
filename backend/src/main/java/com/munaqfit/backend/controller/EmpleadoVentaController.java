@@ -9,6 +9,8 @@ import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.service.VentaService;
 import com.munaqfit.backend.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,14 @@ public class EmpleadoVentaController {
             Venta nuevaVenta = ventaService.procesarVenta(request.getVenta(), request.getDetalles());
             return ResponseEntity.ok(nuevaVenta);
         } catch (Exception e) {
+            // Los conflictos de concurrencia (bloqueo optimista) y las reglas de
+            // negocio (stock insuficiente, venta ya pagada) se reenvian al
+            // GlobalExceptionHandler, que responde 409 para que se reintente.
+            if (e instanceof OptimisticLockingFailureException
+                    || e instanceof DataIntegrityViolationException
+                    || e instanceof IllegalStateException) {
+                throw e;
+            }
             return ResponseEntity.badRequest().body("Error al procesar la venta: " + e.getMessage());
         }
     }
@@ -57,7 +67,8 @@ public class EmpleadoVentaController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Venta ya pagada o cancelada: conflicto, 409 via GlobalExceptionHandler.
+            throw e;
         }
     }
 
