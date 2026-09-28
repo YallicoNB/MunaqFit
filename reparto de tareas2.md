@@ -73,7 +73,7 @@ y el 409 de concurrencia responde correctamente. Commits de referencia:
 
 ---
 
-### Developer 1 (Elvis) — Núcleo del Negocio + Modelo de Datos — ✅ COMPLETO (1.1 – 1.12)
+### Developer 1 (Noe) — Núcleo del Negocio + Modelo de Datos — ✅ COMPLETO (1.1 – 1.12)
 
 **Objetivo:** Cerrar el flujo que hace que el sistema realmente venda, y modelar los datos correctamente. Es la parte más difícil y la más visible en la sustentación.
 
@@ -265,7 +265,7 @@ No cambian, pero se escribe más código, así que conviene tenerlas presentes:
 
 | Developer | Responsabilidad | Tareas | Dificultad | Depende de |
 |:---|:---|:---|:---|:---|
-| **Developer 1 (Elvis)** | POS + modelo de datos + concurrencia | 1.1 – 1.12 | **ALTA** | — |
+| **Developer 1 (Noe)** | POS + modelo de datos + concurrencia | 1.1 – 1.12 | **ALTA** | — |
 | **Developer 2** | Kardex y exportación | 2.1 – 2.7 | **MEDIA** | — |
 | **Developer 3** | Bootstrap, `shared/`, Toast | 3.1 – 3.7 | **MEDIA-BAJA** | — |
 | **Developer 4** | CRUD faltante, accesibilidad, formularios | 4.1 – 4.8 | **BAJA** | Dev 1 (1.5) · Dev 3 (3.4/3.7 para 4.4/4.5/4.8) |
@@ -330,7 +330,7 @@ Estos nombres no se cambian sin avisar, para que el frontend y el backend no se 
 
 ---
 
-## Primera Acción para Developer 1 (Elvis) — ✅ Cumplida
+## Primera Acción para Developer 1 (Noe) — ✅ Cumplida
 
 **Estado:** los 4 pasos de abajo ya están hechos y verificados en `feat/dev1-etapa-2`.
 Esta sección se conserva como registro de cómo se desbloqueó a los demás developers.
