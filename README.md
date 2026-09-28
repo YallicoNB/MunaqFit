@@ -65,6 +65,42 @@ La API queda disponible en `http://localhost:8080`.
 
 Responde con un token JWT (`Bearer`) que debe enviarse en el header `Authorization` para acceder al resto de la API.
 
+## Comprobar el token (para el frontend)
+
+`GET /api/auth/validar-token` — solo verifica el token, no devuelve datos de negocio.
+
+| Situación | Respuesta |
+|:---|:---|
+| Token válido | `200` → `{"valido": true, "dni": "12345678", "rol": "ADMIN"}` |
+| Token inválido o expirado | `401` → `{"valido": false, "mensaje": "..."}` |
+| Sin token | `401` → `{"valido": false, "mensaje": "..."}` |
+
+```sh
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:8080/api/auth/validar-token
+```
+
+Útil para que el frontend verifique la sesión al cargar la app (por ejemplo en un `interceptor` o un `guard`).
+
+## API de productos
+
+Todas requieren token JWT válido en el header `Authorization: Bearer <TOKEN>`.
+
+| Método | Ruta | Descripción |
+|:---|:---|:---|
+| `GET` | `/api/productos` | Lista todos los productos |
+| `GET` | `/api/productos/{id}` | Obtiene un producto por su id |
+| `GET` | `/api/productos/categoria/{categoriaId}` | Lista productos de una categoría |
+| `GET` | `/api/productos/buscar?nombre=texto` | Busca productos por nombre (parcial) |
+
+## Resto de endpoints
+
+| Módulo | Prefijo | Developer |
+|:---|:---|:---|
+| Panel de administración (dashboard, inventario, proveedores, usuarios, ventas, reportes) | `/api/admin/**` | Dev 2 |
+| Módulo de empleado (ventas, órdenes, menú, fidelidad) | `/api/empleado/**` | Dev 3 |
+
+Los endpoints `/api/admin/**` requieren rol `ADMIN`.
+
 ## Rama principal
 
 La rama por defecto del repositorio es `main`. Los integrantes deben trabajar en ramas por feature (por ejemplo `feat/usuario-crud`, `feat/ventas`) y abrir Pull Requests hacia `main`.

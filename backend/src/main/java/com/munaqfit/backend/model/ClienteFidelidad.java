@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,6 +42,7 @@ public class ClienteFidelidad {
     @Column(name = "fecha_registro", nullable = false, updatable = false)
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "clienteFidelidad")
     private List<VisitaCliente> visitasDetalle = new ArrayList<>();
 }

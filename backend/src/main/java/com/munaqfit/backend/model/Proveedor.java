@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,6 +43,7 @@ public class Proveedor {
     @Column(name = "tipo_contrato", length = 20)
     private TipoContrato tipoContrato;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "proveedor")
     private List<Producto> productos = new ArrayList<>();
 

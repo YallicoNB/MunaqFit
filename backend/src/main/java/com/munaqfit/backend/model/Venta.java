@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,9 +54,11 @@ public class Venta {
     @Column(name = "numero_pedido", length = 30)
     private String numeroPedido;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
+    @JsonIgnore
     @OneToOne(mappedBy = "venta", cascade = CascadeType.ALL)
     private Pago pago;
 

@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,6 +42,7 @@ public class Bebida {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "bebida")
     private List<Receta> recetas = new ArrayList<>();
 }

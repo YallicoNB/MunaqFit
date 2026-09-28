@@ -1,5 +1,6 @@
 package com.munaqfit.backend.controller;
 
+import com.munaqfit.backend.dto.VentaRequest;
 import com.munaqfit.backend.model.Venta;
 import com.munaqfit.backend.service.VentaService;
 import com.munaqfit.backend.service.PagoService;

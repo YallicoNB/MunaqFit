@@ -1,5 +1,6 @@
 package com.munaqfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Categoria {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     private List<Producto> productos = new ArrayList<>();
 }
