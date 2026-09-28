@@ -1,0 +1,112 @@
+.dashboard {
+  font-family: Arial, sans-serif;
+  color: #1c2b2d;
+  padding: 24px;
+}
+
+.titulo {
+  margin: 0 0 20px;
+  font-size: 26px;
+  color: #203a43;
+}
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tarjeta {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.tarjeta.peligro {
+  background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+}
+
+.tarjeta-valor {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.tarjeta-etiqueta {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 6px;
+}
+
+.filas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #dce6e8;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+  color: #2c5364;
+}
+
+.panel h3 {
+  margin: 18px 0 8px;
+  font-size: 14px;
+  color: #2c5364;
+}
+
+.datos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.datos li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef3f4;
+  font-size: 14px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 9px 8px;
+  border-bottom: 1px solid #eef3f4;
+}
+
+.tabla th {
+  color: #2c5364;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.vacio,
+.cargando {
+  color: #6b7f82;
+  font-size: 14px;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}

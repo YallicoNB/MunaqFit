@@ -16,11 +16,15 @@ export class Token {
   private readonly TOKEN_KEY = 'token';
   private readonly NOMBRE_KEY = 'nombreUsuario';
   private readonly ROL_KEY = 'rolUsuario';
+  private readonly DNI_KEY = 'dniUsuario';
+  private readonly EMAIL_KEY = 'emailUsuario';
 
   guardarSesion(respuesta: RespuestaLogin): void {
     localStorage.setItem(this.TOKEN_KEY, respuesta.token);
     localStorage.setItem(this.NOMBRE_KEY, respuesta.nombreCompleto);
     localStorage.setItem(this.ROL_KEY, respuesta.rol);
+    localStorage.setItem(this.DNI_KEY, respuesta.dni);
+    localStorage.setItem(this.EMAIL_KEY, respuesta.email);
   }
 
   decodificarToken(): TokenPayload | null {
@@ -52,9 +56,19 @@ export class Token {
     return localStorage.getItem(this.NOMBRE_KEY);
   }
 
+  getDni(): string | null {
+    return localStorage.getItem(this.DNI_KEY);
+  }
+
+  getEmail(): string | null {
+    return localStorage.getItem(this.EMAIL_KEY);
+  }
+
   cerrarSesion(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.NOMBRE_KEY);
     localStorage.removeItem(this.ROL_KEY);
+    localStorage.removeItem(this.DNI_KEY);
+    localStorage.removeItem(this.EMAIL_KEY);
   }
 }

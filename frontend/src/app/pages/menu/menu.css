@@ -1,0 +1,118 @@
+.menu {
+  font-family: Arial, sans-serif;
+  color: #1c2b2d;
+  padding: 24px;
+}
+
+.titulo {
+  margin: 0 0 20px;
+  font-size: 26px;
+  color: #203a43;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #dce6e8;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-imagen {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-cuerpo {
+  padding: 16px;
+  flex: 1;
+}
+
+.card-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #2c5364;
+}
+
+.precio {
+  font-weight: 700;
+  color: #0f2027;
+}
+
+.descripcion {
+  font-size: 13px;
+  color: #52676b;
+  margin: 8px 0;
+}
+
+.meta {
+  font-size: 12px;
+  color: #8aa0a4;
+  margin: 0 0 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.btn-receta {
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-receta:hover {
+  opacity: 0.9;
+}
+
+.receta {
+  list-style: none;
+  margin: 0;
+  padding: 14px 16px;
+  background: #f4f8f9;
+  font-size: 13px;
+  border-top: 1px solid #e4edef;
+}
+
+.receta li {
+  padding: 5px 0;
+}
+
+.paso {
+  display: block;
+  color: #7b9196;
+  font-size: 12px;
+}
+
+.vacio,
+.cargando {
+  color: #6b7f82;
+  font-size: 14px;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}

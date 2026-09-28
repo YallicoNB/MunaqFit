@@ -1,0 +1,72 @@
+<div class="usuarios">
+  <div class="cabecera">
+    <h1 class="titulo">Usuarios</h1>
+    <button class="btn" (click)="abrirFormulario()">Nuevo empleado</button>
+  </div>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
+  <p *ngIf="cargando" class="cargando">Cargando usuarios...</p>
+
+  <table class="tabla" *ngIf="!cargando && usuarios.length">
+    <thead>
+      <tr>
+        <th>DNI</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.dni }}</td>
+        <td>{{ u.nombreCompleto }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.rol }}</td>
+        <td>
+          <span class="estado" [class.inactivo]="u.estado === 'INACTIVO'">{{ u.estado }}</span>
+        </td>
+        <td>
+          <button
+            class="btn peligro"
+            *ngIf="u.estado === 'ACTIVO'"
+            (click)="desactivar(u)"
+          >
+            Inactivar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!cargando && !usuarios.length" class="vacio">No hay empleados registrados.</p>
+
+  <div class="formulario" *ngIf="mostrarFormulario">
+    <h2>Nuevo empleado</h2>
+    <label>
+      DNI
+      <input type="text" [(ngModel)]="dni" maxlength="8" />
+    </label>
+    <label>
+      Nombre completo
+      <input type="text" [(ngModel)]="nombreCompleto" />
+    </label>
+    <label>
+      Email
+      <input type="email" [(ngModel)]="email" />
+    </label>
+    <label>
+      Contrasena
+      <input type="password" [(ngModel)]="password" />
+    </label>
+    <p class="nota">El usuario se creara con el rol EMPLEADO.</p>
+    <div class="acciones">
+      <button class="btn" (click)="crear()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : 'Crear' }}
+      </button>
+      <button class="btn secundario" (click)="mostrarFormulario = false">Cancelar</button>
+    </div>
+  </div>
+</div>

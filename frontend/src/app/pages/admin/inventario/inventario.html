@@ -1,0 +1,65 @@
+<div class="inventario">
+  <h1 class="titulo">Inventario</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
+
+  <div class="alertas" *ngIf="criticos.length || bajos.length">
+    <div class="alerta critica" *ngIf="criticos.length">
+      <strong>{{ criticos.length }}</strong> insumo(s) en stock critico:
+      {{ nombresCriticos }}
+    </div>
+    <div class="alerta baja" *ngIf="bajos.length">
+      <strong>{{ bajos.length }}</strong> insumo(s) por debajo del minimo.
+    </div>
+  </div>
+
+  <p *ngIf="cargando" class="cargando">Cargando inventario...</p>
+
+  <table class="tabla" *ngIf="!cargando && productos.length">
+    <thead>
+      <tr>
+        <th>Insumo</th>
+        <th>Stock</th>
+        <th>Minimo</th>
+        <th>Critico</th>
+        <th>Unidad</th>
+        <th>Costo</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of productos">
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.stockActual | number: '1.2-2' }}</td>
+        <td>{{ p.stockMinimo | number: '1.2-2' }}</td>
+        <td>{{ p.stockCritico | number: '1.2-2' }}</td>
+        <td>{{ p.unidadMedida }}</td>
+        <td>S/ {{ p.costoUnitario | number: '1.3-3' }}</td>
+        <td><span [ngClass]="'nivel-' + nivel(p)">{{ nivel(p) }}</span></td>
+        <td>
+          <button class="btn" (click)="abrirFormulario(p)">Reabastecer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formulario" *ngIf="mostrarFormulario">
+    <h2>Reabastecer insumo</h2>
+    <label>
+      Cantidad
+      <input type="number" [(ngModel)]="cantidad" min="0" step="0.01" />
+    </label>
+    <label>
+      Motivo
+      <input type="text" [(ngModel)]="motivo" />
+    </label>
+    <div class="acciones">
+      <button class="btn" (click)="reabastecer()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : 'Confirmar' }}
+      </button>
+      <button class="btn secundario" (click)="mostrarFormulario = false">Cancelar</button>
+    </div>
+  </div>
+</div>

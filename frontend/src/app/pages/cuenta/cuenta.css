@@ -1,0 +1,115 @@
+.cuenta {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.cabecera {
+  margin-bottom: 24px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #1c2b2d;
+}
+
+.subtitulo {
+  margin: 4px 0 0;
+  color: #6b7f82;
+  font-size: 0.9rem;
+}
+
+.perfil {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #dce6e8;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.datos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fila {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid #eef3f4;
+  padding-bottom: 12px;
+}
+
+.fila:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.etiqueta {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8aa0a4;
+}
+
+.valor {
+  font-size: 1rem;
+  color: #1c2b2d;
+  word-break: break-word;
+}
+
+.rol {
+  display: inline-block;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.rol-codigo {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  color: #8aa0a4;
+}
+
+.acciones {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cerrar {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-cerrar:hover {
+  background: #991b1b;
+}

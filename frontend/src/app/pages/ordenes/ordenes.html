@@ -1,0 +1,50 @@
+<div class="ordenes">
+  <h1 class="titulo">Historial de ordenes</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="cargando" class="cargando">Cargando ordenes...</p>
+
+  <table class="tabla" *ngIf="!cargando && ordenes.length">
+    <thead>
+      <tr>
+        <th>Pedido</th>
+        <th>Fecha</th>
+        <th>Empleado</th>
+        <th>Mesa</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let orden of ordenes">
+        <tr>
+          <td>{{ orden.numeroPedido }}</td>
+          <td>{{ orden.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ orden.usuario?.nombreCompleto }}</td>
+          <td>{{ orden.mesa ?? '-' }}</td>
+          <td>S/ {{ orden.total | number: '1.2-2' }}</td>
+          <td><span class="estado" [class.pagado]="orden.estado === 'PAGADO'">{{ orden.estado }}</span></td>
+          <td>
+            <button class="btn" (click)="verDetalle(orden)">
+              {{ ordenAbierta?.id === orden.id ? 'Ocultar' : 'Detalle' }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="ordenAbierta?.id === orden.id">
+          <td colspan="7" class="detalle-celda">
+            <ul class="detalle" *ngIf="detalle.length">
+              <li *ngFor="let item of detalle">
+                <strong>{{ item.bebida.nombre }}</strong> x {{ item.cantidad }}
+                <span>S/ {{ item.subtotal | number: '1.2-2' }}</span>
+              </li>
+            </ul>
+            <p *ngIf="!detalle.length" class="vacio">Sin productos registrados.</p>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <p *ngIf="!cargando && !ordenes.length" class="vacio">Todavia no hay ordenes registradas.</p>
+</div>
