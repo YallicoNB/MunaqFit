@@ -39,7 +39,7 @@ INSERT INTO parametro (codigo, nombre, valor, tipo_dato, descripcion) VALUES
 -- USUARIOS (password de todos: 12345678)
 -- ============================================================
 INSERT INTO usuario (dni, nombre_completo, email, password, rol, estado) VALUES
-('12345678', 'Elvis Munaq', 'elvis@munaqfit.com', '$2a$10$zctytCR0prc/fKewL.3dW.HOlIAb8Iwvebumq5QXET/YZz5.RCFN2', 'ADMIN', 'ACTIVO'),
+('12345678', 'Noe Munaq', 'noe.munaq@munaqfit.com', '$2a$10$zctytCR0prc/fKewL.3dW.HOlIAb8Iwvebumq5QXET/YZz5.RCFN2', 'ADMIN', 'ACTIVO'),
 ('87654321', 'Noe Developer', 'noe@munaqfit.com',   '$2a$10$Ba81nWeeqlSpFneLvjnn5ODZLnp1.YDe.lsupnkda.x0z9nFmvACu', 'EMPLEADO', 'ACTIVO'),
 ('11111111', 'Maria Lopez',   'maria@munaqfit.com', '$2a$10$cJvAEVw.SDiJa/Z0uz5CXO98CTsXzQWfDUxCaBKxrL6PlimWks1yK', 'EMPLEADO', 'ACTIVO'),
 ('22222222', 'Carlos Ruiz',   'carlos@munaqfit.com', '$2a$10$DmdWOt7RK2QS4l4xH5l4NeVCICTMTLD2RnIhu.U8lBHWqpPfLyIB2', 'EMPLEADO', 'INACTIVO');

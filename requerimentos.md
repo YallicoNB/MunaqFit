@@ -65,7 +65,7 @@ Desarrollar un sistema web integral que permita a Munaq Fit:
 
 | Término | Definición |
 |:---|:---|
-| **Administrador** | Usuario con acceso total al sistema. Puede crear empleados, gestionar inventario y ver todos los reportes. Generalmente es el dueño del negocio (Elvis). |
+| **Administrador** | Usuario con acceso total al sistema. Puede crear empleados, gestionar inventario y ver todos los reportes. Generalmente es el dueño del negocio (Noe). |
 | **Bebida** | Producto final que vende Munaq Fit. Ejemplos: Atomic, Detox, Relax, Pink Protein, Hydrate, Golden Glow. |
 | **Caja** | Registro de apertura y cierre de turno, con control de ingresos del día. |
 | **Cliente Frecuente** | Cliente registrado en el sistema de fidelización que acumula visitas para obtener beneficios. |

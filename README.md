@@ -74,7 +74,7 @@ Los cuatro usuarios usan la contraseña `12345678`:
 
 | DNI | Contraseña | Nombre | Rol | Estado |
 |:---|:---|:---|:---|:---|
-| `12345678` | `12345678` | Elvis Munaq | ADMIN | ACTIVO |
+| `12345678` | `12345678` | Noe Munaq | ADMIN | ACTIVO |
 | `87654321` | `12345678` | Noe Developer | EMPLEADO | ACTIVO |
 | `11111111` | `12345678` | Maria Lopez | EMPLEADO | ACTIVO |
 | `22222222` | `12345678` | Carlos Ruiz | EMPLEADO | **INACTIVO** |
@@ -120,7 +120,7 @@ exitoso reinicia el contador y limpia el bloqueo.
 `POST /api/auth/forgot-password`
 
 ```json
-{ "email": "elvis@munaqfit.com" }
+{ "email": "noe.munaq@munaqfit.com" }
 ```
 
 Devuelve `200` **siempre**, exista o no el correo, con el mismo mensaje. Esto es
