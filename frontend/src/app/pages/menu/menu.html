@@ -6,12 +6,7 @@
 
   <div class="grid" *ngIf="!cargando">
     <article class="card" *ngFor="let bebida of bebidas">
-      <img
-        *ngIf="bebida.imagenUrl"
-        class="card-imagen"
-        [src]="bebida.imagenUrl"
-        [alt]="bebida.nombre"
-      />
+      <img *ngIf="bebida.imagenUrl" class="card-imagen" [src]="bebida.imagenUrl" [alt]="bebida.nombre" />
       <div class="card-cuerpo">
         <div class="card-cabecera">
           <h2>{{ bebida.nombre }}</h2>
@@ -35,6 +30,25 @@
         </li>
         <li *ngIf="!recetaAbierta.length" class="vacio">Esta bebida no tiene receta cargada.</li>
       </ul>
+      <!-- Parte nueva developer 4-->
+      <div class="mt-4" *ngIf="recetaDeBebida === bebida.nombre && recetaAbierta">
+        <h5>Información Nutricional</h5>
+
+        <ng-container *ngIf="bebida.calorias; else noNutricion">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Calorías:</strong> {{ bebida.calorias }} kcal</li>
+            <li class="list-group-item"><strong>Proteínas:</strong> {{ bebida.proteinas }} g</li>
+            <li class="list-group-item"><strong>Carbohidratos:</strong> {{ bebida.carbohidratos }} g</li>
+            <li class="list-group-item"><strong>Grasas:</strong> {{ bebida.grasas }} g</li>
+            <li class="list-group-item"><strong>Fibra:</strong> {{ bebida.fibra }} g</li>
+            <li class="list-group-item"><strong>Azúcares:</strong> {{ bebida.azucares }} g</li>
+          </ul>
+        </ng-container>
+
+        <ng-template #noNutricion>
+          <p class="text-muted fst-italic">Información nutricional no disponible</p>
+        </ng-template>
+      </div>
     </article>
   </div>
 
