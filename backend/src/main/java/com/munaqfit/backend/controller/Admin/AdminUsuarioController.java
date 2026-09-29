@@ -79,4 +79,10 @@ public class AdminUsuarioController {
         
         return ResponseEntity.ok("Empleado eliminado (inactivado) exitosamente.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioCreateRequest request) {
+        UsuarioDTO usuarioActualizado = usuarioService.actualizarUsuario(id, request);
+        return ResponseEntity.ok(usuarioActualizado);
+    }
 }
