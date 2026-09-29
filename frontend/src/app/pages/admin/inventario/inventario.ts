@@ -14,6 +14,7 @@ export class Inventario implements OnInit {
   productos: ProductoInventario[] = [];
   criticos: ProductoInventario[] = [];
   bajos: ProductoInventario[] = [];
+  busqueda = '';
   cargando = true;
   error = '';
   mensaje = '';
@@ -26,6 +27,19 @@ export class Inventario implements OnInit {
   guardando = false;
 
   constructor(private adminService: AdminService) {}
+
+  get productosFiltrados(): ProductoInventario[] {
+    const termino = this.busqueda.trim().toLocaleLowerCase();
+    if (!termino) return this.productos;
+
+    return this.productos.filter((producto) =>
+      producto.nombre.toLocaleLowerCase().includes(termino),
+    );
+  }
+
+  abreviarUnidad(unidad: string): string {
+    return unidad === 'UNIDAD' ? 'U' : unidad;
+  }
 
   ngOnInit(): void {
     this.cargar();

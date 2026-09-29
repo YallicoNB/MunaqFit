@@ -1,41 +1,77 @@
 <div class="menu">
-  <h1 class="titulo">Menu de bebidas</h1>
+  <h1 class="titulo">Menú de productos</h1>
 
   <p *ngIf="error" class="error">{{ error }}</p>
   <p *ngIf="cargando" class="cargando">Cargando menu...</p>
 
-  <div class="grid" *ngIf="!cargando">
-    <article class="card" *ngFor="let bebida of bebidas">
-      <img
-        *ngIf="bebida.imagenUrl"
-        class="card-imagen"
-        [src]="bebida.imagenUrl"
-        [alt]="bebida.nombre"
-      />
-      <div class="card-cuerpo">
-        <div class="card-cabecera">
-          <h2>{{ bebida.nombre }}</h2>
-          <span class="precio">S/ {{ bebida.precio | number: '1.2-2' }}</span>
-        </div>
-        <p class="descripcion">{{ bebida.descripcion }}</p>
-        <p class="meta">
-          <span *ngIf="bebida.categoria">{{ bebida.categoria }}</span>
-          <span *ngIf="bebida.tiempoPreparacion">· {{ bebida.tiempoPreparacion }} min</span>
-        </p>
-        <button class="btn-receta" (click)="verReceta(bebida)">
-          {{ recetaDeBebida === bebida.nombre ? 'Ocultar insumos' : 'Ver insumos' }}
-        </button>
-      </div>
+  <div class="menu-contenido" *ngIf="!cargando && bebidas.length">
+    <aside class="filtros" aria-label="Filtros de productos">
+      <label class="campo-filtro busqueda-filtro">
+        <span>Buscar por nombre</span>
+        <input
+          type="search"
+          class="form-control"
+          [(ngModel)]="busqueda"
+          placeholder="Ej. Latte"
+        />
+      </label>
 
-      <ul class="receta" *ngIf="recetaDeBebida === bebida.nombre && recetaAbierta">
-        <li *ngFor="let r of recetaAbierta">
-          <strong>{{ r.producto.nombre }}</strong>
-          — {{ r.cantidad }} {{ r.producto.unidadMedida }}
-          <span class="paso">{{ r.pasoInstruccion }}</span>
-        </li>
-        <li *ngIf="!recetaAbierta.length" class="vacio">Esta bebida no tiene receta cargada.</li>
-      </ul>
-    </article>
+      <section class="grupo-filtro" aria-label="Filtrar por precio mínimo">
+        <h2 class="titulo-filtro">Precio</h2>
+        <button
+          *ngFor="let opcion of opcionesPrecio"
+          type="button"
+          class="opcion-filtro"
+          [class.seleccionada]="precioMinimo === opcion.minimo"
+          [attr.aria-pressed]="precioMinimo === opcion.minimo"
+          (click)="seleccionarPrecio(opcion.minimo)"
+        >
+          {{ opcion.etiqueta }}
+        </button>
+      </section>
+
+      <section class="grupo-filtro" *ngIf="categorias.length" aria-label="Filtrar por categoría">
+        <h2 class="titulo-filtro">Categorías</h2>
+        <button
+          type="button"
+          class="opcion-filtro"
+          [class.seleccionada]="!categoriaSeleccionada"
+          [attr.aria-pressed]="!categoriaSeleccionada"
+          (click)="seleccionarCategoria(null)"
+        >
+          <span aria-hidden="true">🍽️</span>
+          Todas
+        </button>
+        <button
+          *ngFor="let categoria of categorias"
+          type="button"
+          class="opcion-filtro"
+          [class.seleccionada]="categoriaSeleccionada === categoria"
+          [attr.aria-pressed]="categoriaSeleccionada === categoria"
+          (click)="seleccionarCategoria(categoria)"
+        >
+          <span aria-hidden="true">{{ iconoCategoria(categoria) }}</span>
+          {{ categoria }}
+        </button>
+      </section>
+
+      <button type="button" class="btn-limpiar" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    </aside>
+
+    <section class="resultados-menu" aria-label="Productos">
+      <div class="grid">
+        <app-card
+          *ngFor="let bebida of bebidasFiltradas"
+          [bebida]="bebida"
+          [accionable]="false"
+        />
+      </div>
+      <p *ngIf="!bebidasFiltradas.length" class="vacio">
+        No hay productos que coincidan con los filtros.
+      </p>
+    </section>
   </div>
 
   <p *ngIf="!cargando && !bebidas.length" class="vacio">No hay bebidas registradas.</p>

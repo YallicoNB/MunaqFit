@@ -1,2 +1,8 @@
-<router-outlet />
-<app-toast-container />
+<div class="app-shell" [class.nav-cuenta-abierto]="cuentaAbierta">
+  <app-navbar
+    *ngIf="mostrarNavegacion"
+    (cuentaAbiertaChange)="cambiarEstadoCuenta($event)"
+  />
+  <router-outlet />
+  <app-toast-container />
+</div>
