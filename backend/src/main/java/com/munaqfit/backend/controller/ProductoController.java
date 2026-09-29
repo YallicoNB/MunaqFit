@@ -61,6 +61,31 @@ public class ProductoController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /* Parte nueva de POST, PUT, DELETE */
+    /** Crea un nuevo producto */
+    @PostMapping
+    public ResponseEntity crearProducto(@Valid @RequestBody ProductoRequestDTO request) {
+        // Delegamos la lógica compleja al Service
+        Producto p = productoService.crearProducto(request); 
+        return new ResponseEntity<>(aResponse(p), HttpStatus.CREATED);
+    }
+
+    /** Actualiza un producto existente */
+    @PutMapping("/{id}")
+    public ResponseEntity actualizarProducto(@PathVariable Long id, @Valid @RequestBody ProductoRequestDTO request) {
+        Producto p = productoService.actualizarProducto(id, request);
+        return ResponseEntity.ok(aResponse(p));
+    }
+
+    /** Elimina un producto */
+    @DeleteMapping("/{id}")
+    public ResponseEntity eliminarProducto(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /* FIN DE PARTE DE POST, PUT, DELETE */
+
     /** Convierte la entidad al DTO que consume el frontend. */
     private ProductoResponseDTO aResponse(Producto p) {
         ProductoResponseDTO dto = new ProductoResponseDTO();
