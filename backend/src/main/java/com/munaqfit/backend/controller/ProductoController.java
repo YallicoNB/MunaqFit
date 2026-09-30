@@ -1,12 +1,20 @@
 package com.munaqfit.backend.controller;
 
+import com.munaqfit.backend.dto.ProductoRequestDTO;
 import com.munaqfit.backend.dto.ProductoResponseDTO;
 import com.munaqfit.backend.model.Producto;
 import com.munaqfit.backend.model.ProductoProveedor;
 import com.munaqfit.backend.repository.ProductoRepository;
+import com.munaqfit.backend.service.ProductoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,9 +35,11 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoRepository productoRepository;
+    private final ProductoService productoService;
 
-    public ProductoController(ProductoRepository productoRepository) {
+    public ProductoController(ProductoRepository productoRepository, ProductoService productoService) {
         this.productoRepository = productoRepository;
+        this.productoService = productoService;
     }
 
     /** Lista todos los productos. */

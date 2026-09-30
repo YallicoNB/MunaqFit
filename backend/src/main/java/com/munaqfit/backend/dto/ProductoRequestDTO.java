@@ -15,16 +15,16 @@ public class ProductoRequestDTO {
     @NotNull(message = "La categoría es obligatoria")
     private Long categoriaId;
 
-    private Integer stockActual;
-    private Integer stockMinimo;
-    private Integer stockCritico;
+    private BigDecimal stockActual;
+    private BigDecimal stockMinimo;
+    private BigDecimal stockCritico;
     private BigDecimal costoUnitario;
     private LocalDate fechaCaducidad;
     private LocalDateTime ultimaReposicion;
     private String unidadMedida; 
 
     @NotNull(message = "Debe tener al menos un proveedor")
-    private List proveedores; 
+    private List<ProveedorAsignadoDTO> proveedores; 
 
     // --- GETTERS Y SETTERS ---
 
@@ -34,14 +34,14 @@ public class ProductoRequestDTO {
     public Long getCategoriaId() { return categoriaId; }
     public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
 
-    public Integer getStockActual() { return stockActual; }
-    public void setStockActual(Integer stockActual) { this.stockActual = stockActual; }
+    public BigDecimal getStockActual() { return stockActual; }
+    public void setStockActual(BigDecimal stockActual) { this.stockActual = stockActual; }
 
-    public Integer getStockMinimo() { return stockMinimo; }
-    public void setStockMinimo(Integer stockMinimo) { this.stockMinimo = stockMinimo; }
+    public BigDecimal getStockMinimo() { return stockMinimo; }
+    public void setStockMinimo(BigDecimal stockMinimo) { this.stockMinimo = stockMinimo; }
 
-    public Integer getStockCritico() { return stockCritico; }
-    public void setStockCritico(Integer stockCritico) { this.stockCritico = stockCritico; }
+    public BigDecimal getStockCritico() { return stockCritico; }
+    public void setStockCritico(BigDecimal stockCritico) { this.stockCritico = stockCritico; }
 
     public BigDecimal getCostoUnitario() { return costoUnitario; }
     public void setCostoUnitario(BigDecimal costoUnitario) { this.costoUnitario = costoUnitario; }
@@ -55,8 +55,8 @@ public class ProductoRequestDTO {
     public String getUnidadMedida() { return unidadMedida; }
     public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
 
-    public List getProveedores() { return proveedores; }
-    public void setProveedores(List proveedores) { this.proveedores = proveedores; }
+    public List<ProveedorAsignadoDTO> getProveedores() { return proveedores; }
+    public void setProveedores(List<ProveedorAsignadoDTO> proveedores) { this.proveedores = proveedores; }
 
     // --- CLASE ANIDADA ---
 
