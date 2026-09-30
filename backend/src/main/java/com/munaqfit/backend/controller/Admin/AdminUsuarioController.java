@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import com.munaqfit.backend.dto.UsuarioDTO;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,5 +80,38 @@ public class AdminUsuarioController {
         usuarioRepository.save(usuarioAEliminar);
         
         return ResponseEntity.ok("Empleado eliminado (inactivado) exitosamente.");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioCreateRequest request) {
+        
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Validación de DNI: Si cambia, verificamos que no exista en la BD
+        if (!usuario.getDni().equals(request.getDni()) && usuarioRepository.existsByDni(request.getDni())) {
+            throw new RuntimeException("El DNI ingresado ya está registrado en otro usuario");
+        }
+
+        // Validación de Email: Prevenimos duplicados también en el correo
+        if (!usuario.getEmail().equals(request.getEmail()) && usuarioRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("El correo ingresado ya está registrado en otro usuario");
+        }
+
+        // Actualizamos los datos básicos
+        usuario.setDni(request.getDni());
+        usuario.setNombreCompleto(request.getNombreCompleto());
+        usuario.setEmail(request.getEmail());
+        
+        // Actualizamos la contraseña solo si el frontend envía una nueva
+        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        // Guardamos en BD
+        Usuario guardado = usuarioRepository.save(usuario);
+        
+        // Retornamos usando tu propio método mapeador
+        return ResponseEntity.ok(UsuarioDTO.fromEntity(guardado));
     }
 }

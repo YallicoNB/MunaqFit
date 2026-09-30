@@ -1,12 +1,20 @@
 package com.munaqfit.backend.controller;
 
+import com.munaqfit.backend.dto.ProductoRequestDTO;
 import com.munaqfit.backend.dto.ProductoResponseDTO;
 import com.munaqfit.backend.model.Producto;
 import com.munaqfit.backend.model.ProductoProveedor;
 import com.munaqfit.backend.repository.ProductoRepository;
+import com.munaqfit.backend.service.ProductoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,9 +35,11 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoRepository productoRepository;
+    private final ProductoService productoService;
 
-    public ProductoController(ProductoRepository productoRepository) {
+    public ProductoController(ProductoRepository productoRepository, ProductoService productoService) {
         this.productoRepository = productoRepository;
+        this.productoService = productoService;
     }
 
     /** Lista todos los productos. */
@@ -60,6 +70,31 @@ public class ProductoController {
                 .map(p -> ResponseEntity.ok(aResponse(p)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    /* Parte nueva de POST, PUT, DELETE */
+    /** Crea un nuevo producto */
+    @PostMapping
+    public ResponseEntity crearProducto(@Valid @RequestBody ProductoRequestDTO request) {
+        // Delegamos la lógica compleja al Service
+        Producto p = productoService.crearProducto(request); 
+        return new ResponseEntity<>(aResponse(p), HttpStatus.CREATED);
+    }
+
+    /** Actualiza un producto existente */
+    @PutMapping("/{id}")
+    public ResponseEntity actualizarProducto(@PathVariable Long id, @Valid @RequestBody ProductoRequestDTO request) {
+        Producto p = productoService.actualizarProducto(id, request);
+        return ResponseEntity.ok(aResponse(p));
+    }
+
+    /** Elimina un producto */
+    @DeleteMapping("/{id}")
+    public ResponseEntity eliminarProducto(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /* FIN DE PARTE DE POST, PUT, DELETE */
 
     /** Convierte la entidad al DTO que consume el frontend. */
     private ProductoResponseDTO aResponse(Producto p) {
