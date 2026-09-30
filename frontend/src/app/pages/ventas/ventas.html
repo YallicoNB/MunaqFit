@@ -1,5 +1,3 @@
-<app-navbar />
-
 <div class="pos">
   <header class="pos-header d-flex justify-content-between align-items-center flex-wrap gap-2">
     <h1 class="titulo mb-0">Punto de venta</h1>
@@ -13,26 +11,68 @@
     <!-- ====== Catalogo de bebidas ====== -->
     <section class="col-lg-8">
       <p class="text-muted small mb-2">Toca una bebida para agregarla al pedido.</p>
-      <div class="row g-3" *ngIf="bebidas.length else sinMenu">
-        <article
-          *ngFor="let bebida of bebidas"
-          class="col-sm-6 col-md-4"
+      <div class="catalogo-filtros mb-3" *ngIf="bebidas.length">
+        <label class="buscador-bebidas">
+          <span class="visually-hidden">Buscar bebida por nombre</span>
+          <input
+            type="search"
+            class="form-control"
+            [(ngModel)]="busquedaBebida"
+            placeholder="Buscar por nombre..."
+          />
+        </label>
+        <button
+          type="button"
+          class="btn btn-outline-primary boton-filtros"
+          [attr.aria-expanded]="filtrosAbiertos"
+          aria-controls="filtros-categorias"
+          (click)="filtrosAbiertos = !filtrosAbiertos"
         >
-          <button
-            type="button"
-            class="bebida-card card h-100 w-100 text-start"
-            (click)="agregar(bebida)"
-          >
-            <div class="card-body d-flex flex-column">
-              <h2 class="card-title h6 mb-1">{{ bebida.nombre }}</h2>
-              <p class="card-text text-muted small flex-grow-1 mb-2">{{ bebida.descripcion }}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge text-bg-light border">{{ bebida.categoria }}</span>
-                <span class="fw-bold">S/ {{ bebida.precio | number: '1.2-2' }}</span>
-              </div>
-            </div>
-          </button>
-        </article>
+          <span aria-hidden="true">☷</span>
+          Filtrar
+          <span *ngIf="categoriaSeleccionada" class="filtro-activo">· {{ categoriaSeleccionada }}</span>
+        </button>
+      </div>
+
+      <section
+        *ngIf="filtrosAbiertos && categorias.length"
+        id="filtros-categorias"
+        class="panel-categorias mb-3"
+        aria-label="Filtrar por categoría"
+      >
+        <button
+          type="button"
+          class="categoria-filtro"
+          [class.seleccionada]="!categoriaSeleccionada"
+          [attr.aria-pressed]="!categoriaSeleccionada"
+          (click)="seleccionarCategoria(null)"
+        >
+          <span aria-hidden="true">🍽️</span>
+          Todas
+        </button>
+        <button
+          *ngFor="let categoria of categorias"
+          type="button"
+          class="categoria-filtro"
+          [class.seleccionada]="categoriaSeleccionada === categoria"
+          [attr.aria-pressed]="categoriaSeleccionada === categoria"
+          (click)="seleccionarCategoria(categoria)"
+        >
+          <span aria-hidden="true">{{ iconoCategoria(categoria) }}</span>
+          {{ categoria }}
+        </button>
+      </section>
+
+      <div class="row g-3" *ngIf="bebidas.length; else sinMenu">
+        <app-card
+          *ngFor="let bebida of bebidasFiltradas"
+          class="col-sm-6 col-md-4"
+          [bebida]="bebida"
+          (seleccionar)="agregar($event)"
+        />
+        <div class="col-12" *ngIf="!bebidasFiltradas.length">
+          <p class="text-muted mb-0">No hay bebidas que coincidan con la búsqueda o categoría.</p>
+        </div>
       </div>
       <ng-template #sinMenu>
         <p class="text-muted">No hay bebidas activas en el menu.</p>
@@ -54,81 +94,47 @@
           </button>
         </div>
 
-        <div class="card-body" *ngIf="carrito().length else carritoVacio">
-          <ul class="list-group list-group-flush" *ngIf="carrito().length">
-            <li
-              class="list-group-item d-flex justify-content-between align-items-start px-2"
-              *ngFor="let item of carrito(); trackBy: rastrearLinea"
+        <div class="card-body">
+          <div class="tipo-pedido mb-3" role="group" aria-label="Tipo de pedido">
+            <button
+              type="button"
+              class="btn"
+              [class.btn-primary]="tipoVenta === 'DELIVERY'"
+              [class.btn-outline-primary]="tipoVenta !== 'DELIVERY'"
+              [attr.aria-pressed]="tipoVenta === 'DELIVERY'"
+              (click)="cambiarTipoVenta('DELIVERY')"
             >
-              <div class="flex-grow-1 me-2">
-                <div class="fw-semibold small">{{ item.bebida.nombre }}</div>
-                <div class="text-muted small">S/ {{ item.bebida.precio | number: '1.2-2' }} c/u</div>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="btn-group btn-group-sm" role="group">
-                  <button
-                    type="button"
-                    class="btn btn-outline-secondary"
-                    (click)="disminuir(item.bebida.id)"
-                    aria-label="Restar"
-                  >
-                    −
-                  </button>
-                  <span class="btn btn-light disabled">{{ item.cantidad }}</span>
-                  <button
-                    type="button"
-                    class="btn btn-outline-secondary"
-                    (click)="aumentar(item.bebida.id)"
-                    aria-label="Sumar"
-                  >
-                    +
-                  </button>
-                </div>
-                <span class="small fw-bold w-100px text-end">
-                  S/ {{ item.bebida.precio * item.cantidad | number: '1.2-2' }}
-                </span>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-link text-danger p-0"
-                  (click)="quitarLinea(item.bebida.id)"
-                  aria-label="Quitar"
-                >
-                  ✕
-                </button>
-              </div>
-            </li>
-          </ul>
-
-          <div class="mt-3">
-            <label class="form-label small text-muted mb-1" for="mesa">Mesa (opcional)</label>
-            <input
-              id="mesa"
-              type="number"
-              min="1"
-              class="form-control form-control-sm mb-2"
-              [(ngModel)]="mesa"
-              placeholder="Ej. 3"
-            />
-            <label class="form-label small text-muted mb-1" for="tipoVenta">Tipo de venta</label>
-            <select
-              id="tipoVenta"
-              class="form-select form-select-sm mb-2"
-              [(ngModel)]="tipoVenta"
+              Delivery
+            </button>
+            <button
+              type="button"
+              class="btn"
+              [class.btn-primary]="tipoVenta === 'LOCAL'"
+              [class.btn-outline-primary]="tipoVenta !== 'LOCAL'"
+              [attr.aria-pressed]="tipoVenta === 'LOCAL'"
+              (click)="cambiarTipoVenta('LOCAL')"
             >
-              <option value="LOCAL">En local</option>
-              <option value="DELIVERY">Delivery</option>
-            </select>
-            <label class="form-label small text-muted mb-1" for="notas">Notas</label>
-            <textarea
-              id="notas"
-              rows="2"
-              class="form-control form-control-sm mb-2"
-              [(ngModel)]="notas"
-              placeholder="Opcional...">
-            </textarea>
+              Local
+            </button>
           </div>
 
-          <div class="border-top pt-2 mt-2 small">
+          <section *ngIf="tipoVenta === 'LOCAL'" class="mesas mb-3" aria-label="Seleccionar mesa">
+            <h3 class="seccion-pedido">Selecciona una mesa</h3>
+            <div class="selector-mesas">
+              <button
+                *ngFor="let numeroMesa of mesas"
+                type="button"
+                class="mesa-opcion"
+                [class.seleccionada]="mesa === numeroMesa"
+                [attr.aria-pressed]="mesa === numeroMesa"
+                (click)="seleccionarMesa(numeroMesa)"
+              >
+                Mesa {{ numeroMesa }}
+              </button>
+            </div>
+          </section>
+
+          <div class="resumen-pedido border-top pt-2 mt-3 small">
             <div class="d-flex justify-content-between text-muted">
               <span>Subtotal</span><span>S/ {{ subtotal() | number: '1.2-2' }}</span>
             </div>
@@ -140,21 +146,74 @@
             </div>
           </div>
 
+          <section class="productos-pedido mt-3">
+            <h3 class="seccion-pedido">Productos pedidos</h3>
+            <ul class="list-group list-group-flush" *ngIf="carrito().length; else carritoVacio">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-start px-2"
+                *ngFor="let item of carrito(); trackBy: rastrearLinea"
+              >
+                <div class="flex-grow-1 me-2">
+                  <div class="fw-semibold small">{{ item.bebida.nombre }}</div>
+                  <div class="text-muted small">S/ {{ item.bebida.precio | number: '1.2-2' }} c/u</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="disminuir(item.bebida.id)"
+                      aria-label="Restar"
+                    >
+                      −
+                    </button>
+                    <span class="btn btn-light disabled">{{ item.cantidad }}</span>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="aumentar(item.bebida.id)"
+                      aria-label="Sumar"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span class="small fw-bold w-100px text-end">
+                    S/ {{ item.bebida.precio * item.cantidad | number: '1.2-2' }}
+                  </span>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    (click)="quitarLinea(item.bebida.id)"
+                    aria-label="Quitar"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <ng-template #carritoVacio>
+              <p class="text-muted small mb-0">Agrega productos desde el catálogo.</p>
+            </ng-template>
+          </section>
+
+          <label class="form-label small text-muted mb-1 mt-3" for="notas">Notas</label>
+          <textarea
+            id="notas"
+            rows="2"
+            class="form-control form-control-sm"
+            [(ngModel)]="notas"
+            placeholder="Opcional..."
+          ></textarea>
+
           <button
             type="button"
             class="btn btn-success w-100 mt-3"
             (click)="abrirCobro()"
+            [disabled]="!carrito().length"
           >
             Cobrar S/ {{ total() | number: '1.2-2' }}
           </button>
         </div>
-
-        <ng-template #carritoVacio>
-          <div class="card-body text-center text-muted py-5">
-            <p class="mb-1 fw-semibold">El pedido esta vacio</p>
-            <p class="small mb-0">Agrega bebidas desde el catalogo para empezar.</p>
-          </div>
-        </ng-template>
       </div>
     </aside>
   </div>

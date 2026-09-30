@@ -1,0 +1,13 @@
+<article class="producto-home-card">
+  <img
+    class="producto-home-imagen"
+    [src]="imagen"
+    [alt]="bebida.nombre"
+    (error)="manejarErrorImagen($event)"
+  />
+  <div class="producto-home-datos">
+    <span class="producto-home-categoria">{{ bebida.categoria }}</span>
+    <h3>{{ bebida.nombre }}</h3>
+    <span class="producto-home-precio">S/ {{ bebida.precio | number: '1.2-2' }}</span>
+  </div>
+</article>

@@ -30,6 +30,7 @@ export class Sidebar {
     { ruta: '/admin/inventario', texto: 'Inventario', icono: '📦' },
     { ruta: '/admin/usuarios', texto: 'Usuarios', icono: '🧑‍💼' },
     { ruta: '/admin/reportes', texto: 'Reportes', icono: '📈' },
+    { ruta: '/admin/kardex', texto: 'Kardex', icono: '🗄️' },
   ];
 
   get enlaces(): EnlaceMenu[] {

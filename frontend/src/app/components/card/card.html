@@ -1,0 +1,33 @@
+<button
+  *ngIf="accionable; else soloLectura"
+  type="button"
+  class="producto-card interactiva"
+  (click)="seleccionar.emit(bebida)"
+>
+  <ng-container *ngTemplateOutlet="contenido"></ng-container>
+</button>
+
+<ng-template #soloLectura>
+  <article class="producto-card">
+    <ng-container *ngTemplateOutlet="contenido"></ng-container>
+  </article>
+</ng-template>
+
+<ng-template #contenido>
+  <img
+    class="producto-imagen"
+    [src]="imagenPredeterminada"
+    [alt]="bebida.nombre"
+  />
+  <span class="producto-contenido">
+    <span class="producto-cabecera">
+      <span class="producto-nombre">{{ bebida.nombre }}</span>
+      <span class="producto-precio">S/ {{ bebida.precio | number: '1.2-2' }}</span>
+    </span>
+    <span class="producto-descripcion">{{ bebida.descripcion }}</span>
+    <span class="producto-pie">
+      <span class="producto-categoria">{{ bebida.categoria }}</span>
+      <span *ngIf="accionable" class="producto-accion">Agregar al pedido</span>
+    </span>
+  </span>
+</ng-template>

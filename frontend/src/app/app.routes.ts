@@ -11,6 +11,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Inventario } from './pages/admin/inventario/inventario';
 import { Usuarios } from './pages/admin/usuarios/usuarios';
 import { Reportes } from './pages/admin/reportes/reportes';
+import { KardexComponent } from './pages/admin/kardex/kardex.component';
 
 export const routes: Routes = [
   // Sin sesion: solo el login
@@ -32,5 +33,6 @@ export const routes: Routes = [
   { path: 'menu', component: Menu, canActivate: [empleadoGuard] },
   { path: 'ordenes', component: Ordenes, canActivate: [empleadoGuard] },
 
+  { path: 'admin/kardex', component: KardexComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '/home' },
 ];

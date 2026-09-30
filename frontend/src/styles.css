@@ -1,9 +1,184 @@
-/* Estilos globales de MunaqFit.
-   Bootstrap 5 se importa desde angular.json (node_modules/bootstrap/dist/css/bootstrap.min.css).
-   Aqui viven los ajustes que aplican a toda la aplicacion. */
+:root {
+  --bs-primary: #2e8b57;
+  --bs-primary-rgb: 46, 139, 87;
+  --bs-link-color: #1b4d3e;
+  --bs-link-hover-color: #2e8b57;
+  --munaq-deep: #1b4d3e;
+  --munaq-sea: #2e8b57;
+  --munaq-turquoise: #40e0d0;
+  --munaq-foam: #a3e4d7;
+  --munaq-ocean: #e8f8f5;
+  --munaq-text: #1b4d3e;
+  --munaq-muted: #2e8b57;
+  --munaq-border: #2e8b57;
+  --munaq-soft: #a3e4d7;
+}
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f4f6f8;
-  color: #1f2937;
+  background-color: var(--munaq-ocean);
+  color: var(--munaq-text);
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+.app-shell {
+  width: 100%;
+  min-height: 100vh;
+  transition:
+    width 0.3s ease,
+    margin-right 0.3s ease;
+}
+
+.app-shell.nav-cuenta-abierto {
+  width: calc(100% - min(200px, 85vw));
+  margin-right: min(200px, 85vw);
+}
+
+.btn-primary {
+  --bs-btn-bg: #1b4d3e;
+  --bs-btn-border-color: #1b4d3e;
+  --bs-btn-hover-bg: #2e8b57;
+  --bs-btn-hover-border-color: #2e8b57;
+  --bs-btn-active-bg: #2e8b57;
+  --bs-btn-active-border-color: #2e8b57;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #1b4d3e;
+  --bs-btn-border-color: #2e8b57;
+  --bs-btn-hover-bg: #2e8b57;
+  --bs-btn-hover-border-color: #2e8b57;
+}
+
+.btn-success {
+  --bs-btn-bg: #1b4d3e;
+  --bs-btn-border-color: #1b4d3e;
+  --bs-btn-hover-bg: #2e8b57;
+  --bs-btn-hover-border-color: #2e8b57;
+}
+
+.btn-danger,
+.btn-warning,
+.btn-info {
+  --bs-btn-bg: #2e8b57;
+  --bs-btn-border-color: #2e8b57;
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-bg: #1b4d3e;
+  --bs-btn-hover-border-color: #1b4d3e;
+  --bs-btn-hover-color: #ffffff;
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: #1b4d3e;
+  --bs-btn-border-color: #2e8b57;
+  --bs-btn-hover-bg: #40e0d0;
+  --bs-btn-hover-border-color: #40e0d0;
+  --bs-btn-hover-color: #1b4d3e;
+}
+
+.btn-light {
+  --bs-btn-bg: #a3e4d7;
+  --bs-btn-border-color: #2e8b57;
+  --bs-btn-color: #1b4d3e;
+  --bs-btn-hover-bg: #40e0d0;
+  --bs-btn-hover-border-color: #2e8b57;
+  --bs-btn-hover-color: #1b4d3e;
+}
+
+.card,
+.list-group-item {
+  --bs-card-bg: #a3e4d7;
+  background-color: #a3e4d7;
+  color: #1b4d3e;
+}
+
+.card-header {
+  background-color: #2e8b57;
+  color: #ffffff;
+}
+
+.form-control,
+.form-select {
+  border-color: #2e8b57;
+  background-color: #a3e4d7;
+  color: #1b4d3e;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #40e0d0;
+  box-shadow: 0 0 0 0.25rem rgba(64, 224, 208, 0.25);
+}
+
+.spinner-border {
+  --bs-spinner-width: 2rem;
+  --bs-spinner-height: 2rem;
+  color: #2e8b57 !important;
+}
+
+.text-success,
+.text-danger,
+.text-warning,
+.text-info {
+  color: var(--munaq-deep) !important;
+}
+
+.bg-success,
+.text-bg-success,
+.text-bg-secondary,
+.badge.text-bg-light {
+  background-color: var(--munaq-foam) !important;
+  color: var(--munaq-deep) !important;
+}
+
+.alert-danger,
+.alert-warning,
+.alert-info,
+.alert-success {
+  border-color: var(--munaq-sea);
+  background-color: var(--munaq-foam);
+  color: var(--munaq-deep);
+}
+
+.border,
+.border-top {
+  border-color: #2e8b57 !important;
+}
+
+.btn:not(:disabled):hover,
+.register-button:hover,
+.register-button-link:hover,
+.logout-button:hover,
+.btn-cerrar:hover,
+.btn-receta:hover {
+  border-color: #40e0d0 !important;
+  background-color: #40e0d0 !important;
+  color: #1b4d3e !important;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+@media (max-width: 1023.98px) {
+  .tabla {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
 }

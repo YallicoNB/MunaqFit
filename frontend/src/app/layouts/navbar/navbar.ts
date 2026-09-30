@@ -1,6 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { NavbarCuenta } from '../navbar-cuenta/navbar-cuenta';
 import { Token } from '../../service/auth/token';
 
 interface EnlaceNav {
@@ -36,24 +38,48 @@ const ENLACES_EMPLEADO: EnlaceNav[] = [
  */
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+
+  imports: [CommonModule, RouterLink, RouterLinkActive, NavbarCuenta],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
-  private readonly rol = signal<string | null>(null);
 
-  readonly esAdmin = computed(() => this.rol() === 'ADMIN');
+  @Output() cuentaAbiertaChange = new EventEmitter<boolean>();
 
-  readonly enlaces = computed<EnlaceNav[]>(() => {
-    const propios = this.esAdmin() ? ENLACES_ADMIN : ENLACES_EMPLEADO;
-    return [...ENLACES_COMUNES, ...propios];
-  });
+  enlacesEmpleado = [
+    { ruta: '/home', texto: 'Inicio' },
+    { ruta: '/menu', texto: 'Menú' },
+  ];
 
-  readonly nombreUsuario = signal('');
+  enlacesAdmin = [
+    { ruta: '/home', texto: 'Inicio' },
+    { ruta: '/menu', texto: 'Menú' },
+  ];
 
-  constructor(token: Token) {
-    this.rol.set(token.getRol());
-    this.nombreUsuario.set(token.getNombre() ?? '');
+  cuentaAbierta = false;
+
+  constructor(private token: Token) {}
+
+  get esAdmin(): boolean {
+    return localStorage.getItem('rolUsuario') === 'ADMIN';
+  }
+
+  get nombreUsuario(): string {
+    return this.token.getNombre() || 'Usuario';
+  }
+
+  get enlaces(): { ruta: string; texto: string }[] {
+    return this.esAdmin ? this.enlacesAdmin : this.enlacesEmpleado;
+  }
+
+  alternarCuenta(): void {
+    this.cuentaAbierta = !this.cuentaAbierta;
+    this.cuentaAbiertaChange.emit(this.cuentaAbierta);
+  }
+
+  cerrarCuenta(): void {
+    this.cuentaAbierta = false;
+    this.cuentaAbiertaChange.emit(false);
   }
 }

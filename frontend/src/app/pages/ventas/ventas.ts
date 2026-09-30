@@ -2,7 +2,7 @@ import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Navbar } from '../../layouts/navbar/navbar';
+import { Card } from '../../components/card/card';
 import { VentaService } from '../../service/venta.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { Bebida } from '../../models/producto';
@@ -20,7 +20,7 @@ type EstadoCobro = 'espera' | 'procesando' | 'exito' | 'error';
 
 @Component({
   selector: 'app-ventas',
-  imports: [CommonModule, FormsModule, Navbar],
+  imports: [CommonModule, FormsModule, Card],
   templateUrl: './ventas.html',
   styleUrl: './ventas.css',
 })
@@ -32,6 +32,25 @@ export class Ventas implements OnInit {
   cargando = true;
   errorCarga = '';
   bebidas: Bebida[] = [];
+  busquedaBebida = '';
+  categoriaSeleccionada: string | null = null;
+  filtrosAbiertos = false;
+
+  get categorias(): string[] {
+    return [...new Set(this.bebidas.map((bebida) => bebida.categoria.trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'es'));
+  }
+
+  get bebidasFiltradas(): Bebida[] {
+    const nombreBuscado = this.busquedaBebida.trim().toLocaleLowerCase('es');
+    return this.bebidas.filter((bebida) => {
+      const coincideNombre = bebida.nombre.toLocaleLowerCase('es').includes(nombreBuscado);
+      const coincideCategoria =
+        !this.categoriaSeleccionada ||
+        bebida.categoria.trim() === this.categoriaSeleccionada;
+      return coincideNombre && coincideCategoria;
+    });
+  }
 
   // ---- Carrito (estado reactivo con signals) ----
   private readonly _items = signal<CarritoItem[]>([]);
@@ -44,6 +63,7 @@ export class Ventas implements OnInit {
   readonly total = computed(() => this.subtotal() + this.igv());
 
   // ---- Datos del pedido ----
+  readonly mesas = [1, 2, 3, 4, 5, 6];
   mesa: number | null = null;
   tipoVenta: TipoVenta = 'LOCAL';
   notas = '';
@@ -118,6 +138,31 @@ export class Ventas implements OnInit {
     if (!this.carrito().length) return;
     this._items.set([]);
     this.toast.info('El pedido se descarto', 'Carrito');
+  }
+
+  cambiarTipoVenta(tipo: TipoVenta): void {
+    this.tipoVenta = tipo;
+    if (tipo === 'DELIVERY') {
+      this.mesa = null;
+    }
+  }
+
+  seleccionarMesa(mesa: number): void {
+    this.mesa = this.mesa === mesa ? null : mesa;
+  }
+
+  seleccionarCategoria(categoria: string | null): void {
+    this.categoriaSeleccionada = categoria;
+  }
+
+  iconoCategoria(categoria: string): string {
+    const nombre = categoria.toLocaleLowerCase('es');
+    if (nombre.includes('cafe') || nombre.includes('café')) return '☕';
+    if (nombre.includes('jugo') || nombre.includes('zumo')) return '🧃';
+    if (nombre.includes('te') || nombre.includes('té')) return '🍵';
+    if (nombre.includes('agua')) return '💧';
+    if (nombre.includes('smoothie') || nombre.includes('batido')) return '🥤';
+    return '🍹';
   }
 
   // ===================== Cobro (modal) =====================

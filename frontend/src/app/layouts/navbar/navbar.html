@@ -1,17 +1,33 @@
 <nav class="navbar">
   <a routerLink="/home" class="navbar-brand">MunaqFit</a>
-
   <div class="navbar-links">
     <a
-      *ngFor="let enlace of enlaces()"
-      class="navbar-item"
+      *ngFor="let enlace of enlaces"
       [routerLink]="enlace.ruta"
       routerLinkActive="activo"
       [routerLinkActiveOptions]="{ exact: true }"
+      class="navbar-item"
     >
       {{ enlace.texto }}
     </a>
   </div>
 
-  <span class="navbar-user" *ngIf="nombreUsuario()">{{ nombreUsuario() }}</span>
+  <div class="cuenta-menu">
+    <button
+      type="button"
+      class="cuenta-toggle"
+      (click)="alternarCuenta()"
+      [attr.aria-expanded]="cuentaAbierta"
+      aria-haspopup="true"
+      aria-label="Abrir navegación de cuenta"
+    >
+      <span>{{ nombreUsuario }}</span>
+      <span class="flecha" [class.abierta]="cuentaAbierta" aria-hidden="true">›</span>
+    </button>
+  </div>
 </nav>
+<app-navbar-cuenta
+  [abierto]="cuentaAbierta"
+  [esAdmin]="esAdmin"
+  (cerrar)="cerrarCuenta()"
+/>

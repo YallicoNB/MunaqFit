@@ -33,4 +33,11 @@ export interface Bebida {
   imagenUrl: string;
   tiempoPreparacion: number;
   activo: boolean;
+  // Nuevos campos opcionales (REQ-018)
+  calorias?: number;
+  proteinas?: number;
+  carbohidratos?: number;
+  grasas?: number;
+  fibra?: number;
+  azucares?: number;
 }

@@ -1,38 +1,124 @@
 .pos {
   font-family: Arial, sans-serif;
-  color: #1c2b2d;
+  color: #1b4d3e;
   padding: 24px;
 }
 
 .titulo {
   margin: 0;
   font-size: 26px;
-  color: #203a43;
-}
-
-.bebida-card {
-  border: 1px solid #dce6e8;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.bebida-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(15, 32, 39, 0.12);
-  border-color: #2c5364;
-}
-
-.bebida-card:active {
-  transform: translateY(0);
-}
-
-.card-title {
-  color: #2c5364;
+  color: #1b4d3e;
 }
 
 .w-100px {
   width: 100px;
+}
+
+.catalogo-filtros {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.buscador-bebidas {
+  flex: 1;
+  min-width: 0;
+}
+
+.buscador-bebidas .form-control {
+  min-height: 42px;
+}
+
+.boton-filtros {
+  flex: 0 0 auto;
+  min-height: 42px;
+}
+
+.filtro-activo {
+  font-size: 12px;
+}
+
+.panel-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #2e8b57;
+  border-radius: 10px;
+  background: #a3e4d7;
+}
+
+.categoria-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 1px solid #2e8b57;
+  border-radius: 999px;
+  background: #e8f8f5;
+  color: #1b4d3e;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.categoria-filtro:hover,
+.categoria-filtro.seleccionada {
+  border-color: #40e0d0;
+  background: #40e0d0;
+}
+
+.tipo-pedido {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.seccion-pedido {
+  margin: 0 0 10px;
+  color: #1b4d3e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.selector-mesas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mesa-opcion {
+  min-height: 40px;
+  padding: 6px;
+  border: 1px solid #2e8b57;
+  border-radius: 8px;
+  background: #e8f8f5;
+  color: #1b4d3e;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.mesa-opcion:hover,
+.mesa-opcion.seleccionada {
+  border-color: #40e0d0;
+  background: #40e0d0;
+}
+
+.resumen-pedido {
+  border-color: #2e8b57 !important;
+}
+
+.productos-pedido .list-group-item {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* Overlay del modal de cobro: oscurece el fondo y centra la tarjeta. */
@@ -40,7 +126,7 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(15, 32, 39, 0.55);
+  background: rgba(27, 77, 62, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,4 +139,43 @@
   border: none;
   border-radius: 14px;
   overflow: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .pos {
+    padding: 16px 12px;
+  }
+
+  .pos-header {
+    align-items: flex-start !important;
+  }
+
+  .catalogo-filtros {
+    align-items: stretch;
+  }
+
+  .boton-filtros {
+    padding-inline: 10px;
+  }
+
+  .modal-caja {
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+
+  .modal-caja .btn-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .pos-header {
+    flex-direction: column;
+  }
+
+  .pos .list-group-item > .d-flex:last-child {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 }

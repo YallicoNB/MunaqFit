@@ -1,13 +1,13 @@
 .dashboard {
   font-family: Arial, sans-serif;
-  color: #1c2b2d;
+  color: #1b4d3e;
   padding: 24px;
 }
 
 .titulo {
   margin: 0 0 20px;
   font-size: 26px;
-  color: #203a43;
+  color: #1b4d3e;
 }
 
 .tarjetas {
@@ -18,14 +18,14 @@
 }
 
 .tarjeta {
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background: #1b4d3e;
   color: #ffffff;
   border-radius: 12px;
   padding: 20px;
 }
 
 .tarjeta.peligro {
-  background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+  background: #2e8b57;
 }
 
 .tarjeta-valor {
@@ -46,8 +46,8 @@
 }
 
 .panel {
-  background: #ffffff;
-  border: 1px solid #dce6e8;
+  background: #a3e4d7;
+  border: 1px solid #2e8b57;
   border-radius: 12px;
   padding: 20px;
 }
@@ -55,13 +55,13 @@
 .panel h2 {
   margin: 0 0 14px;
   font-size: 17px;
-  color: #2c5364;
+  color: #1b4d3e;
 }
 
 .panel h3 {
   margin: 18px 0 8px;
   font-size: 14px;
-  color: #2c5364;
+  color: #1b4d3e;
 }
 
 .datos {
@@ -74,7 +74,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #eef3f4;
+  border-bottom: 1px solid #40e0d0;
   font-size: 14px;
 }
 
@@ -88,25 +88,55 @@
 .tabla td {
   text-align: left;
   padding: 9px 8px;
-  border-bottom: 1px solid #eef3f4;
+  border-bottom: 1px solid #40e0d0;
 }
 
 .tabla th {
-  color: #2c5364;
+  color: #1b4d3e;
   font-size: 12px;
   text-transform: uppercase;
 }
 
 .vacio,
 .cargando {
-  color: #6b7f82;
+  color: #2e8b57;
   font-size: 14px;
 }
 
 .error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #a3e4d7;
+  color: #1b4d3e;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 14px;
+}
+
+@media (max-width: 767.98px) {
+  .dashboard {
+    padding: 20px 16px;
+  }
+
+  .tarjetas,
+  .filas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel {
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .datos li {
+    gap: 12px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .dashboard {
+    padding: 24px 20px;
+  }
+
+  .filas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

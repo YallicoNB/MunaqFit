@@ -1,0 +1,25 @@
+<div class="capa-cuenta" [class.abierta]="abierto" [attr.aria-hidden]="!abierto">
+  <nav class="panel-cuenta" aria-label="Navegación de cuenta">
+    <div class="cabecera-cuenta">
+      <span>Navegación</span>
+      <button
+        type="button"
+        class="cerrar-cuenta"
+        aria-label="Cerrar menú"
+        (click)="cerrarMenu()"
+      >
+        ×
+      </button>
+    </div>
+
+    <a
+      *ngFor="let enlace of enlaces"
+      [routerLink]="enlace.ruta"
+      routerLinkActive="activo"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="enlace-cuenta"
+    >
+      {{ enlace.texto }}
+    </a>
+  </nav>
+</div>
