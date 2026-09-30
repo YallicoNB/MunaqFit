@@ -19,7 +19,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
     List<MovimientoInventario> findByFechaMovimientoBetween(LocalDateTime inicio, LocalDateTime fin);
 
     @Query("SELECT new com.munaqfit.backend.dto.KardexFilaDTO(" +
-           "m.fechaMovimiento, p.nombre, CAST(m.tipoMovimiento AS string), m.cantidad, m.stockAnterior, m.stockNuevo, m.motivo, u.nombre) " +
+           "m.fechaMovimiento, p.nombre, CAST(m.tipoMovimiento AS string), m.cantidad, m.stockAnterior, m.stockNuevo, m.motivo, u.nombreCompleto) " +
            "FROM MovimientoInventario m " +
            "JOIN m.producto p " +
            "LEFT JOIN m.usuario u " +

@@ -12,6 +12,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Inventario } from './pages/admin/inventario/inventario';
 import { Usuarios } from './pages/admin/usuarios/usuarios';
 import { Reportes } from './pages/admin/reportes/reportes';
+import { KardexComponent } from './pages/admin/kardex/kardex.component';
 
 export const routes: Routes = [
   { path: '', component: Login, canActivate: [guestGuard] },
@@ -27,5 +28,6 @@ export const routes: Routes = [
   { path: 'admin/inventario', component: Inventario, canActivate: [adminGuard] },
   { path: 'admin/usuarios', component: Usuarios, canActivate: [adminGuard] },
   { path: 'admin/reportes', component: Reportes, canActivate: [adminGuard] },
+  { path: 'admin/kardex', component: KardexComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '/home' },
 ];
