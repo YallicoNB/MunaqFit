@@ -1,7 +1,7 @@
 .sidebar {
   width: 220px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+  background: #2e8b57;
   color: #ffffff;
   padding: 24px 0;
   font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #e8f1f2;
+  color: #ffffff;
   text-decoration: none;
   padding: 12px 20px;
   font-size: 15px;
@@ -33,17 +33,46 @@
 }
 
 .sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: #40e0d0;
+  color: #1b4d3e;
 }
 
 .sidebar-link.activo {
-  background: rgba(255, 255, 255, 0.22);
+  background: #40e0d0;
   font-weight: 600;
-  border-left: 4px solid #ffffff;
+  border-left: 4px solid #40e0d0;
 }
 
 .icono {
   font-size: 18px;
   width: 24px;
   text-align: center;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 16px 0;
+  }
+
+  .sidebar-titulo {
+    margin-bottom: 12px;
+  }
+
+  .sidebar-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 8px;
+  }
+
+  .sidebar-link {
+    padding: 10px 12px;
+  }
+
+  .sidebar-link.activo {
+    border-left: 0;
+    border-bottom: 3px solid #40e0d0;
+  }
 }

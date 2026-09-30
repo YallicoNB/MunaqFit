@@ -1,6 +1,15 @@
 <div class="inventario">
   <h1 class="titulo">Inventario</h1>
 
+  <aside class="guia-unidades" aria-label="Guía de unidades de inventario">
+    <strong>Unidades:</strong>
+    <span><b>U</b> = unidades individuales; no representa peso ni volumen.</span>
+    <span><b>KG</b> = kilogramos.</span>
+    <span><b>G</b> = gramos.</span>
+    <span><b>L</b> = litros almacenados.</span>
+    <span><b>ML</b> = mililitros almacenados.</span>
+  </aside>
+
   <p *ngIf="error" class="error">{{ error }}</p>
   <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
 
@@ -16,34 +25,45 @@
 
   <p *ngIf="cargando" class="cargando">Cargando inventario...</p>
 
-  <table class="tabla" *ngIf="!cargando && productos.length">
+  <label class="buscador" *ngIf="!cargando">
+    Buscar insumo
+    <input
+      type="search"
+      [(ngModel)]="busqueda"
+      placeholder="Escribe el nombre del insumo"
+      aria-label="Buscar insumo por nombre"
+    />
+  </label>
+
+  <table class="tabla" *ngIf="!cargando && productosFiltrados.length">
     <thead>
       <tr>
         <th>Insumo</th>
         <th>Stock</th>
         <th>Minimo</th>
-        <th>Critico</th>
-        <th>Unidad</th>
-        <th>Costo</th>
+        <th>Punto crítico (≤)</th>
         <th>Estado</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of productos">
+      <tr *ngFor="let p of productosFiltrados">
         <td>{{ p.nombre }}</td>
-        <td>{{ p.stockActual | number: '1.2-2' }}</td>
+        <td>{{ p.stockActual | number: '1.0-2' }}{{ abreviarUnidad(p.unidadMedida) }}</td>
         <td>{{ p.stockMinimo | number: '1.2-2' }}</td>
-        <td>{{ p.stockCritico | number: '1.2-2' }}</td>
-        <td>{{ p.unidadMedida }}</td>
-        <td>S/ {{ p.costoUnitario | number: '1.3-3' }}</td>
-        <td><span [ngClass]="'nivel-' + nivel(p)">{{ nivel(p) }}</span></td>
+        <td>{{ p.stockCritico | number: '1.0-0' }}</td>
+        <td><span [ngClass]="'nivel ' + nivel(p)">{{ nivel(p) }}</span></td>
         <td>
           <button class="btn" (click)="abrirFormulario(p)">Reabastecer</button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <p *ngIf="!cargando && !productos.length" class="vacio">No hay insumos en el inventario.</p>
+  <p *ngIf="!cargando && productos.length && !productosFiltrados.length" class="vacio">
+    No se encontraron insumos con ese nombre.
+  </p>
 
   <div class="formulario" *ngIf="mostrarFormulario">
     <h2>Reabastecer insumo</h2>

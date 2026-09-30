@@ -1,0 +1,113 @@
+:host {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(34%, 360px);
+  height: 360px;
+  opacity: 0.72;
+  transform: translate(calc(-50% - 108%), -50%) scale(0.82);
+  transition:
+    transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1),
+    opacity 0.4s ease;
+}
+
+:host(.promocion-centro) {
+  z-index: 2;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+:host(.promocion-siguiente) {
+  transform: translate(calc(-50% + 108%), -50%) scale(0.82);
+}
+
+.promocion-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(163, 228, 215, 0.85);
+  border-radius: 20px;
+  background: #1b4d3e;
+  box-shadow: 0 14px 34px rgba(27, 77, 62, 0.22);
+}
+
+.promocion-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+:host(.promocion-centro) .promocion-imagen {
+  transform: scale(1.04);
+}
+
+.promocion-contenido {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 58px 22px 24px;
+  background: linear-gradient(transparent, rgba(11, 35, 27, 0.94) 36%);
+  color: #ffffff;
+}
+
+.promocion-etiqueta {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #40e0d0;
+  color: #1b4d3e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.promocion-contenido h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.promocion-contenido p {
+  margin: 0;
+  color: #e8f8f5;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (max-width: 767.98px) {
+  :host {
+    width: min(78%, 340px);
+    height: 340px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.88);
+  }
+
+  :host(.promocion-centro) {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  :host(.promocion-anterior),
+  :host(.promocion-siguiente) {
+    transform: translate(-50%, -50%) scale(0.88);
+  }
+
+  .promocion-contenido {
+    padding: 52px 18px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .promocion-imagen {
+    transition-duration: 0.01ms;
+  }
+}
