@@ -24,12 +24,12 @@ export class Sidebar {
     { ruta: '/ordenes', texto: 'Ordenes', icono: '📋' },
     { ruta: '/cuenta', texto: 'Mi cuenta', icono: '👤' },
   ];
-
-  enlacesAdmin: EnlaceMenu[] = [
+enlacesAdmin: EnlaceMenu[] = [
     { ruta: '/dashboard', texto: 'Dashboard', icono: '📊' },
     { ruta: '/admin/inventario', texto: 'Inventario', icono: '📦' },
     { ruta: '/admin/usuarios', texto: 'Usuarios', icono: '🧑‍💼' },
     { ruta: '/admin/reportes', texto: 'Reportes', icono: '📈' },
+    { ruta: '/admin/kardex', texto: 'Kardex', icono: '🗄️' }, 
   ];
 
   get enlaces(): EnlaceMenu[] {
