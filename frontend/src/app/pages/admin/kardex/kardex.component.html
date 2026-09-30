@@ -1,0 +1,80 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-4">Reporte Kardex (Auditoría)</h1>
+
+  <!-- Panel de Filtros -->
+  <div class="filtros-panel bg-gray-50 p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end">
+    <div>
+      <label>Desde:</label>
+      <input type="datetime-local" [(ngModel)]="filtros.fechaDesde" class="border p-2 rounded w-full">
+    </div>
+    <div>
+      <label>Hasta:</label>
+      <input type="datetime-local" [(ngModel)]="filtros.fechaHasta" class="border p-2 rounded w-full">
+    </div>
+    <div>
+      <label>Tipo Movimiento:</label>
+      <select [(ngModel)]="filtros.tipo" class="border p-2 rounded w-full">
+        <option value="">Todos</option>
+        <option value="INGRESO">Ingreso</option>
+        <option value="SALIDA">Salida</option>
+      </select>
+    </div>
+    
+    <!-- Aquí integras los botones de Dev 3. Ejemplo: <app-boton texto="Buscar" (click)="buscarKardex()"></app-boton> -->
+    <button (click)="buscarKardex()" class="bg-blue-600 text-white px-4 py-2 rounded">Buscar</button>
+    <button (click)="limpiarFiltros()" class="bg-gray-400 text-white px-4 py-2 rounded">Limpiar</button>
+    <button (click)="descargarCSV()" class="bg-green-600 text-white px-4 py-2 rounded ml-auto">Descargar CSV</button>
+  </div>
+
+  <!-- Gestión de Estados Visuales -->
+  
+  <!-- ESTADO CARGA: Reemplazar con <app-spinner *ngIf="cargando"></app-spinner> -->
+  <div *ngIf="cargando" class="text-center py-8">
+    <p>Cargando movimientos de inventario...</p>
+  </div>
+
+  <!-- ESTADO ERROR -->
+  <div *ngIf="error && !cargando" class="bg-red-100 text-red-700 p-4 rounded mb-4">
+    Ocurrió un problema de conexión al traer el reporte Kardex.
+  </div>
+
+  <!-- ESTADO VACÍO: Reemplazar con <app-estado-vacio *ngIf="..."></app-estado-vacio> -->
+  <div *ngIf="!cargando && !error && kardexData.length === 0" class="text-center py-8 bg-gray-50 rounded">
+    <p>No se encontraron registros en el Kardex para estos filtros.</p>
+  </div>
+
+  <!-- TABLA CON DATOS: Reemplazar por <app-tabla [columnas]="X" [datos]="kardexData"></app-tabla> cuando Dev 3 la pase -->
+  <div *ngIf="!cargando && !error && kardexData.length > 0" class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-3 border-b text-left">Fecha/Hora</th>
+          <th class="p-3 border-b text-left">Insumo</th>
+          <th class="p-3 border-b text-left">Tipo</th>
+          <th class="p-3 border-b text-right">Cantidad</th>
+          <th class="p-3 border-b text-right">Stock Anterior</th>
+          <th class="p-3 border-b text-right">Stock Nuevo</th>
+          <th class="p-3 border-b text-left">Motivo</th>
+          <th class="p-3 border-b text-left">Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of kardexData" class="hover:bg-gray-50">
+          <td class="p-3 border-b">{{ fila.fechaHora | date:'short' }}</td>
+          <td class="p-3 border-b font-medium">{{ fila.insumo }}</td>
+          <td class="p-3 border-b">
+            <span class="px-2 py-1 rounded text-xs" 
+                  [ngClass]="{'bg-green-100 text-green-800': fila.tipo === 'INGRESO', 'bg-red-100 text-red-800': fila.tipo === 'SALIDA'}">
+              {{ fila.tipo }}
+            </span>
+          </td>
+          <td class="p-3 border-b text-right">{{ fila.cantidad }}</td>
+          <td class="p-3 border-b text-right text-gray-500">{{ fila.stockAnterior }}</td>
+          <td class="p-3 border-b text-right font-bold">{{ fila.stockNuevo }}</td>
+          <td class="p-3 border-b">{{ fila.motivo }}</td>
+          <td class="p-3 border-b">{{ fila.usuario || 'Sistema' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
