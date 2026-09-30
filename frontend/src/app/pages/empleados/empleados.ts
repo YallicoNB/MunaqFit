@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { Navbar } from '../../layouts/navbar/navbar';
 
 @Component({
   selector: 'app-empleados',
-  imports: [],
+  imports: [Navbar],
   templateUrl: './empleados.html',
   styleUrl: './empleados.css',
 })

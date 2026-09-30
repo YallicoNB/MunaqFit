@@ -69,7 +69,7 @@ export class Ventas implements OnInit {
 
   cargarMenu(): void {
     this.cargando = true;
-    this.ventaService.menu().subscribe({
+    this.ventaService.getBebidas().subscribe({
       next: (menu) => {
         this.bebidas = menu.filter((b) => b.activo);
         this.cargando = false;
@@ -174,7 +174,7 @@ export class Ventas implements OnInit {
     };
 
     // 1) El backend registra el pedido y descuenta el stock.
-    this.ventaService.registrar(request).subscribe({
+    this.ventaService.crearVenta(request).subscribe({
       next: (venta) => {
         this.ventaCobrada = venta;
         this.toast.success(`Pedido ${venta.numeroPedido} registrado`, 'Pedido');
@@ -197,7 +197,7 @@ export class Ventas implements OnInit {
       tipoPago: this.tipoPago,
     };
 
-    this.ventaService.registrarPago(pago).subscribe({
+    this.ventaService.crearPago(pago).subscribe({
       next: (resultado) => {
         this.pagoCobrado = resultado;
         this.estadoCobro = 'exito';

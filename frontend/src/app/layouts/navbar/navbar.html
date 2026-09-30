@@ -1,6 +1,17 @@
 <nav class="navbar">
-  <a routerLink="/home" class="navbar-item">Home</a>
-  <a routerLink="/cuenta" class="navbar-item">Cuenta</a>
-  <a routerLink="/ventas" class="navbar-item">Punto de venta</a>
-  <a routerLink="/empleados" *ngIf="esAdmin" class="navbar-item">Empleados</a>
+  <a routerLink="/home" class="navbar-brand">MunaqFit</a>
+
+  <div class="navbar-links">
+    <a
+      *ngFor="let enlace of enlaces()"
+      class="navbar-item"
+      [routerLink]="enlace.ruta"
+      routerLinkActive="activo"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      {{ enlace.texto }}
+    </a>
+  </div>
+
+  <span class="navbar-user" *ngIf="nombreUsuario()">{{ nombreUsuario() }}</span>
 </nav>

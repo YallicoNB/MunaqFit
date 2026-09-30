@@ -17,15 +17,15 @@ export class AdminService {
 
   // ---- Inventario ----
 
-  inventario(): Observable<ProductoInventario[]> {
+  getInventario(): Observable<ProductoInventario[]> {
     return this.http.get<ProductoInventario[]>(this.urlInventario);
   }
 
-  stockCritico(): Observable<ProductoInventario[]> {
+  getStockCritico(): Observable<ProductoInventario[]> {
     return this.http.get<ProductoInventario[]>(`${this.urlInventario}/critico`);
   }
 
-  stockBajo(): Observable<ProductoInventario[]> {
+  getStockBajo(): Observable<ProductoInventario[]> {
     return this.http.get<ProductoInventario[]>(`${this.urlInventario}/bajo`);
   }
 
@@ -35,7 +35,7 @@ export class AdminService {
 
   // ---- Usuarios ----
 
-  listarUsuarios(): Observable<Usuario[]> {
+  getUsuarios(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(this.urlUsuarios);
   }
 
@@ -45,13 +45,13 @@ export class AdminService {
   }
 
   /** Inactiva al empleado (soft delete). */
-  eliminarUsuario(id: number): Observable<string> {
+  eliminarUsuarioById(id: number): Observable<string> {
     return this.http.delete<string>(`${this.urlUsuarios}/${id}`);
   }
 
   // ---- Proveedores ----
 
-  listarProveedores(): Observable<Proveedor[]> {
+  getProveedores(): Observable<Proveedor[]> {
     return this.http.get<Proveedor[]>(this.urlProveedores);
   }
 
@@ -59,21 +59,21 @@ export class AdminService {
     return this.http.post<Proveedor>(this.urlProveedores, proveedor);
   }
 
-  actualizarProveedor(id: number, proveedor: Partial<Proveedor>): Observable<Proveedor> {
+  actualizarProveedorById(id: number, proveedor: Partial<Proveedor>): Observable<Proveedor> {
     return this.http.put<Proveedor>(`${this.urlProveedores}/${id}`, proveedor);
   }
 
-  eliminarProveedor(id: number): Observable<string> {
+  eliminarProveedorById(id: number): Observable<string> {
     return this.http.delete<string>(`${this.urlProveedores}/${id}`);
   }
 
   // ---- Ventas ----
 
-  listarVentas(): Observable<unknown[]> {
+  getVentas(): Observable<unknown[]> {
     return this.http.get<unknown[]>(this.urlVentas);
   }
 
-  cambiarEstadoVenta(id: number, estado: string): Observable<unknown> {
+  actualizarEstadoVentaById(id: number, estado: string): Observable<unknown> {
     return this.http.put<unknown>(`${this.urlVentas}/${id}/estado`, { estado });
   }
 }

@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { VentaService } from '../../service/venta.service';
 import { ProductoService } from '../../service/producto.service';
+import { Navbar } from '../../layouts/navbar/navbar';
 import { Bebida, Receta } from '../../models/producto';
 
 @Component({
   selector: 'app-menu',
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, Navbar],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -30,7 +31,7 @@ export class Menu implements OnInit {
 
   cargar(): void {
     this.cargando = true;
-    this.ventaService.menu().subscribe({
+    this.ventaService.getBebidas().subscribe({
       next: (bebidas) => {
         this.bebidas = bebidas;
         this.cargando = false;
@@ -53,7 +54,7 @@ export class Menu implements OnInit {
     this.recetaDeBebida = bebida.nombre;
     this.recetaAbierta = null;
 
-    this.productoService.recetaDe(bebida.id).subscribe({
+    this.productoService.getRecetasByBebidaId(bebida.id).subscribe({
       next: (recetas) => (this.recetaAbierta = recetas),
       error: () => (this.recetaAbierta = []),
     });

@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
+import { Navbar } from '../../../layouts/navbar/navbar';
 import { ProductoInventario } from '../../../models/admin';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, DecimalPipe, FormsModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, Navbar],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
@@ -34,7 +35,7 @@ export class Inventario implements OnInit {
   cargar(): void {
     this.cargando = true;
 
-    this.adminService.inventario().subscribe({
+    this.adminService.getInventario().subscribe({
       next: (p) => {
         this.productos = p;
         this.cargando = false;
@@ -45,8 +46,8 @@ export class Inventario implements OnInit {
       },
     });
 
-    this.adminService.stockCritico().subscribe((p) => (this.criticos = p));
-    this.adminService.stockBajo().subscribe((p) => (this.bajos = p));
+    this.adminService.getStockCritico().subscribe((p) => (this.criticos = p));
+    this.adminService.getStockBajo().subscribe((p) => (this.bajos = p));
   }
 
   /** Nivel de stock de un producto: critico, bajo o normal. */

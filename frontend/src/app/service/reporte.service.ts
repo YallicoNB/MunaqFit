@@ -13,21 +13,21 @@ export class ReporteService {
 
   constructor(private http: HttpClient) {}
 
-  metricas(): Observable<DashboardMetrics> {
+  getDashboardMetrics(): Observable<DashboardMetrics> {
     return this.http.get<DashboardMetrics>(`${this.urlDashboard}/metricas`);
   }
 
-  ventas(inicio: string, fin: string): Observable<ReporteVentas> {
+  getReporteVentas(inicio: string, fin: string): Observable<ReporteVentas> {
     const params = new HttpParams().set('inicio', inicio).set('fin', fin);
     return this.http.get<ReporteVentas>(`${this.urlReportes}/ventas`, { params });
   }
 
-  ranking(inicio: string, fin: string): Observable<RankingBebida[]> {
+  getRankingBebidas(inicio: string, fin: string): Observable<RankingBebida[]> {
     const params = new HttpParams().set('inicio', inicio).set('fin', fin);
     return this.http.get<RankingBebida[]>(`${this.urlReportes}/ranking`, { params });
   }
 
-  valorizacion(): Observable<number> {
+  getValorizacionInventario(): Observable<number> {
     return this.http.get<number>(`${this.urlReportes}/valorizacion`);
   }
 
@@ -39,13 +39,13 @@ export class ReporteService {
     return { inicio: inicio.toISOString(), fin: fin.toISOString() };
   }
 
-  ventasUltimoMes(): Observable<ReporteVentas> {
+  getReporteVentasUltimoMes(): Observable<ReporteVentas> {
     const { inicio, fin } = this.ultimoMes();
-    return this.ventas(inicio, fin);
+    return this.getReporteVentas(inicio, fin);
   }
 
-  rankingUltimoMes(): Observable<RankingBebida[]> {
+  getRankingBebidasUltimoMes(): Observable<RankingBebida[]> {
     const { inicio, fin } = this.ultimoMes();
-    return this.ranking(inicio, fin);
+    return this.getRankingBebidas(inicio, fin);
   }
 }
