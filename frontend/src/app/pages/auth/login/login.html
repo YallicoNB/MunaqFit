@@ -1,5 +1,5 @@
 <div class="register-container">
-  <form class="register-card">
+  <form class="register-card" (ngSubmit)="iniciarSesion()">
     <h2 class="register-title">Iniciar sesión</h2>
 
     <div class="form-group">
@@ -10,6 +10,7 @@
         name="dni"
         placeholder="Ingresa tu DNI"
         [(ngModel)]="dni"
+        [disabled]="cargando"
         required
       />
     </div>
@@ -22,10 +23,16 @@
         name="password"
         placeholder="Ingresa tu contraseña"
         [(ngModel)]="password"
+        [disabled]="cargando"
         required
       />
     </div>
 
-    <button type="button" class="register-button" (click)="iniciarSesion()">Ingresar</button>
+    <p class="error-mensaje" *ngIf="error" role="alert">{{ error }}</p>
+
+    <button type="submit" class="register-button" [disabled]="cargando">
+      <span class="spinner" *ngIf="cargando" aria-hidden="true"></span>
+      {{ cargando ? 'Iniciando sesión…' : 'Ingresar' }}
+    </button>
   </form>
 </div>
