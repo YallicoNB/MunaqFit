@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
-import { ProductoInventario, ReabastecerRequest, Usuario, Proveedor, CrearUsuarioRequest } from '../models/admin';
+import { ProductoInventario, ReabastecerRequest, Usuario, Proveedor, CrearUsuarioRequest, Rol } from '../models/admin';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +47,11 @@ export class AdminService {
   /** Inactiva al empleado (soft delete). */
   eliminarUsuario(id: number): Observable<string> {
     return this.http.delete<string>(`${this.urlUsuarios}/${id}`);
+  }
+
+  /** Cambia el rol de un usuario (solo ADMIN). */
+  cambiarRol(id: number, rol: Rol): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.urlUsuarios}/${id}/rol`, { rol });
   }
 
   // ---- Proveedores ----

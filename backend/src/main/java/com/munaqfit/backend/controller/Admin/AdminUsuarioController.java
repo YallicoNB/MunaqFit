@@ -1,5 +1,6 @@
 package com.munaqfit.backend.controller.Admin;
 
+import com.munaqfit.backend.dto.CambiarRolRequest;
 import com.munaqfit.backend.dto.UsuarioCreateRequest;
 import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.repository.UsuarioRepository;
@@ -27,11 +28,10 @@ public class AdminUsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // REQ-007: Listar todos los empleados
+    // REQ-007: Listar todos los usuarios (incluye administradores para poder gestionar su rol)
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarEmpleados() {
-        // Asumiendo que el enum se llama Rol.EMPLEADO
-        return ResponseEntity.ok(usuarioRepository.findByRol(Usuario.Rol.EMPLEADO));
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        return ResponseEntity.ok(usuarioRepository.findAll());
     }
 
     // REQ-006: Crear un nuevo empleado
@@ -112,6 +112,57 @@ public class AdminUsuarioController {
         Usuario guardado = usuarioRepository.save(usuario);
         
         // Retornamos usando tu propio método mapeador
+        return ResponseEntity.ok(UsuarioDTO.fromEntity(guardado));
+    }
+
+    /**
+     * Cambia el rol de un usuario (ADMIN <-> EMPLEADO).
+     */
+    @PutMapping("/{id}/rol")
+    public ResponseEntity<?> cambiarRol(@PathVariable Long id,
+                                        @RequestBody CambiarRolRequest request,
+                                        Authentication authentication) {
+
+        // 1. Validar el rol recibido
+        if (request.getRol() == null || request.getRol().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: Debes indicar un rol.");
+        }
+
+        Usuario.Rol nuevoRol;
+        try {
+            nuevoRol = Usuario.Rol.valueOf(request.getRol().trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body("Error: Rol inválido. Usa ADMIN o EMPLEADO.");
+        }
+
+        // 2. Buscar el usuario objetivo
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 3. No permitir que el admin se quite su propio rol de administrador
+        String dniAdmin = authentication.getName();
+        Usuario adminLogueado = usuarioRepository.findByDni(dniAdmin)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+        if (adminLogueado.getId().equals(id) && nuevoRol != Usuario.Rol.ADMIN) {
+            return ResponseEntity.badRequest()
+                    .body("Error de seguridad: No puedes quitarte tu propio rol de administrador.");
+        }
+
+        // 4. No dejar el sistema sin ningún administrador activo
+        if (usuario.getRol() == Usuario.Rol.ADMIN && nuevoRol != Usuario.Rol.ADMIN) {
+            long adminsActivos = usuarioRepository.findByRol(Usuario.Rol.ADMIN).stream()
+                    .filter(u -> u.getEstado() == Usuario.EstadoUsuario.ACTIVO)
+                    .count();
+            if (adminsActivos <= 1) {
+                return ResponseEntity.badRequest()
+                        .body("Error: Debe existir al menos un administrador activo.");
+            }
+        }
+
+        // 5. Guardar el nuevo rol
+        usuario.setRol(nuevoRol);
+        Usuario guardado = usuarioRepository.save(usuario);
+
         return ResponseEntity.ok(UsuarioDTO.fromEntity(guardado));
     }
 }

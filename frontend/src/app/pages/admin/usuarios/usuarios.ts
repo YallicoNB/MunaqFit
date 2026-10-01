@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
-import { Usuario } from '../../../models/admin';
+import { Rol, Usuario } from '../../../models/admin';
+import { Token } from '../../../service/auth/token';
 
 @Component({
   selector: 'app-usuarios',
@@ -24,7 +25,10 @@ export class Usuarios implements OnInit {
   password = '';
   guardando = false;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private token: Token
+  ) {}
 
   ngOnInit(): void {
     this.cargar();
@@ -94,6 +98,29 @@ export class Usuarios implements OnInit {
         this.cargar();
       },
       error: (e) => (this.error = e?.error ?? 'No se pudo inactivar el usuario'),
+    });
+  }
+
+  /** Marca si la fila es del usuario con la sesión iniciada. */
+  esMiUsuario(usuario: Usuario): boolean {
+    return usuario.dni === this.token.getDni();
+  }
+
+  /** Cambia el rol de un usuario. Si el backend lo rechaza, la UI no cambia. */
+  cambiarRol(usuario: Usuario, nuevoRol: Rol): void {
+    if (usuario.rol === nuevoRol) return;
+
+    this.error = '';
+    this.mensaje = '';
+
+    this.adminService.cambiarRol(usuario.id!, nuevoRol).subscribe({
+      next: (u) => {
+        usuario.rol = u.rol;
+        this.mensaje = `Rol de ${u.nombreCompleto} actualizado a ${u.rol}`;
+      },
+      error: (e) => {
+        this.error = e?.error ?? 'No se pudo cambiar el rol';
+      },
     });
   }
 }

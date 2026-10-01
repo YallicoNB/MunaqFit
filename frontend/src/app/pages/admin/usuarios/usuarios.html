@@ -24,7 +24,18 @@
         <td>{{ u.dni }}</td>
         <td>{{ u.nombreCompleto }}</td>
         <td>{{ u.email }}</td>
-        <td>{{ u.rol }}</td>
+        <td>
+          <select
+            class="selector-rol"
+            [ngModel]="u.rol"
+            (ngModelChange)="cambiarRol(u, $event)"
+            [disabled]="esMiUsuario(u)"
+            [attr.aria-label]="'Rol de ' + u.nombreCompleto"
+          >
+            <option value="ADMIN">ADMIN</option>
+            <option value="EMPLEADO">EMPLEADO</option>
+          </select>
+        </td>
         <td>
           <span class="estado" [class.inactivo]="u.estado === 'INACTIVO'">{{ u.estado }}</span>
         </td>
@@ -41,7 +52,7 @@
     </tbody>
   </table>
 
-  <p *ngIf="!cargando && !usuarios.length" class="vacio">No hay empleados registrados.</p>
+  <p *ngIf="!cargando && !usuarios.length" class="vacio">No hay usuarios registrados.</p>
 
   <div class="formulario" *ngIf="mostrarFormulario">
     <h2>Nuevo empleado</h2>
