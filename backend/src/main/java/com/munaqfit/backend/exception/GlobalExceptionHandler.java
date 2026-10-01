@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -132,6 +133,17 @@ public class GlobalExceptionHandler {
         String esperado = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "el tipo esperado";
         return build("El parametro '" + ex.getName() + "' no tiene un valor valido. Se esperaba "
                 + esperado + ".", HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Un parametro obligatorio que no viene en la URL es un error del
+     * cliente (400), no del servidor. Sin esto, por ejemplo
+     * GET /api/admin/reportes/ventas sin inicio ni fin caia en el
+     * handler generico y devolvia 500.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParam(MissingServletRequestParameterException ex) {
+        return build("Falta el parametro obligatorio '" + ex.getParameterName() + "'", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
