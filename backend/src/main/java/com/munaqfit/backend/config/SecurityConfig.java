@@ -64,6 +64,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Sonda de disponibilidad que usa el cron para que Render
+                        // no duerma la instancia. Sin token a proposito.
+                        .requestMatchers("/api/health").permitAll()
                         // Documentacion de la API: sin esto .anyRequest() la bloquearia
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
