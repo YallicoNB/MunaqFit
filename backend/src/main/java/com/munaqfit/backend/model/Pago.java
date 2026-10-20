@@ -51,7 +51,7 @@ public class Pago {
     private EstadoPago estado = EstadoPago.PENDIENTE;
 
     public enum TipoPago {
-        EFECTIVO, YAPE, PLIN, TRANSFERENCIA, QR
+        EFECTIVO, YAPE, PLIN, TRANSFERENCIA, QR, TARJETA
     }
 
     public enum EstadoPago {

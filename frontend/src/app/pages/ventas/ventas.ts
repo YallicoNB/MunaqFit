@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Card } from '../../components/card/card';
 import { VentaService } from '../../service/venta.service';
+import { IzipayService } from '../../service/izipay.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { Bebida } from '../../models/producto';
 import { PagoRequest, PagoRespuesta, Venta, VentaRequest } from '../../models/venta';
@@ -15,7 +16,7 @@ interface CarritoItem {
 }
 
 type TipoVenta = 'LOCAL' | 'DELIVERY';
-type TipoPago = 'EFECTIVO' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA' | 'QR';
+type TipoPago = 'EFECTIVO' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA' | 'QR' | 'TARJETA';
 type EstadoCobro = 'espera' | 'procesando' | 'exito' | 'error';
 
 @Component({
@@ -76,15 +77,23 @@ export class Ventas implements OnInit {
   mensajeError = '';
   ventaCobrada: Venta | null = null;
   pagoCobrado: PagoRespuesta | null = null;
-  readonly metodosDePago: TipoPago[] = ['EFECTIVO', 'YAPE', 'PLIN', 'QR', 'TRANSFERENCIA'];
+  readonly metodosDePago: TipoPago[] = ['EFECTIVO', 'YAPE', 'PLIN', 'QR', 'TRANSFERENCIA', 'TARJETA'];
+  /** true cuando Izipay tiene credenciales: si no, el metodo TARJETA se oculta. */
+  izipayConfigurado = false;
 
   constructor(
     private ventaService: VentaService,
+    private izipayService: IzipayService,
     private toast: ToastService
   ) {}
 
   ngOnInit(): void {
     this.cargarMenu();
+    this.izipayService.configurado().subscribe({
+      next: (configurado) => (this.izipayConfigurado = configurado),
+      // Sin configuracion el metodo TARJETA simplemente no se muestra.
+      error: () => (this.izipayConfigurado = false),
+    });
   }
 
   cargarMenu(): void {
@@ -167,6 +176,13 @@ export class Ventas implements OnInit {
 
   // ===================== Cobro (modal) =====================
 
+  /** Metodos visibles en el modal: TARJETA solo si Izipay esta configurado. */
+  get metodosVisibles(): TipoPago[] {
+    return this.metodosDePago.filter(
+      (metodo) => metodo !== 'TARJETA' || this.izipayConfigurado
+    );
+  }
+
   elegirMetodo(metodo: TipoPago): void {
     this.tipoPago = metodo;
     // Los pagos digitales son por el monto exacto; solo el efectivo pide vuelto.
@@ -223,14 +239,42 @@ export class Ventas implements OnInit {
       next: (venta) => {
         this.ventaCobrada = venta;
         this.toast.success(`Pedido ${venta.numeroPedido} registrado`, 'Pedido');
-        this.cobrarVenta(venta);
+        if (this.tipoPago === 'TARJETA') {
+          // 2-T) Tarjeta: antes de cobrar hay que pasar por el formulario
+          // seguro de Izipay. Si el cliente aprueba, se cobra; si no, la
+          // venta queda PENDIENTE y se puede reintentar o cobrar en efectivo.
+          this.cobrarConTarjeta(venta);
+        } else {
+          this.cobrarVenta(venta);
+        }
+      },
+      error: (error) => this.fallarCobro(error),
+    });
+  }
+
+  /** 2-T) Pide el token a Izipay, abre su formulario y cobra al aprobarse. */
+  private cobrarConTarjeta(venta: Venta): void {
+    this.izipayService.tokenDeSesion(this.redondear(venta.total), venta.numeroPedido).subscribe({
+      next: (token) => {
+        this.izipayService
+          .abrirFormulario(token)
+          .then((resultado) => {
+            if (resultado?.Code === '00') {
+              // Code "00" = aprobado por Izipay: se registra el cobro.
+              this.cobrarVenta(venta, resultado.Transactionid);
+            } else {
+              const motivo = resultado?.Message || 'Pago no aprobado por Izipay';
+              this.fallarCobro(new Error(motivo));
+            }
+          })
+          .catch((error) => this.fallarCobro(error as Error));
       },
       error: (error) => this.fallarCobro(error),
     });
   }
 
   /** 2) Con la venta registrada se cobra (la pasa a PAGADO). */
-  private cobrarVenta(venta: Venta): void {
+  private cobrarVenta(venta: Venta, numeroOperacion?: string): void {
     const montoPagado =
       this.tipoPago === 'EFECTIVO'
         ? this.montoRecibido ?? 0
@@ -240,6 +284,7 @@ export class Ventas implements OnInit {
       ventaId: venta.id,
       montoPagado,
       tipoPago: this.tipoPago,
+      numeroOperacion,
     };
 
     this.ventaService.registrarPago(pago).subscribe({

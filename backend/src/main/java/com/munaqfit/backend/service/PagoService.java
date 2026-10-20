@@ -67,13 +67,13 @@ public class PagoService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
                     "Tipo de pago invalido: " + request.getTipoPago()
-                            + ". Valores permitidos: EFECTIVO, YAPE, PLIN, TRANSFERENCIA, QR");
+                            + ". Valores permitidos: EFECTIVO, YAPE, PLIN, TRANSFERENCIA, QR, TARJETA");
         }
 
         // El vuelto solo existe cuando el pago es en efectivo. Con Yape,
-        // Plin, QR o transferencia no hay billetes que devolver, asi que el
-        // monto recibido tiene que ser exacto: si sobra, ese sobrante es un
-        // error de digito, no un vuelto.
+        // Plin, QR, transferencia o tarjeta no hay billetes que devolver, asi
+        // que el monto recibido tiene que ser exacto: si sobra, ese sobrante
+        // es un error de digito, no un vuelto.
         BigDecimal cambio;
         if (tipoPago == Pago.TipoPago.EFECTIVO) {
             cambio = vuelto;
