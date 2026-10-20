@@ -16,7 +16,7 @@ public class PagoRequest {
     /** Efectivo entregado por el cliente. */
     private BigDecimal montoPagado;
 
-    /** EFECTIVO, YAPE, PLIN, TRANSFERENCIA o QR. Si viene null se asume EFECTIVO. */
+    /** EFECTIVO, YAPE, PLIN, TRANSFERENCIA, QR o TARJETA (Izipay). Si viene null se asume EFECTIVO. */
     private String tipoPago;
 
     /** Numero de operacion para pagos digitales (Yape/Plin/transferencia). */

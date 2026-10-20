@@ -45,6 +45,12 @@ export class Token {
     }
   }
 
+  /** JWT crudo guardado. Lo usa EventSource (alertas SSE), que no puede
+   *  mandar headers Authorization y lleva el token en la URL. */
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
   getRol(): string | null {
     const payload = this.decodificarToken();
     if (payload?.role) return payload.role;
