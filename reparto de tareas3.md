@@ -178,6 +178,24 @@ en tiempo real.
 **Bloqueo:** 1.1 (credenciales externas) — **se pide el día 1, no se espera para
 empezar 1.2/1.6** (todo el código se escribe contra sandbox; solo faltan las env vars).
 
+### Mensaje listo para copiar al dueño (tarea 1.1)
+
+> Hola, necesito las credenciales de **sandbox de Izipay** para la integración de
+> pagos (fase de pruebas, dinero de prueba). El código ya está listo y solo falta
+> configurar estas 6 variables de entorno en Render:
+>
+> | Variable | Qué es | Ejemplo sandbox |
+> |:---------|:-------|:----------------|
+> | `IZIPAY_TOKEN_URL` | URL del servicio que emite el token de pago | `https://sandboxsecure.izipay.pe/...` |
+> | `IZIPAY_SCRIPT_URL` | URL del SDK del formulario | `https://sandbox-checkout.izipay.pe/payments/v1/js/index.js` |
+> | `IZIPAY_MERCHANT_CODE` | Código de comercio | `491508601010...` |
+> | `IZIPAY_API_USER` | Usuario del servicio de tokens | |
+> | `IZIPAY_API_PASSWORD` | Contraseña del servicio de tokens | |
+> | `IZIPAY_KEY_RSA` | Llave pública RSA de Izipay (PEM) | |
+>
+> Si Izipay ya les dio credenciales de **producción**, también sirven: el código
+> es idéntico, solo cambian las variables (Fase 2).
+
 ---
 
 ## 8. Persona 2 — Backend: contratos y seguridad
