@@ -145,8 +145,11 @@ public class AlertaSseService {
         try {
             String json = objectMapper.writeValueAsString(datos);
             emisor.send(SseEmitter.event().name(evento).data(json));
-        } catch (IOException | IllegalStateException e) {
-            // El cliente ya se fue: se limpia y listo, no es un error del sistema.
+        } catch (Exception e) {
+            // El cliente ya se fue: se limpia y listo, no es un error del
+            // sistema. Se captura Exception y no solo IOException porque
+            // Spring lanza AsyncRequestNotUsableException (ServletException)
+            // cuando la respuesta murio, y eso romperia el hilo.
             quitar(emisor);
         }
     }
@@ -155,7 +158,7 @@ public class AlertaSseService {
         for (SseEmitter emisor : emisores) {
             try {
                 emisor.send(SseEmitter.event().comment("ping"));
-            } catch (IOException | IllegalStateException e) {
+            } catch (Exception e) {
                 quitar(emisor);
             }
         }
@@ -165,7 +168,7 @@ public class AlertaSseService {
         if (emisores.remove(emisor)) {
             try {
                 emisor.complete();
-            } catch (RuntimeException ignorado) {
+            } catch (Exception ignorado) {
                 // Ya estaba cerrado del otro lado.
             }
             log.debug("SSE desconectado. Clientes activos: {}", emisores.size());
