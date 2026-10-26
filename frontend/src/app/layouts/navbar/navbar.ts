@@ -14,13 +14,20 @@ export class Navbar {
   @Output() cuentaAbiertaChange = new EventEmitter<boolean>();
 
   enlacesEmpleado = [
-    { ruta: '/home', texto: 'Inicio' },
+    { ruta: '/ventas', texto: 'Ventas' },
     { ruta: '/menu', texto: 'Menú' },
+    { ruta: '/ordenes', texto: 'Órdenes' },
+    { ruta: '/cuenta', texto: 'Cuenta' }
   ];
 
   enlacesAdmin = [
-    { ruta: '/home', texto: 'Inicio' },
-    { ruta: '/menu', texto: 'Menú' },
+    { ruta: '/dashboard', texto: 'Dashboard' },
+    { ruta: '/admin/inventario', texto: 'Inventario' },
+    { ruta: '/admin/usuarios', texto: 'Usuarios' },
+    { ruta: '/admin/reportes', texto: 'Reportes' },
+    { ruta: '/admin/kardex', texto: 'Kardex' },
+    { ruta: '/admin/ventas', texto: 'Ventas' },
+    { ruta: '/admin/ordenes', texto: 'Órdenes' }
   ];
 
   cuentaAbierta = false;
