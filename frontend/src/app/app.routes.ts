@@ -12,6 +12,8 @@ import { Inventario } from './pages/admin/inventario/inventario';
 import { Usuarios } from './pages/admin/usuarios/usuarios';
 import { Reportes } from './pages/admin/reportes/reportes';
 import { Kardex } from './pages/admin/kardex/kardex';
+import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
+import { ResetPassword } from './pages/auth/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: Login, canActivate: [guestGuard] },
@@ -28,4 +30,6 @@ export const routes: Routes = [
   { path: 'admin/reportes', component: Reportes, canActivate: [adminGuard] },
   { path: 'admin/kardex', component: Kardex, canActivate: [adminGuard] },
   { path: '**', redirectTo: '/home' },
+  { path: 'auth/forgot-password', component: ForgotPassword },
+  { path: 'auth/reset-password', component: ResetPassword },
 ];

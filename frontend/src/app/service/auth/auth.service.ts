@@ -24,7 +24,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private token: Token
-  ) {}
+  ) { }
 
   /**
    * Le pregunta al backend si el token guardado sigue siendo valido.
@@ -46,6 +46,14 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  solicitarRecuperacion(correo: string) {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { correo });
+  }
+
+  cambiarContrasena(token: string, nuevaContrasena: string) {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, nuevaContrasena });
   }
 
   cerrarSesion(): void {
