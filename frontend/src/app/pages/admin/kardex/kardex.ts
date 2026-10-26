@@ -9,7 +9,7 @@ import { ReporteService } from '../../../service/reporte.service';
   imports: [CommonModule, FormsModule], // Agregar aquí los importes de Shared cuando Dev 3 los termine
   templateUrl: './kardex.component.html'
 })
-export class KardexComponent implements OnInit {
+export class Kardex implements OnInit {
   kardexData: any[] = [];
   filtros = {
     fechaDesde: '',
@@ -31,7 +31,7 @@ export class KardexComponent implements OnInit {
   buscarKardex(): void {
     this.cargando = true;
     this.error = false;
-    
+
     this.reporteService.obtenerKardex(this.filtros).subscribe({
       next: (data) => {
         this.kardexData = data;
