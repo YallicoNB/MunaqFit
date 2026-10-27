@@ -1,0 +1,56 @@
+<div class="container mt-4">
+  <h2>Gestión de Órdenes</h2>
+
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="date" class="form-control" [(ngModel)]="filtroFecha" (change)="aplicarFiltros()" title="Filtrar por fecha">
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtroEmpleado" (input)="aplicarFiltros()" placeholder="Buscar por empleado">
+    </div>
+    <div class="col-md-3">
+      <select class="form-control" [(ngModel)]="filtroEstado" (change)="aplicarFiltros()" title="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="PREPARANDO">Preparando</option>
+        <option value="COMPLETADO">Completado</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-secondary w-100" (click)="limpiarFiltros()">Limpiar Filtros</button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Empleado</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let venta of ventasFiltradas">
+          <td>{{ venta.id }}</td>
+          <td>{{ venta.fecha | date:'short' }}</td>
+          <td>{{ venta.empleadoNombre }}</td>
+          <td>S/ {{ venta.total }}</td>
+          <td><span class="badge bg-primary">{{ venta.estado }}</span></td>
+          <td>
+            <button class="btn btn-sm btn-warning me-2" (click)="cambiarEstado(venta.id, 'PREPARANDO')">Preparar</button>
+            <button class="btn btn-sm btn-success" (click)="cambiarEstado(venta.id, 'COMPLETADO')">Completar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="ventasFiltradas.length === 0" class="alert alert-info text-center">
+      No se encontraron órdenes con los filtros actuales.
+    </div>
+  </div>
+</div>

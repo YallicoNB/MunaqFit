@@ -14,6 +14,7 @@ import { Reportes } from './pages/admin/reportes/reportes';
 import { Kardex } from './pages/admin/kardex/kardex';
 import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
 import { ResetPassword } from './pages/auth/reset-password/reset-password';
+import { OrdenesAdmin } from './pages/admin/ordenes/ordenes';
 
 export const routes: Routes = [
   { path: '', component: Login, canActivate: [guestGuard] },
@@ -32,4 +33,5 @@ export const routes: Routes = [
   { path: '**', redirectTo: '/home' },
   { path: 'auth/forgot-password', component: ForgotPassword },
   { path: 'auth/reset-password', component: ResetPassword },
+  { path: 'admin/ordenes', component: OrdenesAdmin },
 ];
