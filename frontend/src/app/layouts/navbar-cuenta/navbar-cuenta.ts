@@ -28,6 +28,7 @@ export class NavbarCuenta {
   private readonly enlacesAdmin: EnlaceCuenta[] = [
     { ruta: '/admin/dashboard', texto: 'Dashboard' },
     { ruta: '/admin/inventario', texto: 'Inventario' },
+    { ruta: '/admin/proveedores', texto: 'Proveedores' },
     { ruta: '/admin/usuarios', texto: 'Usuarios' },
     { ruta: '/admin/reportes', texto: 'Reportes' },
     { ruta: '/admin/kardex', texto: 'Kardex' }, // Faltaba en tu arreglo original

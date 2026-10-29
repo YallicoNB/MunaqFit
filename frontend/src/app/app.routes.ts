@@ -11,10 +11,11 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Inventario } from './pages/admin/inventario/inventario';
 import { Usuarios } from './pages/admin/usuarios/usuarios';
 import { Reportes } from './pages/admin/reportes/reportes';
-import { KardexComponent } from './pages/admin/kardex/kardex.component';
+import { KardexComponent } from './pages/admin/kardex/kardex';
 import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
 import { ResetPassword } from './pages/auth/reset-password/reset-password';
 import { OrdenesAdmin } from './pages/admin/ordenes/ordenes';
+import { Proveedores } from './pages/admin/proveedores/proveedores';
 
 export const routes: Routes = [
   { path: '', component: Login, canActivate: [guestGuard] },
@@ -33,5 +34,6 @@ export const routes: Routes = [
   { path: 'admin/kardex', component: KardexComponent, canActivate: [adminGuard] },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'reset-password', component: ResetPassword },
+  { path: 'admin/proveedores', component: Proveedores, canActivate: [adminGuard] },
   { path: '**', redirectTo: '/home' },
 ];
