@@ -62,12 +62,36 @@
 
     <section class="resultados-menu" aria-label="Productos">
       <div class="grid">
-        <app-card
-          *ngFor="let bebida of bebidasFiltradas"
-          [bebida]="bebida"
-          [accionable]="false"
-        />
+        <div *ngFor="let bebida of bebidasFiltradas" class="tarjeta-contenedor">
+          <app-card
+            [bebida]="bebida"
+            [accionable]="false"
+          />
+
+          <!-- REQ-018: Información nutricional -->
+          <div class="info-nutricional" style="margin-top: 0.5rem; font-size: 0.85rem;">
+            <ng-container *ngIf="bebida.calorias != null; else sinNutricion">
+              <span>🔥 {{ bebida.calorias }} kcal</span>
+              <span *ngIf="bebida.proteinas != null"> | Prot: {{ bebida.proteinas }}g</span>
+              <span *ngIf="bebida.carbohidratos != null"> | Carb: {{ bebida.carbohidratos }}g</span>
+              <span *ngIf="bebida.grasas != null"> | Grasas: {{ bebida.grasas }}g</span>
+            </ng-container>
+            <ng-template #sinNutricion>
+              <span class="text-muted" style="font-style: italic;">Información nutricional no disponible</span>
+            </ng-template>
+          </div>
+
+          <!-- REQ-017: Botón para ver receta -->
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary mt-2 w-100"
+            (click)="verReceta(bebida)"
+          >
+            📋 Ver receta
+          </button>
+        </div>
       </div>
+
       <p *ngIf="!bebidasFiltradas.length" class="vacio">
         No hay productos que coincidan con los filtros.
       </p>
@@ -75,4 +99,54 @@
   </div>
 
   <p *ngIf="!cargando && !bebidas.length" class="vacio">No hay bebidas registradas.</p>
+
+  <!-- REQ-017: Modal de Receta -->
+  <div
+    class="modal d-block"
+    tabindex="-1"
+    *ngIf="mostrarModalReceta"
+    style="background-color: rgba(0,0,0,0.5);"
+    (click)="cerrarModalReceta()"
+  >
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Receta: {{ bebidaSeleccionada?.nombre }}</h5>
+          <button type="button" class="btn-close" (click)="cerrarModalReceta()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="cargandoReceta" class="text-center py-3">
+            <span class="spinner-border spinner-border-sm text-primary"></span>
+            <p class="mt-2 text-muted">Cargando receta...</p>
+          </div>
+
+          <div *ngIf="errorReceta" class="alert alert-warning">
+            {{ errorReceta }}
+          </div>
+
+          <div *ngIf="!cargandoReceta && !errorReceta && recetaModal.length">
+            <h6>Insumos e Instrucciones:</h6>
+            <ul class="list-group list-group-flush">
+              <li *ngFor="let item of recetaModal" class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ item.producto.nombre }}</strong>
+                  <div *ngIf="item.pasoInstruccion" class="text-muted small">{{ item.pasoInstruccion }}</div>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                  {{ item.cantidad }} {{ item.producto.unidadMedida }}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div *ngIf="!cargandoReceta && !errorReceta && !recetaModal.length" class="text-muted text-center py-3">
+            No hay ingredientes registrados para esta bebida.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalReceta()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

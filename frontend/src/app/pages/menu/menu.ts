@@ -1,9 +1,10 @@
+import { ProductoService } from './../../service/producto.service';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Card } from '../../components/card/card';
 import { VentaService } from '../../service/venta.service';
-import { Bebida } from '../../models/producto';
+import { Bebida, Receta } from '../../models/producto';
 
 interface OpcionPrecio {
   etiqueta: string;
@@ -30,6 +31,13 @@ export class Menu implements OnInit {
   precioMinimo: number | null = null;
   categoriaSeleccionada: string | null = null;
 
+  // Estado para el modal de receta
+  bebidaSeleccionada: Bebida | null = null;
+  recetaModal: Receta[] = [];
+  cargandoReceta = false;
+  mostrarModalReceta = false;
+  errorReceta = '';
+
   get categorias(): string[] {
     return [...new Set(this.bebidas.map((bebida) => bebida.categoria.trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, 'es'));
@@ -49,7 +57,7 @@ export class Menu implements OnInit {
     });
   }
 
-  constructor(private ventaService: VentaService) {}
+  constructor(private ventaService: VentaService, private ProductoService: ProductoService) {}
 
   ngOnInit(): void {
     this.cargar();
@@ -91,5 +99,32 @@ export class Menu implements OnInit {
     if (nombre.includes('agua')) return '💧';
     if (nombre.includes('smoothie') || nombre.includes('batido')) return '🥤';
     return '🍹';
+  }
+
+  // Consulta de receta
+  verReceta(bebida: Bebida): void {
+    this.bebidaSeleccionada = bebida;
+    this.mostrarModalReceta = true;
+    this.cargandoReceta = true;
+    this.errorReceta = '';
+    this.recetaModal = [];
+
+    this.ProductoService.recetaDe(bebida.id).subscribe({
+      next: (receta) => {
+        this.recetaModal = receta;
+        this.cargandoReceta = false;
+      },
+      error: () => {
+        this.errorReceta = 'No se pudo cargar la receta de esta bebida.';
+        this.cargandoReceta = false;
+      },
+    });
+  }
+
+  cerrarModalReceta(): void {
+    this.mostrarModalReceta = false;
+    this.bebidaSeleccionada = null;
+    this.recetaModal = [];
+    this.errorReceta = '';
   }
 }
