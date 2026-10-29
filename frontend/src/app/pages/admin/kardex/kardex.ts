@@ -7,7 +7,7 @@ import { ReporteService } from '../../../service/reporte.service';
   selector: 'app-kardex',
   standalone: true,
   imports: [CommonModule, FormsModule], // Agregar aquí los importes de Shared cuando Dev 3 los termine
-  templateUrl: './kardex.component.html'
+  templateUrl: './kardex.html'
 })
 export class Kardex implements OnInit {
   kardexData: any[] = [];
