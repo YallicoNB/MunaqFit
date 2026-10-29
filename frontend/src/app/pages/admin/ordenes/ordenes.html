@@ -1,0 +1,87 @@
+<div class="container-fluid py-4">
+  <h2 class="mb-4">Gestión de Órdenes (Admin)</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form (ngSubmit)="aplicarFiltros()" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Fecha</label>
+          <input type="date" class="form-control" name="fecha" [(ngModel)]="filtros.fecha">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">DNI / ID Empleado</label>
+          <input type="text" class="form-control" name="empleadoId" placeholder="Ej. 11111111" [(ngModel)]="filtros.empleadoId">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select class="form-select" name="estado" [(ngModel)]="filtros.estado">
+            <option value="">Todos</option>
+            <option value="PAGADA">Pagada</option>
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="CANCELADA">Cancelada</option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100" [disabled]="cargando">Buscar</button>
+          <button type="button" class="btn btn-outline-secondary w-100" (click)="limpiarFiltros()" [disabled]="cargando">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0 text-center py-5" *ngIf="cargando">
+      <span class="spinner-border text-primary" role="status"></span>
+      <p class="mt-2 text-muted">Cargando órdenes...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!cargando && ventas.length > 0">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Empleado</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of ventas">
+            <td>#{{ v.id }}</td>
+            <td>{{ v.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ v.empleado?.nombreCompleto || 'N/A' }}</td>
+            <td>S/ {{ v.total | number:'1.2-2' }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'bg-success': v.estado === 'PAGADA',
+                  'bg-warning text-dark': v.estado === 'PENDIENTE',
+                  'bg-danger': v.estado === 'CANCELADA'
+                }">
+                {{ v.estado }}
+              </span>
+            </td>
+            <td class="text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Cambiar estado
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><button class="dropdown-item" (click)="cambiarEstado(v.id, 'PAGADA')" [disabled]="v.estado === 'PAGADA'">PAGADA</button></li>
+                  <li><button class="dropdown-item" (click)="cambiarEstado(v.id, 'PENDIENTE')" [disabled]="v.estado === 'PENDIENTE'">PENDIENTE</button></li>
+                  <li><button class="dropdown-item text-danger" (click)="cambiarEstado(v.id, 'CANCELADA')" [disabled]="v.estado === 'CANCELADA'">CANCELADA</button></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center py-5 text-muted" *ngIf="!cargando && ventas.length === 0">
+      No se encontraron órdenes con los filtros actuales.
+    </div>
+  </div>
+</div>

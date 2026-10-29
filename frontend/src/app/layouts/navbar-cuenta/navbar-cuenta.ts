@@ -33,6 +33,7 @@ export class NavbarCuenta {
     { ruta: '/admin/kardex', texto: 'Kardex' }, // Faltaba en tu arreglo original
     { ruta: '/ventas', texto: 'Ventas' }, // Asumiendo que el admin usa el mismo POS
     { ruta: '/admin/ordenes', texto: 'Órdenes' }, // Nueva ruta de la Tarea 3.3
+    { ruta: '/cuenta', texto: 'Mi cuenta' },
   ];
 
   get enlaces(): EnlaceCuenta[] {

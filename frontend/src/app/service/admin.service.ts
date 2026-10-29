@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
 import { ProductoInventario, ReabastecerRequest, Usuario, Proveedor, CrearUsuarioRequest, Rol } from '../models/admin';
+
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class AdminService {
   private urlProveedores = `${API_URL}/admin/proveedores`;
   private urlVentas = `${API_URL}/admin/ventas`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ---- Inventario ----
 
@@ -74,8 +75,16 @@ export class AdminService {
 
   // ---- Ventas ----
 
-  listarVentas(): Observable<unknown[]> {
-    return this.http.get<unknown[]>(this.urlVentas);
+  listarVentas(filtros?: any): Observable<any[]> {
+    let params = new HttpParams();
+
+    if (filtros) {
+      if (filtros.fecha) params = params.set('fecha', filtros.fecha);
+      if (filtros.empleadoId) params = params.set('empleadoId', filtros.empleadoId);
+      if (filtros.estado) params = params.set('estado', filtros.estado);
+    }
+
+    return this.http.get<any[]>(this.urlVentas, { params });
   }
 
   cambiarEstadoVenta(id: number, estado: string): Observable<unknown> {
