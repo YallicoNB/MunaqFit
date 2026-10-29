@@ -8,7 +8,28 @@
   <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
   <p *ngIf="cargando" class="cargando">Cargando usuarios...</p>
 
-  <table class="tabla" *ngIf="!cargando && usuarios.length">
+  <!-- NUEVO: Controles de filtro (REQ-007) -->
+  <div class="filtros" *ngIf="!cargando && usuarios.length" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+    <input
+      type="text"
+      placeholder="Buscar por DNI o Nombre..."
+      [(ngModel)]="terminoBusqueda"
+      (ngModelChange)="aplicarFiltros()"
+      style="flex: 1; padding: 0.5rem;"
+    />
+    <select
+      [(ngModel)]="estadoFiltro"
+      (ngModelChange)="aplicarFiltros()"
+      style="padding: 0.5rem;"
+    >
+      <option value="">Todos los estados</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+    </select>
+  </div>
+
+  <!-- OJO AQUÍ: Cambiamos a usuariosFiltrados.length -->
+  <table class="tabla" *ngIf="!cargando && usuariosFiltrados.length">
     <thead>
       <tr>
         <th>DNI</th>
@@ -16,11 +37,13 @@
         <th>Email</th>
         <th>Rol</th>
         <th>Estado</th>
+        <th>Último Acceso</th> <!-- NUEVA COLUMNA -->
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuarios">
+      <!-- OJO AQUÍ: Iteramos sobre usuariosFiltrados -->
+      <tr *ngFor="let u of usuariosFiltrados">
         <td>{{ u.dni }}</td>
         <td>{{ u.nombreCompleto }}</td>
         <td>{{ u.email }}</td>
@@ -39,6 +62,10 @@
         <td>
           <span class="estado" [class.inactivo]="u.estado === 'INACTIVO'">{{ u.estado }}</span>
         </td>
+        <!-- NUEVA COLUMNA: Mostramos la fecha formateada o 'Nunca' -->
+        <td class="fecha-login">
+          {{ u.ultimoLogin ? (u.ultimoLogin | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
+        </td>
         <td>
           <button
             class="btn peligro"
@@ -52,8 +79,10 @@
     </tbody>
   </table>
 
-  <p *ngIf="!cargando && !usuarios.length" class="vacio">No hay usuarios registrados.</p>
+  <!-- OJO AQUÍ: Validamos usuariosFiltrados.length para cuando la búsqueda no da resultados -->
+  <p *ngIf="!cargando && !usuariosFiltrados.length" class="vacio">No hay usuarios que coincidan con la búsqueda.</p>
 
+  <!-- TU FORMULARIO ORIGINAL (Sin tocar) -->
   <div class="formulario" *ngIf="mostrarFormulario">
     <h2>Nuevo empleado</h2>
     <label>

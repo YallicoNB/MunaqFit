@@ -13,11 +13,16 @@ import { Token } from '../../../service/auth/token';
 })
 export class Usuarios implements OnInit {
   usuarios: Usuario[] = [];
+  usuariosFiltrados: Usuario[] = []; // Lista para renderizar en pantalla
   cargando = true;
   error = '';
   mensaje = '';
 
-  // Formulario de alta. El backend siempre crea al usuario con rol EMPLEADO.
+  //Filtros
+  terminoBusqueda = '';
+  estadoFiltro = '';
+
+  //El backend siempre crea al usuario con rol EMPLEADO.
   mostrarFormulario = false;
   dni = '';
   nombreCompleto = '';
@@ -39,12 +44,26 @@ export class Usuarios implements OnInit {
     this.adminService.listarUsuarios().subscribe({
       next: (u) => {
         this.usuarios = u;
+        this.aplicarFiltros(); // aplicación de filtros cada vez que cargamos datos
         this.cargando = false;
       },
       error: () => {
         this.error = 'No se pudieron cargar los usuarios';
         this.cargando = false;
       },
+    });
+  }
+
+  // Nueva función de filtro
+  aplicarFiltros(): void {
+    this.usuariosFiltrados = this.usuarios.filter(u => {
+      const coincideBusqueda =
+        u.dni.includes(this.terminoBusqueda) ||
+        u.nombreCompleto.toLowerCase().includes(this.terminoBusqueda.toLowerCase());
+
+      const coincideEstado = this.estadoFiltro ? u.estado === this.estadoFiltro : true;
+
+      return coincideBusqueda && coincideEstado;
     });
   }
 
@@ -88,7 +107,7 @@ export class Usuarios implements OnInit {
       });
   }
 
-  /** El backend lo marca como INACTIVO, no lo borra de la base de datos. */
+  //El backend lo marcará como inactivo, no lo va a borrar
   desactivar(usuario: Usuario): void {
     if (!confirm(`Inactivar a ${usuario.nombreCompleto}?`)) return;
 
@@ -101,12 +120,12 @@ export class Usuarios implements OnInit {
     });
   }
 
-  /** Marca si la fila es del usuario con la sesión iniciada. */
+  //Marca si la fila es del usuario logueado
   esMiUsuario(usuario: Usuario): boolean {
     return usuario.dni === this.token.getDni();
   }
 
-  /** Cambia el rol de un usuario. Si el backend lo rechaza, la UI no cambia. */
+  // Cambia el rol de un usuario. Si el backend lo rechaza, la UI no cambia.
   cambiarRol(usuario: Usuario, nuevoRol: Rol): void {
     if (usuario.rol === nuevoRol) return;
 
@@ -116,6 +135,7 @@ export class Usuarios implements OnInit {
     this.adminService.cambiarRol(usuario.id!, nuevoRol).subscribe({
       next: (u) => {
         usuario.rol = u.rol;
+        this.aplicarFiltros(); // Actualiza la vista para reflejar el cambio
         this.mensaje = `Rol de ${u.nombreCompleto} actualizado a ${u.rol}`;
       },
       error: (e) => {
