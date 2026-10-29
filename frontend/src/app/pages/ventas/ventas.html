@@ -8,7 +8,7 @@
   <p *ngIf="errorCarga" class="alert alert-danger py-2">{{ errorCarga }}</p>
 
   <div class="pos-body row g-3" *ngIf="!cargando">
-    <!-- ====== Catalogo de bebidas ====== -->
+    <!-- ====== Catálogo de bebidas ====== -->
     <section class="col-lg-8">
       <p class="text-muted small mb-2">Toca una bebida para agregarla al pedido.</p>
       <div class="catalogo-filtros mb-3" *ngIf="bebidas.length">
@@ -95,6 +95,48 @@
         </div>
 
         <div class="card-body">
+
+          <!-- ====== REQ-023 / REQ-024 / REQ-025: Fidelización de Cliente ====== -->
+          <div class="fidelizacion-box p-2 mb-3 bg-light rounded border">
+            <label class="form-label small fw-bold text-muted mb-1 d-block">
+              👤 Cliente Frecuente (DNI)
+            </label>
+            <div class="input-group input-group-sm mb-1" *ngIf="!clienteInfo">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="DNI del cliente"
+                maxlength="8"
+                [(ngModel)]="dniCliente"
+                (keyup.enter)="buscarCliente()"
+              />
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="buscarCliente()"
+                [disabled]="buscandoCliente"
+              >
+                {{ buscandoCliente ? '...' : 'Buscar' }}
+              </button>
+            </div>
+
+            <div *ngIf="clienteInfo" class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge text-bg-success me-1">DNI {{ clienteInfo.dni }}</span>
+                <span class="small fw-semibold text-secondary">
+                  Visitas: {{ clienteInfo.visitas }}/10
+                </span>
+              </div>
+              <button type="button" class="btn btn-sm btn-link text-danger p-0" (click)="limpiarCliente()">
+                Quitar
+              </button>
+            </div>
+
+            <div *ngIf="clienteInfo && (clienteInfo.visitas + 1) % 10 === 0" class="alert alert-warning py-1 px-2 mt-2 mb-0 small">
+              🎉 <strong>¡10.ª visita!</strong> ¡Premio: bebida gratis disponible!
+            </div>
+          </div>
+
           <div class="tipo-pedido mb-3" role="group" aria-label="Tipo de pedido">
             <button
               type="button"
@@ -219,7 +261,7 @@
   </div>
 </div>
 
-<!-- ====== Modal de cobro (overlay propio, sin dependencia del JS de Bootstrap) ====== -->
+<!-- ====== Modal de cobro ====== -->
 <div class="overlay" *ngIf="cobroAbierto" (click)="cerrarCobro()">
   <div class="modal-caja card shadow-lg" (click)="$event.stopPropagation()">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -238,6 +280,9 @@
       <div class="text-center mb-3">
         <div class="text-muted small">Total a cobrar</div>
         <div class="fs-3 fw-bold">S/ {{ total() | number: '1.2-2' }}</div>
+        <div *ngIf="clienteInfo" class="small text-success fw-semibold mt-1">
+          Cliente: DNI {{ clienteInfo.dni }}
+        </div>
       </div>
 
       <label class="form-label small text-muted mb-1">Metodo de pago</label>
