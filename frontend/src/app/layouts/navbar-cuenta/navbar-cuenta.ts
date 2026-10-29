@@ -19,21 +19,20 @@ export class NavbarCuenta {
   @Output() cerrar = new EventEmitter<void>();
 
   private readonly enlacesEmpleado: EnlaceCuenta[] = [
+    { ruta: '/ventas', texto: 'Ventas' },
     { ruta: '/menu', texto: 'Menú' },
     { ruta: '/ordenes', texto: 'Órdenes' },
-    { ruta: '/ventas', texto: 'Punto de venta' },
-    { ruta: '/cuenta', texto: 'Mi cuenta' },
+    { ruta: '/cuenta', texto: 'Cuenta' },
   ];
 
   private readonly enlacesAdmin: EnlaceCuenta[] = [
-    { ruta: '/dashboard', texto: 'Dashboard' },
-    { ruta: '/menu', texto: 'Menú' },
-    { ruta: '/ordenes', texto: 'Órdenes' },
-    { ruta: '/ventas', texto: 'Punto de venta' },
+    { ruta: '/admin/dashboard', texto: 'Dashboard' },
     { ruta: '/admin/inventario', texto: 'Inventario' },
-    { ruta: '/admin/usuarios', texto: 'Empleados' },
+    { ruta: '/admin/usuarios', texto: 'Usuarios' },
     { ruta: '/admin/reportes', texto: 'Reportes' },
-    { ruta: '/cuenta', texto: 'Mi cuenta' },
+    { ruta: '/admin/kardex', texto: 'Kardex' }, // Faltaba en tu arreglo original
+    { ruta: '/ventas', texto: 'Ventas' }, // Asumiendo que el admin usa el mismo POS
+    { ruta: '/admin/ordenes', texto: 'Órdenes' }, // Nueva ruta de la Tarea 3.3
   ];
 
   get enlaces(): EnlaceCuenta[] {
