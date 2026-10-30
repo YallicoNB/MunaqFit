@@ -1,66 +1,149 @@
-<div class="reportes">
-  <h1 class="titulo">Reportes</h1>
-
-  <div class="filtros">
-    <label>Desde <input type="date" [(ngModel)]="desde" /></label>
-    <label>Hasta <input type="date" [(ngModel)]="hasta" /></label>
-    <button class="btn" (click)="cargar()" [disabled]="cargando">
-      {{ cargando ? 'Consultando...' : 'Consultar' }}
+<div class="reportes container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="titulo mb-0">Dashboard de Reportes</h1>
+    <!-- REQ-032: Botón de Exportación -->
+    <button class="btn btn-outline-danger" (click)="exportarPDF()" [disabled]="cargando || !filtrado">
+      📄 Exportar a PDF
     </button>
   </div>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-
-  <div class="paneles" *ngIf="filtrado && !cargando">
-    <section class="panel">
-      <h2>Resumen de ventas</h2>
-      <ul class="datos" *ngIf="reporte as r">
-        <li><span>Ingresos totales</span><strong>S/ {{ r.totalIngresos | number: '1.2-2' }}</strong></li>
-        <li><span>Transacciones</span><strong>{{ r.totalTransacciones }}</strong></li>
-        <li><span>Promedio diario</span><strong>S/ {{ r.promedioDiario | number: '1.2-2' }}</strong></li>
-        <li><span>Bebida mas vendida</span><strong>{{ r.productoMasVendido }}</strong></li>
-        <li><span>Valor del inventario</span><strong>S/ {{ valorInventario | number: '1.2-2' }}</strong></li>
-      </ul>
-    </section>
-
-    <section class="panel">
-      <h2>Ingresos por metodo de pago</h2>
-      <ul class="datos" *ngIf="clavesPago.length; else sinPagos">
-        <li *ngFor="let metodo of clavesPago">
-          <span>{{ metodo }}</span>
-          <strong>S/ {{ reporte?.ingresosPorMetodoPago?.[metodo] | number: '1.2-2' }}</strong>
-        </li>
-      </ul>
-      <ng-template #sinPagos>
-        <p class="vacio">No hay pagos registrados en este periodo.</p>
-      </ng-template>
-    </section>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body filtros d-flex gap-3 align-items-end">
+      <div>
+        <label class="form-label small text-muted">Desde</label>
+        <input type="date" class="form-control" [(ngModel)]="desde" />
+      </div>
+      <div>
+        <label class="form-label small text-muted">Hasta</label>
+        <input type="date" class="form-control" [(ngModel)]="hasta" />
+      </div>
+      <button class="btn btn-primary px-4" (click)="cargar()" [disabled]="cargando">
+        {{ cargando ? 'Consultando...' : 'Consultar Período' }}
+      </button>
+    </div>
   </div>
 
-  <section class="panel ancho" *ngIf="filtrado && !cargando">
-    <h2>Ranking de bebidas mas vendidas</h2>
-    <table class="tabla" *ngIf="ranking.length; else sinRanking">
-      <thead>
-        <tr>
-          <th>Posicion</th>
-          <th>Bebida</th>
-          <th>Cantidad</th>
-          <th>Recaudado</th>
-          <th>Participacion</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of ranking">
-          <td>{{ item.posicion }}</td>
-          <td>{{ item.nombreBebida }}</td>
-          <td>{{ item.cantidadVendida }}</td>
-          <td>S/ {{ item.totalRecaudado | number: '1.2-2' }}</td>
-          <td>{{ item.porcentajeTotal | number: '1.1-1' }}%</td>
-        </tr>
-      </tbody>
-    </table>
-    <ng-template #sinRanking>
-      <p class="vacio">No hay ventas pagadas en el periodo seleccionado.</p>
-    </ng-template>
-  </section>
+  <p *ngIf="error" class="alert alert-danger">{{ error }}</p>
+
+  <div class="row g-4" *ngIf="filtrado && !cargando">
+    <!-- Panel 1: Resumen -->
+    <div class="col-md-4">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-muted mb-4">Resumen General</h5>
+          <ul class="list-group list-group-flush" *ngIf="reporte as r">
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span>Ingresos Totales</span>
+              <strong>S/ {{ r.totalIngresos | number: '1.2-2' }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span>Transacciones</span>
+              <strong>{{ r.totalTransacciones }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span>Promedio Diario</span>
+              <strong>S/ {{ r.promedioDiario | number: '1.2-2' }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span>Bebida Top</span>
+              <strong>{{ r.productoMasVendido || '-' }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span>Valor Inventario</span>
+              <strong class="text-success">S/ {{ valorInventario | number: '1.2-2' }}</strong>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Panel 2: Gráfico Circular de Pagos -->
+    <div class="col-md-8">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-muted mb-4">Ingresos por Método de Pago</h5>
+          <div class="row align-items-center">
+            <div class="col-md-5">
+              <ul class="list-group list-group-flush" *ngIf="clavesPago.length; else sinPagos">
+                <li *ngFor="let metodo of clavesPago" class="list-group-item d-flex justify-content-between align-items-center px-0">
+                  <span>{{ metodo }}</span>
+                  <strong>S/ {{ reporte?.ingresosPorMetodoPago?.[metodo] | number: '1.2-2' }}</strong>
+                </li>
+              </ul>
+              <ng-template #sinPagos>
+                <p class="text-muted small">No hay pagos en este periodo.</p>
+              </ng-template>
+            </div>
+
+            <!-- REQ-029: Gráfico de Pie (Chart.js) -->
+            <div class="col-md-7" style="height: 250px;">
+              <canvas
+                *ngIf="clavesPago.length"
+                baseChart
+                [data]="pieChartData"
+                [options]="pieChartOptions"
+                [type]="pieChartType">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Panel 3: Ranking y Gráfico de Barras -->
+  <div class="row mt-4 mb-4" *ngIf="filtrado && !cargando">
+    <div class="col-12">
+      <section class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-muted mb-4">Top 5 - Ranking de Bebidas</h5>
+          <div class="row">
+            <!-- REQ-029: Gráfico de Barras (Chart.js) -->
+            <div class="col-md-5 mb-4" style="height: 300px;">
+               <canvas
+                 *ngIf="ranking.length"
+                 baseChart
+                 [data]="barChartData"
+                 [options]="barChartOptions"
+                 [type]="barChartType">
+               </canvas>
+            </div>
+
+            <div class="col-md-7">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle" *ngIf="ranking.length; else sinRanking">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Bebida</th>
+                      <th>Cant.</th>
+                      <th>Recaudado</th>
+                      <th>Cuota</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of ranking">
+                      <td><span class="badge bg-secondary">{{ item.posicion }}</span></td>
+                      <td class="fw-semibold">{{ item.nombreBebida }}</td>
+                      <td>{{ item.cantidadVendida }}</td>
+                      <td>S/ {{ item.totalRecaudado | number: '1.2-2' }}</td>
+                      <td>
+                        <div class="progress" style="height: 10px;">
+                          <div class="progress-bar bg-success" role="progressbar" [style.width.%]="item.porcentajeTotal"></div>
+                        </div>
+                        <span class="small text-muted">{{ item.porcentajeTotal | number: '1.1-1' }}%</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #sinRanking>
+                <p class="text-muted py-3">No hay ventas registradas en el periodo seleccionado.</p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
