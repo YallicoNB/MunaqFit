@@ -1,7 +1,6 @@
 <div class="reportes container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="titulo mb-0">Dashboard de Reportes</h1>
-    <!-- REQ-032: Botón de Exportación -->
     <button class="btn btn-outline-danger" (click)="exportarPDF()" [disabled]="cargando || !filtrado">
       📄 Exportar a PDF
     </button>
@@ -23,7 +22,19 @@
     </div>
   </div>
 
-  <p *ngIf="error" class="alert alert-danger">{{ error }}</p>
+  <!-- ESTADO ESTÁNDAR: Error -->
+  <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert" *ngIf="error">
+    <span class="fs-4 me-3" aria-hidden="true">⚠️</span>
+    <div>{{ error }}</div>
+  </div>
+
+  <!-- ESTADO ESTÁNDAR: Cargando -->
+  <div class="text-center py-5" *ngIf="cargando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Cargando información...</p>
+  </div>
 
   <div class="row g-4" *ngIf="filtrado && !cargando">
     <!-- Panel 1: Resumen -->
@@ -70,12 +81,16 @@
                   <strong>S/ {{ reporte?.ingresosPorMetodoPago?.[metodo] | number: '1.2-2' }}</strong>
                 </li>
               </ul>
+
+              <!-- ESTADO ESTÁNDAR: Sin Datos (Pagos) -->
               <ng-template #sinPagos>
-                <p class="text-muted small">No hay pagos en este periodo.</p>
+                <div class="text-center py-4 bg-light rounded border mt-3">
+                  <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+                  <p class="text-muted mb-0">No hay pagos en este periodo.</p>
+                </div>
               </ng-template>
             </div>
 
-            <!-- REQ-029: Gráfico de Pie (Chart.js) -->
             <div class="col-md-7" style="height: 250px;">
               <canvas
                 *ngIf="clavesPago.length"
@@ -98,7 +113,6 @@
         <div class="card-body">
           <h5 class="card-title text-muted mb-4">Top 5 - Ranking de Bebidas</h5>
           <div class="row">
-            <!-- REQ-029: Gráfico de Barras (Chart.js) -->
             <div class="col-md-5 mb-4" style="height: 300px;">
                <canvas
                  *ngIf="ranking.length"
@@ -137,8 +151,13 @@
                   </tbody>
                 </table>
               </div>
+
+              <!-- ESTADO ESTÁNDAR: Sin Datos (Ranking) -->
               <ng-template #sinRanking>
-                <p class="text-muted py-3">No hay ventas registradas en el periodo seleccionado.</p>
+                <div class="text-center py-5 bg-light rounded border mb-4 mt-3">
+                  <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+                  <p class="text-muted mb-0">No hay ventas registradas en el periodo seleccionado.</p>
+                </div>
               </ng-template>
             </div>
           </div>

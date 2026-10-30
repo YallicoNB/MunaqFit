@@ -41,9 +41,11 @@
     </div>
   </div>
 
-  <!-- Loader -->
+  <!-- ESTADO ESTÁNDAR: Cargando -->
   <div class="text-center py-5" *ngIf="cargando">
-    <span class="spinner-border text-primary"></span>
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
     <p class="mt-2 text-muted">Cargando proveedores...</p>
   </div>
 
@@ -73,8 +75,15 @@
               <button class="btn btn-sm btn-outline-danger" (click)="eliminar(p)">Eliminar</button>
             </td>
           </tr>
+
+          <!-- ESTADO ESTÁNDAR: Sin Datos (Tabla) -->
           <tr *ngIf="proveedores.length === 0">
-            <td colspan="6" class="text-center py-4 text-muted">No hay proveedores registrados.</td>
+            <td colspan="6" class="p-0 border-0">
+              <div class="text-center py-5 bg-light rounded border m-3">
+                <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+                <p class="text-muted mb-0">No hay proveedores registrados.</p>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>

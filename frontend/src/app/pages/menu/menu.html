@@ -1,8 +1,19 @@
 <div class="menu">
-  <h1 class="titulo">Menú de productos</h1>
+  <h1 class="titulo mb-4">Menú de productos</h1>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-  <p *ngIf="cargando" class="cargando">Cargando menu...</p>
+  <!-- ESTADO ESTÁNDAR: Error -->
+  <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert" *ngIf="error">
+    <span class="fs-4 me-3" aria-hidden="true">⚠️</span>
+    <div>{{ error }}</div>
+  </div>
+
+  <!-- ESTADO ESTÁNDAR: Cargando -->
+  <div class="text-center py-5" *ngIf="cargando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Cargando menú...</p>
+  </div>
 
   <div class="menu-contenido" *ngIf="!cargando && bebidas.length">
     <aside class="filtros" aria-label="Filtros de productos">
@@ -92,13 +103,19 @@
         </div>
       </div>
 
-      <p *ngIf="!bebidasFiltradas.length" class="vacio">
-        No hay productos que coincidan con los filtros.
-      </p>
+      <!-- ESTADO ESTÁNDAR: Sin Datos (Filtro) -->
+      <div class="text-center py-5 bg-light rounded border mb-4 mt-4" *ngIf="!bebidasFiltradas.length">
+        <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+        <p class="text-muted mb-0">No hay productos que coincidan con los filtros.</p>
+      </div>
     </section>
   </div>
 
-  <p *ngIf="!cargando && !bebidas.length" class="vacio">No hay bebidas registradas.</p>
+  <!-- ESTADO ESTÁNDAR: Sin Datos (Total) -->
+  <div class="text-center py-5 bg-light rounded border mb-4 mt-4" *ngIf="!cargando && !bebidas.length">
+    <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+    <p class="text-muted mb-0">No hay bebidas registradas por el momento.</p>
+  </div>
 
   <!-- REQ-017: Modal de Receta -->
   <div
@@ -115,13 +132,19 @@
           <button type="button" class="btn-close" (click)="cerrarModalReceta()"></button>
         </div>
         <div class="modal-body">
-          <div *ngIf="cargandoReceta" class="text-center py-3">
-            <span class="spinner-border spinner-border-sm text-primary"></span>
+
+          <!-- ESTADO ESTÁNDAR: Cargando (Modal) -->
+          <div class="text-center py-5" *ngIf="cargandoReceta">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
             <p class="mt-2 text-muted">Cargando receta...</p>
           </div>
 
-          <div *ngIf="errorReceta" class="alert alert-warning">
-            {{ errorReceta }}
+          <!-- ESTADO ESTÁNDAR: Error (Modal) -->
+          <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert" *ngIf="errorReceta">
+            <span class="fs-4 me-3" aria-hidden="true">⚠️</span>
+            <div>{{ errorReceta }}</div>
           </div>
 
           <div *ngIf="!cargandoReceta && !errorReceta && recetaModal.length">
