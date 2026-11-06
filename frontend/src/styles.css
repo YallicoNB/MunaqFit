@@ -7,11 +7,12 @@
   --mq-white: #ffffff;       /* Blanco puro para las tarjetas de contenido */
   
   /* Tus colores principales refinados */
-  --mq-purple: #a68cf2;      /* Tu morado lila original */
-  --mq-purple-dark: #8c6fe6; /* Morado un poco más oscuro para botones en hover */
+  --mq-purple: #6f4fd0;      /* Morado lila con contraste AA sobre blanco */
+  --mq-purple-dark: #5a3cb8; /* Morado más oscuro para hover y texto */
   
   --mq-pink: #ff7eb6;        /* Tu rosado original para acentos y detalles */
   --mq-pink-light: #fbe6ff;  /* Rosado ultra suave para fondos secundarios */
+  --mq-pink-frame: #fdf0ff;  /* Rosado casi blanco para cabeceras y guías */
   
   --mq-text-main: #4a3f69;   /* Morado muy oscuro para los textos (súper legible) */
   --mq-text-muted: #8b82a5;  /* Gris-lila para textos secundarios */
