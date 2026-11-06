@@ -27,6 +27,9 @@ public class InventarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private AlertaSseService alertaSseService;
+
     // REQ-019: Ver stock actual
     public List<Producto> obtenerTodoElInventario() {
         return productoRepository.findAll();
@@ -81,6 +84,19 @@ public class InventarioService {
         }
 
         // Guardar y retornar el producto actualizado
-        return productoRepository.save(producto);
+        Producto guardado = productoRepository.save(producto);
+
+        // REQ-031 (reparto 3, P1): si el reabastecimiento saco al insumo del
+        // stock critico, se avisa en tiempo real para que el equipo sepa que
+        // ya esta disponible otra vez.
+        BigDecimal stockCritico = guardado.getStockCritico();
+        if (stockCritico != null
+                && stockAnterior.compareTo(stockCritico) <= 0
+                && nuevoStock.compareTo(stockCritico) > 0) {
+            alertaSseService.notificarTrasCommit(
+                    () -> alertaSseService.notificarStockRecuperado(guardado, nuevoStock));
+        }
+
+        return guardado;
     }
 }

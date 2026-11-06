@@ -64,6 +64,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Sonda de disponibilidad que usa el cron para que Render
+                        // no duerma la instancia. Sin token a proposito.
+                        .requestMatchers("/api/health").permitAll()
+                        // Stream SSE de alertas de stock: EventSource no puede
+                        // mandar el header Authorization, asi que el JWT viaja
+                        // en ?token= y el controller lo valida a mano. Se abre
+                        // aqui solo la ruta; el resto sigue exigiendo sesion.
+                        .requestMatchers("/api/alertas/stock").permitAll()
+                        // Documentacion de la API: sin esto .anyRequest() la bloquearia
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Sin token o con token vencido la peticion no esta

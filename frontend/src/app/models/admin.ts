@@ -1,10 +1,12 @@
+export type Rol = 'ADMIN' | 'EMPLEADO';
+
 export interface Usuario {
   id?: number;
   dni: string;
   nombreCompleto: string;
   email: string;
   password?: string;
-  rol: 'ADMIN' | 'EMPLEADO';
+  rol: Rol;
   estado: 'ACTIVO' | 'INACTIVO';
   ultimoLogin: string | null;
   fechaCreacion: string;
@@ -16,6 +18,11 @@ export interface CrearUsuarioRequest {
   nombreCompleto: string;
   email: string;
   password: string;
+}
+
+/** Cuerpo que espera PUT /api/admin/usuarios/{id}/rol */
+export interface CambiarRolRequest {
+  rol: Rol;
 }
 
 export interface ProductoInventario {

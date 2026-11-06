@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -134,6 +136,17 @@ public class GlobalExceptionHandler {
                 + esperado + ".", HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Un parametro obligatorio que no viene en la URL es un error del
+     * cliente (400), no del servidor. Sin esto, por ejemplo
+     * GET /api/admin/reportes/ventas sin inicio ni fin caia en el
+     * handler generico y devolvia 500.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParam(MissingServletRequestParameterException ex) {
+        return build("Falta el parametro obligatorio '" + ex.getParameterName() + "'", HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleUnreadableBody(HttpMessageNotReadableException ex) {
         return build("El cuerpo de la peticion no es un JSON valido", HttpStatus.BAD_REQUEST);
@@ -152,6 +165,20 @@ public class GlobalExceptionHandler {
                 + String.join(", ", ex.getSupportedHttpMethods() == null
                         ? new String[0] : ex.getSupportedMethods()));
         return new ResponseEntity<>(body, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    /**
+     * El cliente de un stream SSE (o una descarga larga) se desconecto
+     * mientras el servidor le escribia: ya no hay a quien responderle.
+     * Spring reenvia la excepcion por el dispatch async y, sin este
+     * handler, caia en el generico como ERROR 500 con stack trace cada
+     * vez que un navegador cerraba la pestaña de alertas. Se registra en
+     * debug y se devuelve void para no intentar escribir un cuerpo sobre
+     * una conexion que ya no existe.
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public void handleAsyncRequestNotUsable(AsyncRequestNotUsableException ex) {
+        log.debug("Cliente desconectado durante una respuesta async (SSE/descarga): {}", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

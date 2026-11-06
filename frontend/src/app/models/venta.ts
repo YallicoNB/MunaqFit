@@ -38,7 +38,7 @@ export interface DetalleVentaRespuesta extends DetalleVenta {
 export interface PagoRequest {
   ventaId: number;
   montoPagado: number;
-  tipoPago?: 'EFECTIVO' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA' | 'QR';
+  tipoPago?: 'EFECTIVO' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA' | 'QR' | 'TARJETA';
   numeroOperacion?: string;
   banco?: string;
 }

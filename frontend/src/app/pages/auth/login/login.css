@@ -72,6 +72,56 @@
   background: #2e8b57;
 }
 
+/* Estado de espera: el boton no admite pulsaciones y no cambia de color. */
+.register-button:disabled,
+.register-button:disabled:hover {
+  background: #6b8f84;
+  cursor: not-allowed;
+}
+
+.form-group input:disabled {
+  background: rgba(255, 255, 255, 0.45);
+  cursor: not-allowed;
+}
+
+/* Mensaje de error del servidor (credenciales invalidas, cuenta bloqueada). */
+.error-mensaje {
+  background: #fdecea;
+  border: 1px solid #f0b4ae;
+  border-left: 4px solid #c0392b;
+  border-radius: 8px;
+  color: #922b21;
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 11px 13px;
+  margin-bottom: 18px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respeta la preferencia del sistema de reducir animaciones (RNF-08). */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
 .register-link {
   display: block;
   text-align: center;

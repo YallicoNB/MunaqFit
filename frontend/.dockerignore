@@ -1,0 +1,5 @@
+# No se sube node_modules ni artefactos de build al repo de Vercel
+node_modules/
+dist/
+.angular/
+*.log

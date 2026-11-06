@@ -4,6 +4,7 @@ import com.munaqfit.backend.dto.LoginRequest;
 import com.munaqfit.backend.dto.LoginResponse;
 import com.munaqfit.backend.security.JwtTokenProvider;
 import com.munaqfit.backend.service.AuthService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,15 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /** Publico: es justamente aqui donde se obtiene el token. */
+    @SecurityRequirements
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    /** Publico: la respuesta es identica exista o no el correo. */
+    @SecurityRequirements
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         String token = authService.solicitarRecuperacion(body.getOrDefault("email", ""));
@@ -38,6 +43,8 @@ public class AuthController {
         ));
     }
 
+    /** Publico: el token de un solo uso llega por correo, no por cabecera. */
+    @SecurityRequirements
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         authService.resetPassword(body.getOrDefault("token", ""), body.getOrDefault("newPassword", ""));

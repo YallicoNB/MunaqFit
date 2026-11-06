@@ -28,3 +28,8 @@ Thumbs.db
 
 # ---- Logs ----
 *.log
+
+# ---- Secretos y configuracion local ----
+.env
+*.env
+application-local.properties

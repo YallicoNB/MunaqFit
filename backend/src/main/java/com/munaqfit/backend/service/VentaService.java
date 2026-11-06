@@ -52,6 +52,9 @@ public class VentaService {
     @Autowired
     private MovimientoInventarioRepository movimientoRepository;
 
+    @Autowired
+    private AlertaSseService alertaSseService;
+
     /**
      * Registra una venta completa: calcula el IGV y el total, guarda los
      * detalles, descuenta el stock de los insumos segun la receta de cada
@@ -187,6 +190,18 @@ public class VentaService {
 
             producto.setStockActual(stockNuevo);
             productoRepository.save(producto);
+
+            // REQ-021 (reparto 3, P1): si este descuento dejo el insumo en o
+            // por debajo del stock critico, se avisa en tiempo real por SSE.
+            // El aviso sale despues del commit: si la transaccion revienta,
+            // no queremos una alerta de un descuento que nunca ocurrio.
+            if (producto.getStockCritico() != null
+                    && stockNuevo.compareTo(producto.getStockCritico()) <= 0) {
+                Producto productoCritico = producto;
+                BigDecimal stockFinal = stockNuevo;
+                alertaSseService.notificarTrasCommit(
+                        () -> alertaSseService.notificarStockCritico(productoCritico, stockFinal));
+            }
         }
     }
 
