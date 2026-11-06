@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ReporteService } from '../../service/reporte.service';
+import { Navbar } from '../../layouts/navbar/navbar';
 import { DashboardMetrics, RankingBebida, ReporteVentas } from '../../models/admin';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, Navbar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -27,22 +28,22 @@ export class Dashboard implements OnInit {
     this.cargando = true;
     this.error = '';
 
-    this.reporteService.metricas().subscribe({
+    this.reporteService.getDashboardMetrics().subscribe({
       next: (m) => (this.metricas = m),
       error: () => (this.error = 'No se pudieron cargar las metricas'),
     });
 
-    this.reporteService.ventasUltimoMes().subscribe({
+    this.reporteService.getReporteVentasUltimoMes().subscribe({
       next: (r) => (this.reporte = r),
       error: () => (this.error = 'No se pudo cargar el reporte de ventas'),
     });
 
-    this.reporteService.rankingUltimoMes().subscribe({
+    this.reporteService.getRankingBebidasUltimoMes().subscribe({
       next: (r) => (this.ranking = r),
       error: () => (this.error = 'No se pudo cargar el ranking'),
     });
 
-    this.reporteService.valorizacion().subscribe({
+    this.reporteService.getValorizacionInventario().subscribe({
       next: (v) => (this.valorInventario = v),
       error: () => (this.error = 'No se pudo cargar la valorizacion'),
     });

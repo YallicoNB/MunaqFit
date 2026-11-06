@@ -12,25 +12,25 @@ export class ProductoService {
 
   constructor(private http: HttpClient) {}
 
-  listar(): Observable<Producto[]> {
+  getProductos(): Observable<Producto[]> {
     return this.http.get<Producto[]>(this.apiUrl);
   }
 
-  obtener(id: number): Observable<Producto> {
+  getProductoById(id: number): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
-  porCategoria(categoriaId: number): Observable<Producto[]> {
+  getProductosByCategoria(categoriaId: number): Observable<Producto[]> {
     return this.http.get<Producto[]>(`${this.apiUrl}/categoria/${categoriaId}`);
   }
 
-  buscar(nombre: string): Observable<Producto[]> {
+  getProductosByNombre(nombre: string): Observable<Producto[]> {
     const params = new HttpParams().set('nombre', nombre);
     return this.http.get<Producto[]>(`${this.apiUrl}/buscar`, { params });
   }
 
   /** Los insumos que usa una bebida, para ver la preparacion. */
-  recetaDe(bebidaId: number): Observable<Receta[]> {
+  getRecetasByBebidaId(bebidaId: number): Observable<Receta[]> {
     return this.http.get<Receta[]>(`${API_URL}/empleado/menu/receta/${bebidaId}`);
   }
 }

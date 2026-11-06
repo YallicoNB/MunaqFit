@@ -57,7 +57,7 @@ export class Menu implements OnInit {
 
   cargar(): void {
     this.cargando = true;
-    this.ventaService.menu().subscribe({
+    this.ventaService.getBebidas().subscribe({
       next: (bebidas) => {
         this.bebidas = bebidas;
         this.cargando = false;
@@ -77,6 +77,12 @@ export class Menu implements OnInit {
     this.precioMinimo = minimo;
   }
 
+<<<<<<< HEAD
+    this.productoService.getRecetasByBebidaId(bebida.id).subscribe({
+      next: (recetas) => (this.recetaAbierta = recetas),
+      error: () => (this.recetaAbierta = []),
+    });
+=======
   limpiarFiltros(): void {
     this.busqueda = '';
     this.precioMinimo = null;
@@ -91,5 +97,6 @@ export class Menu implements OnInit {
     if (nombre.includes('agua')) return '💧';
     if (nombre.includes('smoothie') || nombre.includes('batido')) return '🥤';
     return '🍹';
+>>>>>>> 2690368ed37e2fefe78d28b815399011dd9f7cb2
   }
 }

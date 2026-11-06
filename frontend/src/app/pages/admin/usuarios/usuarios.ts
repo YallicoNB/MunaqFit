@@ -2,12 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
+<<<<<<< HEAD
+import { Navbar } from '../../../layouts/navbar/navbar';
+import { Usuario } from '../../../models/admin';
+=======
 import { Rol, Usuario } from '../../../models/admin';
 import { Token } from '../../../service/auth/token';
+>>>>>>> 2be30a6b4f193c18b654c193368a06af9d3958a7
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Navbar],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css',
 })
@@ -36,7 +41,7 @@ export class Usuarios implements OnInit {
 
   cargar(): void {
     this.cargando = true;
-    this.adminService.listarUsuarios().subscribe({
+    this.adminService.getUsuarios().subscribe({
       next: (u) => {
         this.usuarios = u;
         this.cargando = false;
@@ -92,7 +97,7 @@ export class Usuarios implements OnInit {
   desactivar(usuario: Usuario): void {
     if (!confirm(`Inactivar a ${usuario.nombreCompleto}?`)) return;
 
-    this.adminService.eliminarUsuario(usuario.id!).subscribe({
+    this.adminService.eliminarUsuarioById(usuario.id!).subscribe({
       next: () => {
         this.mensaje = `Usuario ${usuario.nombreCompleto} inactivado`;
         this.cargar();

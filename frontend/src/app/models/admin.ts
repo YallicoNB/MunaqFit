@@ -79,3 +79,24 @@ export interface RankingBebida {
   totalRecaudado: number;
   porcentajeTotal: number;
 }
+
+export type TipoMovimientoKardex = 'INGRESO' | 'SALIDA';
+
+export interface FiltrosKardex {
+  fechaDesde: string;
+  fechaHasta: string;
+  productoId: number | null;
+  tipo: TipoMovimientoKardex | '';
+  usuarioId: number | null;
+}
+
+export interface KardexFila {
+  fechaHora: string;
+  insumo: string;
+  tipo: TipoMovimientoKardex;
+  cantidad: number;
+  stockAnterior: number;
+  stockNuevo: number;
+  motivo: string | null;
+  usuario: string | null;
+}

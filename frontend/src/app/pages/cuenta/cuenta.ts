@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Navbar } from '../../layouts/navbar/navbar';
 import { Token } from '../../service/auth/token';
 
 @Component({
   selector: 'app-cuenta',
-  imports: [],
+  imports: [Navbar],
   templateUrl: './cuenta.html',
   styleUrl: './cuenta.css',
 })

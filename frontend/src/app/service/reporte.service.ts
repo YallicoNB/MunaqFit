@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
-import { DashboardMetrics, ReporteVentas, RankingBebida } from '../models/admin';
+import {
+  DashboardMetrics,
+  FiltrosKardex,
+  KardexFila,
+  RankingBebida,
+  ReporteVentas,
+} from '../models/admin';
 
 @Injectable({
   providedIn: 'root',
@@ -48,32 +54,31 @@ export class ReporteService {
     const { inicio, fin } = this.ultimoMes();
     return this.ranking(inicio, fin);
   }
- obtenerKardex(filtros: any): Observable<any[]> {
-    let params = new HttpParams();
-    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
-    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
-    if (filtros.productoId) params = params.set('productoId', filtros.productoId);
-    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
-    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
 
-    return this.http.get<any[]>(`${this.urlReportes}/kardex`, { params });
+  obtenerKardex(filtros: FiltrosKardex): Observable<KardexFila[]> {
+    return this.http.get<KardexFila[]>(`${this.urlReportes}/kardex`, {
+      params: this.parametrosKardex(filtros),
+    });
   }
 
-  descargarKardexCsv(filtros: any): void {
+  descargarKardexCsv(filtros: FiltrosKardex): Observable<Blob> {
+    return this.http.get(`${this.urlReportes}/kardex/csv`, {
+      params: this.parametrosKardex(filtros),
+      responseType: 'blob',
+    });
+  }
+
+  private parametrosKardex(filtros: FiltrosKardex): HttpParams {
     let params = new HttpParams();
     if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
     if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
-    if (filtros.productoId) params = params.set('productoId', filtros.productoId);
+    if (filtros.productoId !== null) {
+      params = params.set('productoId', filtros.productoId);
+    }
     if (filtros.tipo) params = params.set('tipo', filtros.tipo);
-    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
-
-    this.http.get(`${this.urlReportes}/kardex/csv`, { params, responseType: 'blob' }).subscribe(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'kardex_reporte.csv';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
+    if (filtros.usuarioId !== null) {
+      params = params.set('usuarioId', filtros.usuarioId);
+    }
+    return params;
   }
 }

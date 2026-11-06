@@ -30,7 +30,7 @@ export class AuthService {
    * Le pregunta al backend si el token guardado sigue siendo valido.
    * Devuelve 200 si lo es y 401 si no.
    */
-  validarToken(): Observable<RespuestaValidarToken> {
+  getEstadoToken(): Observable<RespuestaValidarToken> {
     return this.http.get<RespuestaValidarToken>(`${this.apiUrl}/validar-token`);
   }
 
@@ -39,7 +39,7 @@ export class AuthService {
    * lo limpia y devuelve false.
    */
   comprobarSesion(): Observable<boolean> {
-    return this.validarToken().pipe(
+    return this.getEstadoToken().pipe(
       map((r) => r.valido),
       catchError(() => {
         this.token.cerrarSesion();

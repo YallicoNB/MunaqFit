@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { VentaService } from '../../service/venta.service';
+import { Navbar } from '../../layouts/navbar/navbar';
 import { DetalleVentaRespuesta, Venta } from '../../models/venta';
 
 @Component({
   selector: 'app-ordenes',
-  imports: [CommonModule, DecimalPipe, DatePipe],
+  imports: [CommonModule, DecimalPipe, DatePipe, Navbar],
   templateUrl: './ordenes.html',
   styleUrl: './ordenes.css',
 })
@@ -25,7 +26,7 @@ export class Ordenes implements OnInit {
 
   cargar(): void {
     this.cargando = true;
-    this.ventaService.historial().subscribe({
+    this.ventaService.getHistorialVentas().subscribe({
       next: (ordenes) => {
         this.ordenes = ordenes;
         this.cargando = false;
@@ -46,7 +47,7 @@ export class Ordenes implements OnInit {
 
     this.ordenAbierta = venta;
     this.detalle = [];
-    this.ventaService.detalleOrden(venta.id).subscribe({
+    this.ventaService.getDetalleVentaByVentaId(venta.id).subscribe({
       next: (detalle) => (this.detalle = detalle),
       error: () => (this.detalle = []),
     });

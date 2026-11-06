@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReporteService } from '../../../service/reporte.service';
+import { Navbar } from '../../../layouts/navbar/navbar';
 import { RankingBebida, ReporteVentas } from '../../../models/admin';
 
 @Component({
   selector: 'app-reportes',
-  imports: [CommonModule, DecimalPipe, FormsModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, Navbar],
   templateUrl: './reportes.html',
   styleUrl: './reportes.css',
 })
@@ -43,17 +44,17 @@ export class Reportes implements OnInit {
     const inicio = `${this.desde}T00:00:00`;
     const fin = `${this.hasta}T23:59:59`;
 
-    this.reporteService.ventas(inicio, fin).subscribe({
+    this.reporteService.getReporteVentas(inicio, fin).subscribe({
       next: (r) => (this.reporte = r),
       error: () => (this.error = 'No se pudo cargar el reporte de ventas'),
     });
 
-    this.reporteService.ranking(inicio, fin).subscribe({
+    this.reporteService.getRankingBebidas(inicio, fin).subscribe({
       next: (r) => (this.ranking = r),
       error: () => (this.error = 'No se pudo cargar el ranking'),
     });
 
-    this.reporteService.valorizacion().subscribe({
+    this.reporteService.getValorizacionInventario().subscribe({
       next: (v) => (this.valorInventario = v),
       error: () => (this.error = 'No se pudo cargar la valorizacion'),
     });
