@@ -365,7 +365,7 @@ y se probaron los flujos con `Invoke-RestMethod`:
 | `GET /api/admin/ventas?pagina=0&tamano=3` | `PageResponse` con fecha/empleado/estado |
 | `GET /api/admin/reportes/kardex?pagina=0&tamano=3` | `PageResponse` con 12 movimientos, 4 paginas |
 | Empleado en endpoint admin | 403 |
-| Historial de ordenes del empleado | Solo ventas del JWT y de hoy (204 si no hay) |
+| Historial de ordenes del empleado | Solo ventas del JWT y de hoy (lista vacia si no hay) |
 | Rate limit login (11 intentos, misma IP) | 10 x 401 + 1 x 429 |
 | `GET /api/izipay/configuracion` con `app.izipay.mock=true` | `true` |
 | `POST /api/get-izipay-token` en modo mock | `keyRSA=MOCK`, `amount` correcto; el frontend simula la aprobacion |

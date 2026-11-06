@@ -49,9 +49,8 @@ public class EmpleadoOrdenController {
                 hoy.atStartOfDay(),
                 hoy.plusDays(1).atStartOfDay());
 
-        if (ordenes.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        // Se devuelve la lista vacia (200) para que la UI muestre su estado
+        // "sin ordenes" sin tener que tratar un 204 como caso especial.
         return ResponseEntity.ok(ordenes);
     }
 
