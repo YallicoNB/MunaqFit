@@ -1,0 +1,18 @@
+<button
+  [type]="type"
+  class="mq-btn"
+  [class.mq-btn--primary]="tipo === 'primary'"
+  [class.mq-btn--secondary]="tipo === 'secondary'"
+  [class.mq-btn--danger]="tipo === 'danger'"
+  [class.mq-btn--ghost]="tipo === 'ghost'"
+  [class.mq-btn--sm]="tamano === 'sm'"
+  [class.mq-btn--lg]="tamano === 'lg'"
+  [class.mq-btn--bloque]="bloque"
+  [disabled]="deshabilitado || cargando"
+  [attr.aria-label]="ariaLabel || null"
+  [attr.aria-busy]="cargando ? 'true' : null"
+  (click)="alPresionar($event)"
+>
+  <app-spinner *ngIf="cargando" tamano="sm" etiqueta="Procesando…"></app-spinner>
+  <ng-content></ng-content>
+</button>

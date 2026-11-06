@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.mq-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.mq-field__label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--mq-text-main, #4a3f69);
+}
+
+.mq-field__req {
+  color: var(--mq-pink, #ff7eb6);
+}
+
+.mq-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mq-field__input {
+  flex: 1;
+}
+
+.mq-field__input.is-invalid {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+}
+
+.mq-field__sufijo {
+  position: absolute;
+  right: 0.85rem;
+  color: var(--mq-text-muted, #8b82a5);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.mq-field__ayuda {
+  color: var(--mq-text-muted, #8b82a5);
+  font-size: 0.85rem;
+}
+
+.mq-field__error {
+  color: #a52a26;
+  font-size: 0.85rem;
+  font-weight: 700;
+}

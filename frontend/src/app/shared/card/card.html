@@ -1,0 +1,12 @@
+<section class="mq-card-base" [class.mq-card]="conEstilo" [attr.aria-label]="titulo || null">
+  <header *ngIf="titulo || subtitulo" class="mq-card-base__head">
+    <div>
+      <h2 *ngIf="titulo" class="mq-card-base__titulo">{{ titulo }}</h2>
+      <p *ngIf="subtitulo" class="mq-card-base__subtitulo">{{ subtitulo }}</p>
+    </div>
+    <div class="mq-card-base__acciones">
+      <ng-content select="[acciones]"></ng-content>
+    </div>
+  </header>
+  <ng-content></ng-content>
+</section>

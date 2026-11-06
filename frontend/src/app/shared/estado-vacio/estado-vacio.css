@@ -1,0 +1,28 @@
+.mq-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--mq-text-muted, #8b82a5);
+}
+
+.mq-vacio__icono {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.mq-vacio__titulo {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mq-text-main, #4a3f69);
+}
+
+.mq-vacio__mensaje {
+  margin: 0;
+  max-width: 32rem;
+  font-size: 0.95rem;
+}
