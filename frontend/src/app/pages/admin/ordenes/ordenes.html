@@ -16,9 +16,9 @@
           <label class="form-label">Estado</label>
           <select class="form-select" name="estado" [(ngModel)]="filtros.estado">
             <option value="">Todos</option>
-            <option value="PAGADA">Pagada</option>
+            <option value="PAGADO">Pagado</option>
             <option value="PENDIENTE">Pendiente</option>
-            <option value="CANCELADA">Cancelada</option>
+            <option value="CANCELADO">Cancelado</option>
           </select>
         </div>
         <div class="col-md-3 d-flex gap-2">
@@ -56,9 +56,9 @@
             <td>
               <span class="badge"
                 [ngClass]="{
-                  'bg-success': v.estado === 'PAGADA',
+                  'bg-success': v.estado === 'PAGADO',
                   'bg-warning text-dark': v.estado === 'PENDIENTE',
-                  'bg-danger': v.estado === 'CANCELADA'
+                  'bg-danger': v.estado === 'CANCELADO'
                 }">
                 {{ v.estado }}
               </span>
@@ -69,9 +69,9 @@
                   Cambiar estado
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><button class="dropdown-item" (click)="cambiarEstado(v.id, 'PAGADA')" [disabled]="v.estado === 'PAGADA'">PAGADA</button></li>
+                  <li><button class="dropdown-item" (click)="cambiarEstado(v.id, 'PAGADO')" [disabled]="v.estado === 'PAGADO'">PAGADO</button></li>
                   <li><button class="dropdown-item" (click)="cambiarEstado(v.id, 'PENDIENTE')" [disabled]="v.estado === 'PENDIENTE'">PENDIENTE</button></li>
-                  <li><button class="dropdown-item text-danger" (click)="cambiarEstado(v.id, 'CANCELADA')" [disabled]="v.estado === 'CANCELADA'">CANCELADA</button></li>
+                  <li><button class="dropdown-item text-danger" (click)="cambiarEstado(v.id, 'CANCELADO')" [disabled]="v.estado === 'CANCELADO'">CANCELADO</button></li>
                 </ul>
               </div>
             </td>

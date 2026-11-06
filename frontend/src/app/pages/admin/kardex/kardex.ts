@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReporteService } from '../../../service/reporte.service';
 import { PageResponse } from '../../../models/admin';
 import { Tabla, ColumnaTabla } from '../../../shared/tabla/tabla';
 import { Boton } from '../../../shared/boton/boton';
-import { Badge } from '../../../shared/badge/badge';
 import { Spinner } from '../../../shared/spinner/spinner';
 import { EstadoVacio } from '../../../shared/estado-vacio/estado-vacio';
 
 @Component({
   selector: 'app-kardex',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, Tabla, Boton, Badge, Spinner, EstadoVacio],
+  imports: [CommonModule, FormsModule, Tabla, Boton, Spinner, EstadoVacio],
   templateUrl: './kardex.html',
   styleUrl: './kardex.css',
 })

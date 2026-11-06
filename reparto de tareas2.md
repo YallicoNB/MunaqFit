@@ -197,7 +197,7 @@ y el 409 de concurrencia responde correctamente. Commits de referencia:
 ## Estado de avance
 
 Punto de partida de esta segunda etapa: todo lo siguiente estaba pendiente.
-**Estado actualizado tras la entrega de Dev 1:**
+**Estado final tras la integracion local (rama `integracion-local`, sin push):**
 
 | Developer | Tarea | Estado |
 |:---|:---|:---|
@@ -205,17 +205,17 @@ Punto de partida de esta segunda etapa: todo lo siguiente estaba pendiente.
 | **Dev 1** | 1.6 – 1.9 Pantalla de Ventas (POS) con Signals | ✅ Completado (`f5d2c2a`) |
 | **Dev 1** | 1.10 – 1.11 Concurrencia (`@Version`) y formato `PED-{fecha}-{secuencia}` | ✅ Completado (`d5a5b03`) |
 | **Dev 1** | 1.12 Columnas nutricionales en `V3` | ✅ Completado (`d5a5b03`) |
-| **Dev 2** | 2.1 – 2.5 Reporte Kardex con filtros y export CSV | Pendiente |
-| **Dev 2** | 2.6 – 2.7 Pantalla `/admin/kardex` | Pendiente (maqueta con `shared/` de Dev 3) |
+| **Dev 2** | 2.1 – 2.5 Reporte Kardex con filtros y export CSV | Completado (integracion local) |
+| **Dev 2** | 2.6 – 2.7 Pantalla `/admin/kardex` | Completado (integracion local) |
 | **Dev 3** | 3.1 Bootstrap 5 | ✅ Completado por Dev 1 (`0fa4469`) |
-| **Dev 3** | 3.2 – 3.3 Diseño responsivo y grid/utilidades | Pendiente |
-| **Dev 3** | 3.4 Componentes `shared/` (Tabla, Modal, Boton, Input, Badge, Card, EstadoVacio, Spinner) | Pendiente — **bloquea a Dev 2 y Dev 4** |
+| **Dev 3** | 3.2 – 3.3 Diseño responsivo y grid/utilidades | Completado (integracion local) |
+| **Dev 3** | 3.4 Componentes `shared/` (Tabla, Modal, Boton, Input, Badge, Card, EstadoVacio, Spinner) | Completado (integracion local) |
 | **Dev 3** | 3.5 – 3.6 Servicio de Toast y `<app-toast>` | ✅ Completado por Dev 1 (`0fa4469`) |
-| **Dev 3** | 3.7 Migración de vistas a `shared/` | Pendiente |
-| **Dev 4** | 4.1 – 4.3 DTOs, CRUD de productos y `PUT` de usuarios | Pendiente (dependencia 1.5 ya resuelta) |
-| **Dev 4** | 4.4 Accesibilidad | Pendiente — sobre los componentes `shared/` de Dev 3 |
-| **Dev 4** | 4.5 – 4.6 Formularios reactivos e info nutricional | Pendiente (4.5 usa `<app-input>` de Dev 3; 4.6 ya tiene la `V3`) |
-| **Dev 4** | 4.7 – 4.8 Links muertos y estados consistentes | Pendiente (4.8 usa `EstadoVacio`/`Spinner`/`Badge` de Dev 3) |
+| **Dev 3** | 3.7 Migración de vistas a `shared/` | Completado (integracion local) |
+| **Dev 4** | 4.1 – 4.3 DTOs, CRUD de productos y `PUT` de usuarios | Completado (integracion local) |
+| **Dev 4** | 4.4 Accesibilidad | Completado (integracion local) |
+| **Dev 4** | 4.5 – 4.6 Formularios reactivos e info nutricional | Completado (integracion local) |
+| **Dev 4** | 4.7 – 4.8 Links muertos y estados consistentes | Completado (integracion local) |
 
 ### Verificación de cierre
 
@@ -344,3 +344,33 @@ Esta sección se conserva como registro de cómo se desbloqueó a los demás dev
    para migrar los proveedores actuales, y solo después el `ALTER TABLE` que elimina
    `producto.proveedor_id`. En ese orden, para que ningún momento queden datos huérfanos.
 4. **Avisa a Dev 4** que `ProductoResponseDTO` ya está listo, para que empiece su CRUD.
+
+
+---
+
+## Verificacion local de cierre (integracion-local)
+
+Se ejecuto el backend con SPRING_PROFILES_ACTIVE=local contra munaqfit_dev
+y se probaron los flujos con Invoke-RestMethod:
+
+| Comprobacion | Resultado |
+|:---|:---|
+| mvn -DskipTests compile | BUILD SUCCESS |
+| 
+g build | Application bundle generation complete |
+| Login admin (12345678) | 200 + access token (15 min) + refresh token (7 dias) |
+| POST /api/auth/refresh | 200; access y refresh rotados (jti unico) |
+| Refresh token usado como access | 401 (rechazado por JwtAuthenticationFilter) |
+| GET /api/admin/usuarios?pagina=0&tamano=2 | PageResponse con 4 usuarios, 2 paginas |
+| GET /api/admin/inventario?pagina=0&tamano=3 | PageResponse con categoria, unidad, caducidad, ultima reposicion y proveedores |
+| GET /api/admin/ventas?pagina=0&tamano=3 | PageResponse con fecha/empleado/estado |
+| GET /api/admin/reportes/kardex?pagina=0&tamano=3 | PageResponse con 12 movimientos, 4 paginas |
+| Empleado en endpoint admin | 403 |
+| Historial de ordenes del empleado | Solo ventas del JWT y de hoy (204 si no hay) |
+| Rate limit login (11 intentos, misma IP) | 10 x 401 + 1 x 429 |
+| GET /api/izipay/configuracion con pp.izipay.mock=true | 	rue |
+| POST /api/get-izipay-token en modo mock | keyRSA=MOCK, mount correcto; el frontend simula la aprobacion |
+
+> El modo mock de Izipay vive **solo** en pplication-local.properties
+> (gitignored). En produccion pp.izipay.mock=false y el flujo real queda
+> intacto hasta cargar las credenciales sandbox.

@@ -1,13 +1,11 @@
 import {
-  ChangeDetectionStrategy,
   Component,
-  forwardRef,
   Input,
   Optional,
   Self,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 let contadorInputs = 0;
 
@@ -26,14 +24,6 @@ let contadorInputs = 0;
   imports: [CommonModule],
   templateUrl: './input.html',
   styleUrl: './input.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CampoInput),
-      multi: true,
-    },
-  ],
 })
 export class CampoInput implements ControlValueAccessor {
   @Input() label = '';

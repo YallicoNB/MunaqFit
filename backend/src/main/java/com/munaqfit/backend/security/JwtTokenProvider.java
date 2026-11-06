@@ -50,6 +50,7 @@ public class JwtTokenProvider {
                 .subject(dni)
                 .claim("rol", rol)
                 .claim("tipo", tipo)
+                .id(java.util.UUID.randomUUID().toString())
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(this.secretKey)

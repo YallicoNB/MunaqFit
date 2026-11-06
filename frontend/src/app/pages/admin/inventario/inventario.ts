@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
 import { ProductoInventario, PageResponse } from '../../../models/admin';
@@ -7,11 +7,10 @@ import { Tabla, ColumnaTabla } from '../../../shared/tabla/tabla';
 import { Boton } from '../../../shared/boton/boton';
 import { Modal } from '../../../shared/modal/modal';
 import { CampoInput } from '../../../shared/input/input';
-import { Spinner } from '../../../shared/spinner/spinner';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, DecimalPipe, FormsModule, ReactiveFormsModule, Tabla, Boton, Modal, CampoInput, Spinner],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, Tabla, Boton, Modal, CampoInput],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })

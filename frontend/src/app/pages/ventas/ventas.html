@@ -277,3 +277,93 @@
 
 <!-- ====== Modal de cobro ====== -->
 <div class="overlay" *ngIf="cobroAbierto" (click)="cerrarCobro()">
+  <div
+    class="modal-caja card"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Cobrar pedido"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Cobrar pedido</h5>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar cobro"
+        (click)="cerrarCobro()"
+        [disabled]="estadoCobro === 'procesando'"
+      ></button>
+    </div>
+
+    <div class="card-body">
+      <ng-container *ngIf="estadoCobro === 'espera'">
+        <div class="d-flex justify-content-between fs-5 mb-3">
+          <span>Total a pagar</span>
+          <strong>S/ {{ total() | number: '1.2-2' }}</strong>
+        </div>
+
+        <p class="text-muted small mb-2">Método de pago</p>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button
+            *ngFor="let metodo of metodosVisibles"
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="tipoPago === metodo"
+            [class.btn-outline-primary]="tipoPago !== metodo"
+            (click)="elegirMetodo(metodo)"
+          >
+            {{ metodo }}
+          </button>
+        </div>
+
+        <div *ngIf="tipoPago === 'EFECTIVO'" class="mb-3">
+          <label class="form-label" for="monto-recibido">Monto recibido</label>
+          <input
+            id="monto-recibido"
+            type="number"
+            class="form-control"
+            min="0"
+            step="0.10"
+            [(ngModel)]="montoRecibido"
+          />
+          <small class="text-muted">Vuelto: S/ {{ vueltoPrevisto() | number: '1.2-2' }}</small>
+        </div>
+
+        <div *ngIf="tipoPago === 'TARJETA'" class="alert alert-info py-2 small mb-3">
+          Se abrirá el formulario de Izipay. En local se usa el modo simulación aprobado para la demostración.
+        </div>
+
+        <button type="button" class="btn btn-success w-100" (click)="confirmarPago()">
+          Confirmar cobro
+        </button>
+      </ng-container>
+
+      <div *ngIf="estadoCobro === 'procesando'" class="text-center py-4" role="status" aria-live="polite">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Procesando pago</span>
+        </div>
+        <p class="mt-2 mb-0">Procesando el pago…</p>
+      </div>
+
+      <ng-container *ngIf="estadoCobro === 'error'">
+        <div class="alert alert-danger" role="alert">{{ mensajeError }}</div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary flex-fill" (click)="confirmarPago()">Reintentar</button>
+          <button type="button" class="btn btn-outline-secondary flex-fill" (click)="cerrarCobro()">Cerrar</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="estadoCobro === 'exito'">
+        <div class="alert alert-success" role="status" aria-live="polite">
+          <h6 class="alert-heading mb-1">Pago registrado</h6>
+          <div>Pedido {{ ventaCobrada?.numeroPedido }}</div>
+          <div>Total cobrado: S/ {{ pagoCobrado?.montoTotal | number: '1.2-2' }}</div>
+          <div *ngIf="(pagoCobrado?.vuelto ?? 0) > 0">
+            Vuelto: S/ {{ pagoCobrado?.vuelto | number: '1.2-2' }}
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary w-100" (click)="nuevoPedido()">Nuevo pedido</button>
+      </ng-container>
+    </div>
+  </div>
+</div>
