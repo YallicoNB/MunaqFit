@@ -1,178 +1,150 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* =========================================
+   MUNAQFIT - LOGIN PASTEL (TAREA 4.3)
+========================================= */
 
 .register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8f8f5;
-  font-family: Arial, sans-serif;
+  background-color: var(--mq-bg); /* Fondo lila ultra claro para no cansar la vista */
+  padding: 1.5rem;
 }
 
 .register-card {
-  background: #a3e4d7;
-  width: 360px;
-  padding: 40px 32px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(27, 77, 62, 0.2);
+  background-color: var(--mq-white);
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem 2.5rem;
+  border: 1px solid var(--mq-border);
+  border-radius: var(--mq-radius);
+  box-shadow: var(--mq-shadow);
 }
 
 .register-title {
   text-align: center;
-  font-size: 28px;
-  color: #1b4d3e;
-  margin-bottom: 24px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--mq-text-main);
+  margin-bottom: 2rem;
+  letter-spacing: -0.5px;
 }
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 1.25rem;
 }
 
 .form-group label {
   display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1b4d3e;
-  margin-bottom: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--mq-text-main);
+  margin-bottom: 0.5rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #2e8b57;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  background-color: var(--mq-white);
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  min-height: 44px; /* RNF: Accesibilidad táctil */
+  font-family: inherit;
 }
 
 .form-group input:focus {
-  border-color: #40e0d0;
-}
-
-.register-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 8px;
-  background: #1b4d3e;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.register-button:hover {
-  background: #2e8b57;
-}
-
-/* Estado de espera: el boton no admite pulsaciones y no cambia de color. */
-.register-button:disabled,
-.register-button:disabled:hover {
-  background: #6b8f84;
-  cursor: not-allowed;
+  border-color: var(--mq-purple);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2); /* Halo lila brillante */
 }
 
 .form-group input:disabled {
-  background: rgba(255, 255, 255, 0.45);
+  background-color: var(--mq-bg);
+  color: var(--mq-text-muted);
   cursor: not-allowed;
 }
 
-/* Mensaje de error del servidor (credenciales invalidas, cuenta bloqueada). */
-.error-mensaje {
-  background: #fdecea;
-  border: 1px solid #f0b4ae;
-  border-left: 4px solid #c0392b;
-  border-radius: 8px;
-  color: #922b21;
-  font-size: 14px;
-  line-height: 1.45;
-  padding: 11px 13px;
-  margin-bottom: 18px;
+/* Botón Principal */
+.register-button {
+  width: 100%;
+  margin-top: 1rem;
+  background-color: var(--mq-purple);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 48px; /* Botón grande y cómodo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3);
 }
 
+.register-button:hover:not(:disabled) {
+  background-color: var(--mq-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(166, 140, 242, 0.4);
+}
+
+.register-button:disabled {
+  background-color: var(--mq-border);
+  color: var(--mq-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Mensaje de Error (RNF-003 Bloqueos de cuenta) */
+.error-mensaje {
+  background-color: #fff0f4;
+  border: 1px solid #ffb3c6;
+  border-left: 4px solid #ff4f8a;
+  border-radius: 8px;
+  color: #d62852;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Spinner de carga */
 .spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   margin-right: 8px;
-  vertical-align: -2px;
-  border: 2px solid rgba(255, 255, 255, 0.45);
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: girar 0.8s linear infinite;
 }
 
 @keyframes girar {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-/* Respeta la preferencia del sistema de reducir animaciones (RNF-08). */
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation: none;
-  }
+  .spinner { animation: none; }
 }
 
-.register-link {
-  display: block;
-  text-align: center;
-  margin-top: 16px;
-  color: #1b4d3e;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.register-link:hover {
-  text-decoration: underline;
-}
-
-.register-button-link {
-  display: block;
-  width: 100%;
-  margin-top: 16px;
-  padding: 14px;
-  background: transparent;
-  color: #1b4d3e;
-  font-size: 15px;
-  font-weight: 600;
-  border: 2px solid #2e8b57;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.register-button-link:hover {
-  background: #40e0d0;
-  color: #ffffff;
-}
-
-@media (max-width: 767.98px) {
-  .register-container {
-    min-height: 100vh;
-    padding: 16px;
-  }
-
+/* =========================================
+   RESPONSIVO MÓVIL (TAREA 4.4)
+========================================= */
+@media (max-width: 480px) {
   .register-card {
-    width: min(360px, 100%);
-    padding: 32px 24px;
+    padding: 2rem 1.5rem;
+    border: none;
+    box-shadow: 0 8px 24px rgba(166, 140, 242, 0.1);
   }
-}
-
-@media (max-width: 380px) {
-  .register-card {
-    padding: 26px 18px;
-  }
-
   .register-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }

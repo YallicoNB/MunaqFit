@@ -1,0 +1,219 @@
+/* =========================================
+   MUNAQFIT - KARDEX PASTEL (TAREA 4.3)
+========================================= */
+
+/* Forzamos el contenedor principal */
+.p-6 {
+  padding: 24px !important;
+  background-color: var(--mq-bg) !important;
+  min-height: calc(100vh - 68px) !important;
+}
+
+/* Título */
+.text-2xl.font-bold {
+  color: var(--mq-text-main) !important;
+  font-weight: 800 !important;
+  font-size: 1.75rem !important;
+  margin-bottom: 24px !important;
+  font-family: inherit !important;
+}
+
+/* --- PANEL DE FILTROS --- */
+.filtros-panel {
+  background-color: var(--mq-white) !important;
+  border-radius: var(--mq-radius) !important;
+  padding: 20px 24px !important;
+  box-shadow: var(--mq-shadow) !important;
+  border: 1px solid var(--mq-border) !important;
+  margin-bottom: 24px !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filtros-panel > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filtros-panel label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--mq-text-main);
+}
+
+.filtros-panel input,
+.filtros-panel select {
+  border: 2px solid var(--mq-border) !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-size: 1rem !important;
+  color: var(--mq-text-main) !important;
+  background-color: var(--mq-white) !important;
+  outline: none !important;
+  transition: all 0.3s ease !important;
+  min-height: 44px !important;
+  font-family: inherit !important;
+  font-weight: 600;
+}
+
+.filtros-panel input:focus,
+.filtros-panel select:focus {
+  border-color: var(--mq-purple) !important;
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2) !important;
+}
+
+/* Botones del filtro */
+.filtros-panel button {
+  border: none !important;
+  border-radius: 10px !important;
+  min-height: 44px !important;
+  padding: 0 24px !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón Buscar (Azul original -> Nuestro Morado) */
+.bg-blue-600 {
+  background-color: var(--mq-purple) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3) !important;
+}
+.bg-blue-600:hover {
+  background-color: var(--mq-purple-dark) !important;
+  transform: translateY(-2px);
+}
+
+/* Botón Limpiar (Gris original -> Nuestro Secundario) */
+.bg-gray-400 {
+  background-color: var(--mq-bg) !important;
+  color: var(--mq-text-muted) !important;
+  border: 1px solid var(--mq-border) !important;
+}
+.bg-gray-400:hover {
+  background-color: var(--mq-pink-light) !important;
+  color: var(--mq-purple) !important;
+  border-color: var(--mq-purple) !important;
+}
+
+/* Botón CSV (Verde original -> Nuestro Verde Pastel) */
+.bg-green-600 {
+  background-color: #10b981 !important; /* Mantenemos un verde amigable */
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+.bg-green-600:hover {
+  background-color: #059669 !important;
+  transform: translateY(-2px);
+}
+
+/* --- ESTADOS GLOBALES --- */
+.text-center.py-8 {
+  text-align: center;
+  padding: 2rem !important;
+  color: var(--mq-text-muted) !important;
+  font-weight: 700 !important;
+  background-color: var(--mq-white) !important;
+  border-radius: var(--mq-radius) !important;
+  border: 2px dashed var(--mq-border) !important;
+  margin-bottom: 24px;
+}
+
+.bg-red-100.text-red-700 {
+  background-color: #fff0f4 !important;
+  border: 1px solid #ffb3c6 !important;
+  border-left: 4px solid #ff4f8a !important;
+  color: #d62852 !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  margin-bottom: 24px !important;
+}
+
+/* --- TABLA KARDEX --- */
+.overflow-x-auto {
+  background-color: transparent !important;
+}
+
+.min-w-full.bg-white {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  background-color: var(--mq-white) !important;
+  border-radius: var(--mq-radius) !important;
+  overflow: hidden !important;
+  box-shadow: var(--mq-shadow) !important;
+  border: none !important;
+}
+
+.bg-gray-100 th {
+  font-weight: 800 !important;
+  color: var(--mq-white) !important;
+  background-color: var(--mq-purple) !important;
+  padding: 14px 16px !important;
+  border-bottom: none !important;
+}
+
+.min-w-full td {
+  padding: 14px 16px !important;
+  color: var(--mq-text-main) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--mq-border) !important;
+  vertical-align: middle;
+}
+
+.hover\:bg-gray-50:hover td {
+  background-color: var(--mq-pink-light) !important;
+}
+
+/* Etiquetas (Badges) de Tipo de Movimiento */
+.px-2.py-1.rounded.text-xs {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  display: inline-block;
+  letter-spacing: 0.5px !important;
+}
+
+/* INGRESO */
+.bg-green-100.text-green-800 {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+}
+
+/* SALIDA */
+.bg-red-100.text-red-800 {
+  background-color: #ffe4e6 !important;
+  color: #e11d48 !important;
+}
+
+/* =========================================
+   RESPONSIVO MÓVIL
+========================================= */
+@media (max-width: 768px) {
+  .filtros-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filtros-panel > div,
+  .filtros-panel button {
+    width: 100% !important;
+  }
+  .ml-auto {
+    margin-left: 0 !important;
+  }
+  .min-w-full.bg-white {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

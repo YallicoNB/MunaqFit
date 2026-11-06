@@ -1,70 +1,128 @@
+/* =========================================
+   MUNAQFIT - REPORTES PASTEL (TAREA 4.3)
+========================================= */
+
 .reportes {
-  font-family: Arial, sans-serif;
-  color: #1b4d3e;
   padding: 24px;
+  background-color: var(--mq-bg);
+  min-height: calc(100vh - 68px);
 }
 
 .titulo {
-  margin: 0 0 20px;
-  font-size: 26px;
-  color: #1b4d3e;
+  color: var(--mq-text-main);
+  font-weight: 800;
+  font-size: 1.75rem;
+  margin-bottom: 24px;
 }
 
+/* --- BARRA DE FILTROS --- */
 .filtros {
   display: flex;
-  gap: 14px;
   align-items: flex-end;
+  gap: 16px;
+  background-color: var(--mq-white);
+  padding: 20px 24px;
+  border-radius: var(--mq-radius);
+  box-shadow: var(--mq-shadow);
+  border: 1px solid var(--mq-border);
+  margin-bottom: 24px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
-  padding: 16px;
 }
 
 .filtros label {
-  font-size: 13px;
-  color: #1b4d3e;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--mq-text-main);
+  gap: 8px;
 }
 
-.filtros input {
-  padding: 8px 10px;
-  border: 1px solid #2e8b57;
-  border-radius: 8px;
-  font-size: 14px;
+.filtros input[type="date"] {
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  background-color: var(--mq-bg);
+  outline: none;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.filtros input[type="date"]:focus {
+  border-color: var(--mq-purple);
+  background-color: var(--mq-white);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
 }
 
 .btn {
-  padding: 9px 18px;
-  border: none;
-  border-radius: 8px;
-  background: #1b4d3e;
+  background-color: var(--mq-purple);
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 0 28px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-family: inherit;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3);
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--mq-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(166, 140, 242, 0.4);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  background-color: var(--mq-border);
+  color: var(--mq-text-muted);
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
+/* --- ESTADOS GLOBALES --- */
+.error {
+  background-color: #fff0f4;
+  border: 1px solid #ffb3c6;
+  border-left: 4px solid #ff4f8a;
+  color: #d62852;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.vacio {
+  text-align: center;
+  padding: 2rem;
+  color: var(--mq-text-muted);
+  font-weight: 700;
+  background: var(--mq-bg);
+  border-radius: 8px;
+  border: 2px dashed var(--mq-border);
+}
+
+/* --- PANELES --- */
 .paneles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .panel {
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
-  padding: 20px;
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
+  padding: 24px;
+  box-shadow: var(--mq-shadow);
+  border: 1px solid var(--mq-border);
 }
 
 .panel.ancho {
@@ -72,94 +130,101 @@
 }
 
 .panel h2 {
-  margin: 0 0 14px;
-  font-size: 17px;
-  color: #1b4d3e;
+  color: var(--mq-text-main);
+  font-weight: 800;
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--mq-pink-light);
+  padding-bottom: 8px;
 }
 
+/* Listas de datos (Resumen) */
 .datos {
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 .datos li {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #40e0d0;
-  font-size: 14px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--mq-border);
+  font-size: 1rem;
 }
 
+.datos li:last-child {
+  border-bottom: none;
+}
+
+.datos li span {
+  color: var(--mq-text-muted);
+  font-weight: 700;
+}
+
+.datos li strong {
+  color: var(--mq-purple-dark);
+  font-weight: 800;
+}
+
+/* --- TABLA DE RANKING --- */
 .tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-}
-
-.tabla th,
-.tabla td {
   text-align: left;
-  padding: 9px 8px;
-  border-bottom: 1px solid #40e0d0;
 }
 
 .tabla th {
-  color: #1b4d3e;
-  font-size: 12px;
-  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--mq-purple);
+  padding: 12px 10px;
+  border-bottom: 3px solid var(--mq-purple-dark);
 }
 
-.vacio {
-  color: #2e8b57;
-  font-size: 14px;
+.tabla td {
+  padding: 14px 10px;
+  color: var(--mq-text-main);
+  font-weight: 600;
+  border-bottom: 1px solid var(--mq-border);
+  transition: background-color 0.2s;
 }
 
-.error {
-  background: #a3e4d7;
-  color: #1b4d3e;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+.tabla tbody tr:hover td {
+  background-color: var(--mq-pink-light);
 }
 
-@media (max-width: 767.98px) {
-  .reportes {
-    padding: 20px 16px;
-  }
-
+/* =========================================
+   RESPONSIVO MÓVIL (TAREA 4.4)
+========================================= */
+@media (max-width: 768px) {
   .filtros {
-    align-items: stretch;
     flex-direction: column;
-    padding: 14px;
+    align-items: stretch;
   }
-
-  .filtros label,
-  .filtros input,
-  .filtros .btn {
+  
+  .filtros label, .btn {
     width: 100%;
   }
 
   .paneles {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .panel {
-    min-width: 0;
-    padding: 16px;
-  }
-
-  .datos li {
-    gap: 12px;
+    grid-template-columns: 1fr;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023.98px) {
+@media (max-width: 480px) {
   .reportes {
-    padding: 24px 20px;
+    padding: 16px;
   }
-
-  .paneles {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .panel {
+    padding: 16px;
+  }
+  .tabla th, .tabla td {
+    padding: 10px 4px;
+    font-size: 0.9rem;
+  }
+  .tabla {
+    display: block;
+    overflow-x: auto; /* Permite scroll horizontal si la tabla es muy ancha en móvil */
   }
 }
