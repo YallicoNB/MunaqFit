@@ -109,7 +109,7 @@ export class Ventas implements OnInit {
     this.cargando = true;
     this.ventaService.menu().subscribe({
       next: (menu) => {
-        this.bebidas = menu.filter((b) => b.activo);
+        this.bebidas = (menu ?? []).filter((b) => b.activo);
         this.cargando = false;
       },
       error: () => {

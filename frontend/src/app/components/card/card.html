@@ -15,10 +15,26 @@
 
 <ng-template #contenido>
   <img
+    *ngIf="imagen; else sinFoto"
     class="producto-imagen"
-    [src]="imagenPredeterminada"
+    [src]="imagen"
     [alt]="bebida.nombre"
+    loading="lazy"
+    decoding="async"
+    (error)="manejarErrorImagen($event)"
   />
+
+  <ng-template #sinFoto>
+    <div
+      class="producto-imagen producto-imagen--fallback"
+      role="img"
+      [attr.aria-label]="'Sin foto disponible de ' + bebida.nombre"
+    >
+      <span class="producto-fallback-icono" aria-hidden="true">🥤</span>
+      <span class="producto-fallback-nombre">{{ bebida.nombre }}</span>
+    </div>
+  </ng-template>
+
   <span class="producto-contenido">
     <span class="producto-cabecera">
       <span class="producto-nombre">{{ bebida.nombre }}</span>

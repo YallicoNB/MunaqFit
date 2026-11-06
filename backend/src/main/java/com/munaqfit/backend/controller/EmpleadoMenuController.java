@@ -24,7 +24,7 @@ public class EmpleadoMenuController {
     // 1. Ver catálogo de bebidas
     @GetMapping("/bebidas")
     public ResponseEntity<List<Bebida>> obtenerMenuBebidas() {
-        List<Bebida> bebidas = (List<Bebida>) bebidaRepository.findAll();
+        List<Bebida> bebidas = bebidaRepository.findByActivoTrue();
         if (bebidas.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

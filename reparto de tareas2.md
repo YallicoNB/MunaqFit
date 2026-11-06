@@ -370,6 +370,7 @@ y se probaron los flujos con `Invoke-RestMethod`:
 | `GET /api/izipay/configuracion` con `app.izipay.mock=true` | `true` |
 | `POST /api/get-izipay-token` en modo mock | `keyRSA=MOCK`, `amount` correcto; el frontend simula la aprobacion |
 | Venta con tarjeta (modo mock) | Venta `PAGADO` + pago con `tipo_pago=TARJETA` |
+| Catalogo de bebidas con fotos | 21 activas: 19 con imagen y 2 con fallback visual; las 6 antiguas quedan inactivas (no se borran) |
 
 > El modo mock de Izipay vive **solo** en `application-local.properties`
 > (gitignored). En produccion `app.izipay.mock=false` y el flujo real queda

@@ -65,7 +65,7 @@ export class Home implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.suscripcionMenu = this.ventaService.menu().subscribe({
       next: (bebidas) => {
-        this.bebidasMenu = bebidas;
+        this.bebidasMenu = (bebidas ?? []).filter((bebida) => bebida.activo);
         this.cargandoMenu = false;
         if (this.bebidasMenu.length > 1) {
           this.intervaloMenu = setInterval(() => this.mostrarSiguienteProducto(), 4500);
