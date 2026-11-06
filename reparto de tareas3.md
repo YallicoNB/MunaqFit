@@ -396,4 +396,5 @@ como acordaron los cuatro developers.
 - Flujo POS verificado en el navegador: login -> agregar bebida -> cobrar con
   TARJETA -> aprobacion simulada -> venta `PAGADO` con pago registrado.
 - El intento de cobro que fallo antes de la migracion quedo `CANCELADO`
-  (la guia exige que un rechazo deje la venta pendiente/cancelada, no pagada).
+  (la guia exige que un rechazo deje la venta pendiente/cancelada, no pagada).- Lighthouse sobre /admin/inventario: accesibilidad 1.0, buenas practicas 1.0
+  y SEO 1.0 (contraste AA, landmark main, meta description y foco visible).
