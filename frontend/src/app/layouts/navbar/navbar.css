@@ -1,49 +1,59 @@
-* {
-  box-sizing: border-box;
-}
+/* =========================================
+   MUNAQFIT - NAVBAR PASTEL (TAREA 4.2)
+========================================= */
 
 .navbar {
   min-height: 68px;
   width: 100%;
   padding: 10px 24px;
-  background: #2e8b57;
+  /* El degradado suave que usaste en tu mockup para no cansar la vista */
+  background: linear-gradient(180deg, #ffffff 0%, var(--mq-pink-light) 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 15px rgba(166, 140, 242, 0.15); /* Sombra lila sutil */
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
 .navbar-brand {
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
+  color: var(--mq-text-main);
+  font-size: 22px;
+  font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex: 1;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 24px;
+  padding-right: 16px;
 }
 
 .navbar-item {
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--mq-purple);
+  font-size: 15px;
+  font-weight: 700;
   text-decoration: none;
-  padding: 9px 12px;
-  border-radius: 7px;
-  transition: background 0.2s;
+  padding: 6px 4px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  min-height: 44px; /* RNF: Accesibilidad táctil */
+  display: flex;
+  align-items: center;
 }
 
 .navbar-item:hover,
 .navbar-item.activo {
-  background: #40e0d0;
-  color: #1b4d3e;
+  color: var(--mq-pink);
+  border-bottom-color: var(--mq-pink);
 }
 
 .cuenta-menu {
@@ -51,56 +61,69 @@
   flex-shrink: 0;
 }
 
+/* Botón de usuario basado en tus "badges" del mockup */
 .cuenta-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
-  border: 1px solid #a3e4d7;
-  border-radius: 7px;
-  background: #2e8b57;
-  color: #ffffff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid var(--mq-pink);
+  border-radius: 12px;
+  background-color: var(--mq-pink-frame);
+  color: var(--mq-text-main);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 44px; /* RNF: Accesibilidad táctil */
 }
 
 .cuenta-toggle:hover,
 .cuenta-toggle:focus-visible {
-  background: #40e0d0;
-  color: #1b4d3e;
+  background-color: var(--mq-pink);
+  color: #ffffff;
+  outline: none;
+  box-shadow: 0 4px 10px rgba(255, 126, 182, 0.3);
 }
 
 .flecha {
   display: inline-block;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .flecha.abierta {
-  transform: rotate(180deg);
+  transform: rotate(90deg); /* O 180deg dependiendo de cómo apunte tu flecha por defecto */
 }
 
-@media (max-width: 700px) {
+/* =========================================
+   RESPONSIVO (TAREA 4.4)
+========================================= */
+@media (max-width: 768px) {
   .navbar {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
     padding: 12px 16px;
-    gap: 8px;
+    gap: 12px;
   }
 
   .navbar-links {
-    justify-content: flex-start;
+    order: 3; /* Pasa los links abajo en móviles */
+    justify-content: center;
     width: 100%;
+    padding-right: 0;
+    gap: 16px;
   }
 
   .navbar-item {
-    padding: 8px 10px;
+    font-size: 14px;
+    padding: 4px;
+    min-height: 40px;
   }
 
   .cuenta-menu {
-    align-self: flex-end;
+    order: 2; /* Mantiene el perfil arriba a la derecha */
   }
 }

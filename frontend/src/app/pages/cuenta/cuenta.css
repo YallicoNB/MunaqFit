@@ -1,63 +1,82 @@
+/* =========================================
+   MUNAQFIT - MI CUENTA
+========================================= */
+
 .cuenta {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px;
+  background-color: var(--mq-bg);
+  min-height: calc(100vh - 68px);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centramos todo para que parezca un perfil real */
 }
 
+/* --- CABECERA --- */
 .cabecera {
-  margin-bottom: 24px;
+  text-align: center;
+  margin-bottom: 32px;
 }
 
 .titulo {
-  margin: 0;
-  font-size: 1.6rem;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
+  font-weight: 800;
+  font-size: 2rem;
+  margin: 0 0 8px 0;
 }
 
 .subtitulo {
-  margin: 4px 0 0;
-  color: #2e8b57;
-  font-size: 0.9rem;
+  color: var(--mq-text-muted);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
 }
 
+/* --- TARJETA DE PERFIL --- */
 .perfil {
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(166, 140, 242, 0.15);
+  border: 1px solid var(--mq-border);
+  width: 100%;
+  max-width: 500px;
   display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 10px;
-  padding: 24px;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+  animation: aparecer 0.4s ease-out forwards; /* La misma animación fluida */
 }
 
+/* --- EL CÍRCULO CON LA INICIAL --- */
 .avatar {
-  flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: #2e8b57;
-  color: #ffffff;
-  font-size: 2rem;
-  font-weight: 700;
+  width: 100px;
+  height: 100px;
+  background-color: var(--mq-purple);
+  color: var(--mq-white);
+  font-size: 3.5rem;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
+  border-radius: 50%;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(166, 140, 242, 0.4);
 }
 
+/* --- FILAS DE DATOS --- */
 .datos {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .fila {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  border-bottom: 1px solid #40e0d0;
+  justify-content: space-between;
+  align-items: center;
   padding-bottom: 12px;
+  border-bottom: 1px dashed var(--mq-border);
 }
 
 .fila:last-child {
@@ -66,70 +85,76 @@
 }
 
 .etiqueta {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #2e8b57;
+  color: var(--mq-text-muted);
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .valor {
+  color: var(--mq-text-main);
+  font-weight: 800;
   font-size: 1rem;
-  color: #1b4d3e;
-  word-break: break-word;
+  text-align: right;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
+/* --- ETIQUETAS DE ROL --- */
 .rol {
-  display: inline-block;
-  background: #40e0d0;
-  color: #1b4d3e;
-  border-radius: 999px;
-  padding: 2px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  background-color: #d1fae5;
+  color: #059669;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 .rol-codigo {
-  margin-left: 8px;
-  font-size: 0.8rem;
-  color: #2e8b57;
+  color: var(--mq-purple);
+  font-size: 0.85rem;
+  background-color: var(--mq-pink-light);
+  padding: 4px 8px;
+  border-radius: 8px;
 }
 
+/* --- BOTÓN CERRAR SESIÓN --- */
 .acciones {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
+  width: 100%;
+  max-width: 500px;
 }
 
 .btn-cerrar {
-  background: #1b4d3e;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 0.95rem;
+  background-color: var(--mq-white);
+  color: #d62852;
+  border: 2px solid #ffb3c6;
+  border-radius: 10px;
+  padding: 14px 32px;
+  font-weight: 800;
+  font-size: 1.05rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn-cerrar:hover {
-  background: #2e8b57;
+  background-color: #fff0f4;
+  border-color: #ff4f8a;
+  transform: translateY(-2px);
 }
 
-@media (max-width: 575.98px) {
-  .cuenta {
-    padding: 20px 16px;
+/* --- ANIMACIÓN --- */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
   }
-
-  .perfil {
-    flex-direction: column;
-    gap: 18px;
-    padding: 18px;
-  }
-
-  .acciones {
-    justify-content: stretch;
-  }
-
-  .btn-cerrar {
-    width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
