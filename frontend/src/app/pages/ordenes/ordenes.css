@@ -1,113 +1,153 @@
+/* =========================================
+   MUNAQFIT - HISTORIAL DE ÓRDENES
+========================================= */
+
 .ordenes {
-  font-family: Arial, sans-serif;
-  color: #1b4d3e;
   padding: 24px;
+  background-color: var(--mq-bg);
+  min-height: calc(100vh - 68px);
 }
 
 .titulo {
-  margin: 0 0 20px;
-  font-size: 26px;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
+  font-weight: 800;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 
+/* --- ESTADOS GLOBALES --- */
+.error {
+  background-color: #fff0f4;
+  border: 1px solid #ffb3c6;
+  border-left: 4px solid #ff4f8a;
+  color: #d62852;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.cargando, .vacio {
+  text-align: center;
+  padding: 3rem;
+  color: var(--mq-text-muted);
+  font-weight: 700;
+  background: var(--mq-white);
+  border-radius: var(--mq-radius);
+  border: 2px dashed var(--mq-border);
+  margin-bottom: 24px;
+}
+
+/* --- TABLA DE ÓRDENES --- */
 .tabla {
   width: 100%;
   border-collapse: collapse;
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
   overflow: hidden;
-  font-size: 14px;
-}
-
-.tabla th,
-.tabla td {
-  text-align: left;
-  padding: 11px 12px;
-  border-bottom: 1px solid #40e0d0;
+  box-shadow: var(--mq-shadow);
+  margin-bottom: 24px;
 }
 
 .tabla th {
-  background: #2e8b57;
-  color: #ffffff;
-  font-size: 12px;
-  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--mq-white);
+  background-color: var(--mq-purple);
+  padding: 14px 16px;
+  text-align: left;
 }
 
+.tabla td {
+  padding: 14px 16px;
+  color: var(--mq-text-main);
+  font-weight: 600;
+  border-bottom: 1px solid var(--mq-border);
+  vertical-align: middle;
+}
+
+.tabla tbody tr:hover td {
+  background-color: var(--mq-pink-light);
+}
+
+/* Etiqueta de Estado */
 .estado {
-  padding: 3px 9px;
+  padding: 6px 12px;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  background: #40e0d0;
-  color: #1b4d3e;
+  font-size: 0.85rem;
+  font-weight: 800;
+  background-color: #fef3c7;
+  color: #d97706;
+  display: inline-block;
 }
 
 .estado.pagado {
-  background: #a3e4d7;
-  color: #1b4d3e;
+  background-color: #d1fae5;
+  color: #059669;
 }
 
+/* --- BOTÓN DETALLE --- */
 .btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #1b4d3e;
+  background-color: var(--mq-purple);
   color: #ffffff;
-  font-size: 12px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
+.btn:hover {
+  background-color: var(--mq-purple-dark);
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3);
+}
+
+/* --- FILA DESPLEGABLE DE DETALLES --- */
 .detalle-celda {
-  background: #a3e4d7;
-  padding: 14px 12px !important;
+  background-color: var(--mq-pink-frame) !important;
+  padding: 20px 24px !important;
+  border-bottom: 2px solid var(--mq-border) !important;
 }
 
 .detalle {
   list-style: none;
-  margin: 0;
   padding: 0;
-  font-size: 13px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .detalle li {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
-}
-
-.vacio,
-.cargando {
-  color: #2e8b57;
-  font-size: 14px;
-}
-
-.error {
-  background: #a3e4d7;
-  color: #1b4d3e;
-  padding: 10px 14px;
+  align-items: center;
+  background-color: var(--mq-white);
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid var(--mq-border);
+  font-size: 0.95rem;
 }
 
-@media (max-width: 767.98px) {
-  .ordenes {
-    padding: 20px 16px;
-  }
-
-  .titulo {
-    font-size: 23px;
-  }
-
-  .detalle li {
-    align-items: flex-start;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+.detalle li strong {
+  color: var(--mq-purple-dark);
 }
 
-@media (min-width: 768px) and (max-width: 1023.98px) {
-  .ordenes {
-    padding: 24px 20px;
+.detalle li span {
+  font-weight: 800;
+  color: var(--mq-text-main);
+}
+
+/* =========================================
+   RESPONSIVO MÓVIL
+========================================= */
+@media (max-width: 768px) {
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 }

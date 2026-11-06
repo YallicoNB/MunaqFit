@@ -1,153 +1,180 @@
+/* =========================================
+   MUNAQFIT - MENÚ DE PRODUCTOS PASTEL
+========================================= */
+
 .menu {
-  font-family: Arial, sans-serif;
-  color: #1b4d3e;
   padding: 24px;
+  background-color: var(--mq-bg);
+  min-height: calc(100vh - 68px);
 }
 
 .titulo {
-  margin: 0 0 20px;
-  font-size: 26px;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
+  font-weight: 800;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 
+/* --- ESTADOS GLOBALES --- */
+.error {
+  background-color: #fff0f4;
+  border: 1px solid #ffb3c6;
+  border-left: 4px solid #ff4f8a;
+  color: #d62852;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.cargando, .vacio {
+  text-align: center;
+  padding: 3rem;
+  color: var(--mq-text-muted);
+  font-weight: 700;
+  background: var(--mq-white);
+  border-radius: var(--mq-radius);
+  border: 2px dashed var(--mq-border);
+  margin-bottom: 24px;
+}
+
+/* --- CONTENEDOR PRINCIPAL (LAYOUT) --- */
 .menu-contenido {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  align-items: start;
-  gap: 20px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
+/* --- PANEL DE FILTROS (ASIDE LATERAL) --- */
 .filtros {
+  flex: 0 0 280px; /* Ancho fijo para que no se aplaste */
+  background-color: var(--mq-white);
+  padding: 24px;
+  border-radius: var(--mq-radius);
+  box-shadow: 0 8px 24px rgba(166, 140, 242, 0.1);
+  border: 1px solid var(--mq-border);
+  position: sticky;
+  top: 24px; /* Hace que el panel te siga al hacer scroll hacia abajo */
+}
+
+/* Buscador */
+.busqueda-filtro {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 200px;
-  padding: 14px;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
-  background: #a3e4d7;
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
-.campo-filtro {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 5px;
-  color: #1b4d3e;
-  font-size: 13px;
-  font-weight: 600;
+.busqueda-filtro span {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--mq-text-main);
 }
 
-.campo-filtro .form-control {
-  min-width: 0;
-  border-color: #2e8b57;
-  background: #e8f8f5;
-  color: #1b4d3e;
+.form-control {
+  padding: 10px 14px;
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  background-color: var(--mq-white);
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
+.form-control:focus {
+  outline: none;
+  border-color: var(--mq-purple);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
+}
+
+/* Grupos de filtros (Categorías, Precio) */
 .grupo-filtro {
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
+  gap: 4px;
 }
 
 .titulo-filtro {
-  margin: 0 0 2px;
-  color: #1b4d3e;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mq-purple-dark);
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--mq-pink-light);
+  padding-bottom: 6px;
 }
 
 .opcion-filtro {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--mq-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 7px 8px;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  background: transparent;
-  color: #1b4d3e;
-  text-align: left;
-  font-size: 13px;
-  cursor: pointer;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
 }
 
-.opcion-filtro:hover,
+.opcion-filtro:hover {
+  background-color: var(--mq-pink-light);
+  color: var(--mq-purple);
+}
+
 .opcion-filtro.seleccionada {
-  border-color: #2e8b57;
-  background: #40e0d0;
+  background-color: var(--mq-purple);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3);
 }
 
+/* Botón limpiar */
 .btn-limpiar {
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 1px solid #1b4d3e;
-  border-radius: 8px;
-  background: #1b4d3e;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--mq-bg);
+  color: var(--mq-text-muted);
+  border: 1px solid var(--mq-border);
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  font-family: inherit;
 }
 
 .btn-limpiar:hover {
-  border-color: #40e0d0;
-  background: #40e0d0;
-  color: #1b4d3e;
+  background-color: #fff0f4;
+  color: #d62852;
+  border-color: #ffb3c6;
 }
 
+/* --- RESULTADOS (GRILLA DE PRODUCTOS) --- */
 .resultados-menu {
-  min-width: 0;
+  flex: 1; /* Toma todo el espacio restante a la derecha */
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
 }
 
-.vacio,
-.cargando {
-  color: #2e8b57;
-  font-size: 14px;
-}
-
-.error {
-  background: #a3e4d7;
-  color: #1b4d3e;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-@media (max-width: 767.98px) {
-  .menu {
-    padding: 20px 16px;
-  }
-
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
-  }
-
+/* --- RESPONSIVO MÓVIL --- */
+@media (max-width: 900px) {
   .menu-contenido {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    flex-direction: column;
   }
-
+  
   .filtros {
+    flex: none;
     width: 100%;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023.98px) {
-  .menu {
-    padding: 24px 20px;
-  }
-
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    position: static;
   }
 }
