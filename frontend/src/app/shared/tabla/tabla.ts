@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { Spinner } from '../spinner/spinner';
 import { EstadoVacio } from '../estado-vacio/estado-vacio';
+import { Boton } from '../boton/boton';
 
 export interface ColumnaTabla {
   /** Propiedad de la fila que se pinta por defecto. */
@@ -22,7 +23,7 @@ export interface ColumnaTabla {
 @Component({
   selector: 'app-tabla',
   standalone: true,
-  imports: [CommonModule, Spinner, EstadoVacio],
+  imports: [CommonModule, Spinner, EstadoVacio, Boton],
   templateUrl: './tabla.html',
   styleUrl: './tabla.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,8 +37,11 @@ export class Tabla {
   @Input() mensajeVacio = 'No hay datos para mostrar con los filtros actuales.';
   @Input() ariaLabel = 'Tabla de datos';
   @Input() clickeable = false;
+  @Input() mostrarAcciones = false;
+  @Input() textoAccion = 'Acción';
 
   @Output() filaClick = new EventEmitter<any>();
+  @Output() accion = new EventEmitter<any>();
 
   valorCelda(fila: any, columna: ColumnaTabla): string {
     if (columna.valor) {

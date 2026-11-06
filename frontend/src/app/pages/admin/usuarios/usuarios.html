@@ -1,20 +1,18 @@
 <div class="usuarios">
   <div class="cabecera">
     <h1 class="titulo">Usuarios</h1>
-    <button class="btn" (click)="abrirFormulario()">Nuevo empleado</button>
+    <app-boton (accion)="abrirFormulario()">Nuevo empleado</app-boton>
   </div>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-  <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
-  <p *ngIf="cargando" class="cargando">Cargando usuarios...</p>
+  <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+  <p *ngIf="mensaje" class="exito" role="status">{{ mensaje }}</p>
 
-  <!-- NUEVO: Controles de filtro (REQ-007) -->
-  <div class="filtros" *ngIf="!cargando && usuarios.length" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+  <div class="filtros" *ngIf="!cargando" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
     <input
       type="text"
       placeholder="Buscar por DNI o Nombre..."
       [(ngModel)]="terminoBusqueda"
-      (ngModelChange)="aplicarFiltros()"
+      (keyup.enter)="aplicarFiltros()"
       style="flex: 1; padding: 0.5rem;"
     />
     <select
@@ -26,10 +24,12 @@
       <option value="ACTIVO">Activo</option>
       <option value="INACTIVO">Inactivo</option>
     </select>
+    <app-boton tamano="sm" (accion)="aplicarFiltros()">Buscar</app-boton>
   </div>
 
-  <!-- OJO AQUÍ: Cambiamos a usuariosFiltrados.length -->
-  <table class="tabla" *ngIf="!cargando && usuariosFiltrados.length">
+  <app-spinner *ngIf="cargando" [centrado]="true" etiqueta="Cargando usuarios…"></app-spinner>
+
+  <table class="tabla" *ngIf="!cargando && usuarios.length">
     <thead>
       <tr>
         <th>DNI</th>
@@ -37,13 +37,12 @@
         <th>Email</th>
         <th>Rol</th>
         <th>Estado</th>
-        <th>Último Acceso</th> <!-- NUEVA COLUMNA -->
+        <th>Último Acceso</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <!-- OJO AQUÍ: Iteramos sobre usuariosFiltrados -->
-      <tr *ngFor="let u of usuariosFiltrados">
+      <tr *ngFor="let u of usuarios">
         <td>{{ u.dni }}</td>
         <td>{{ u.nombreCompleto }}</td>
         <td>{{ u.email }}</td>
@@ -62,29 +61,40 @@
         <td>
           <span class="estado" [class.inactivo]="u.estado === 'INACTIVO'">{{ u.estado }}</span>
         </td>
-        <!-- NUEVA COLUMNA: Mostramos la fecha formateada o 'Nunca' -->
         <td class="fecha-login">
           {{ u.ultimoLogin ? (u.ultimoLogin | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
         </td>
         <td>
-          <button
-            class="btn peligro"
+          <app-boton
             *ngIf="u.estado === 'ACTIVO'"
-            (click)="desactivar(u)"
+            tamano="sm"
+            tipo="danger"
+            (accion)="desactivar(u)"
           >
             Inactivar
-          </button>
+          </app-boton>
         </td>
       </tr>
     </tbody>
   </table>
 
-  <!-- OJO AQUÍ: Validamos usuariosFiltrados.length para cuando la búsqueda no da resultados -->
-  <p *ngIf="!cargando && !usuariosFiltrados.length" class="vacio">No hay usuarios que coincidan con la búsqueda.</p>
+  <app-estado-vacio
+    *ngIf="!cargando && !usuarios.length"
+    titulo="Sin usuarios"
+    mensaje="No hay usuarios que coincidan con la búsqueda."
+  ></app-estado-vacio>
 
-  <!-- TU FORMULARIO ORIGINAL (Sin tocar) -->
-  <div class="formulario" *ngIf="mostrarFormulario">
-    <h2>Nuevo empleado</h2>
+  <nav class="paginacion" *ngIf="totalPaginas > 1" aria-label="Paginación de usuarios">
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual === 0" (accion)="irPagina(paginaActual - 1)">
+      Anterior
+    </app-boton>
+    <span>Página {{ paginaActual + 1 }} de {{ totalPaginas }}</span>
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual + 1 >= totalPaginas" (accion)="irPagina(paginaActual + 1)">
+      Siguiente
+    </app-boton>
+  </nav>
+
+  <app-modal [abierto]="mostrarFormulario" titulo="Nuevo empleado" (cerrar)="mostrarFormulario = false">
     <label>
       DNI
       <input type="text" [(ngModel)]="dni" maxlength="8" />
@@ -98,15 +108,15 @@
       <input type="email" [(ngModel)]="email" />
     </label>
     <label>
-      Contrasena
+      Contraseña
       <input type="password" [(ngModel)]="password" />
     </label>
-    <p class="nota">El usuario se creara con el rol EMPLEADO.</p>
-    <div class="acciones">
-      <button class="btn" (click)="crear()" [disabled]="guardando">
+    <p class="nota">El usuario se creará con el rol EMPLEADO.</p>
+    <div acciones>
+      <app-boton [cargando]="guardando" (accion)="crear()">
         {{ guardando ? 'Guardando...' : 'Crear' }}
-      </button>
-      <button class="btn secundario" (click)="mostrarFormulario = false">Cancelar</button>
+      </app-boton>
+      <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
     </div>
-  </div>
+  </app-modal>
 </div>

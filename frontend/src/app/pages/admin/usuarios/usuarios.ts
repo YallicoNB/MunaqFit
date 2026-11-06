@@ -2,18 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
-import { Rol, Usuario } from '../../../models/admin';
+import { Rol, Usuario, PageResponse } from '../../../models/admin';
 import { Token } from '../../../service/auth/token';
+import { Boton } from '../../../shared/boton/boton';
+import { Modal } from '../../../shared/modal/modal';
+import { Badge } from '../../../shared/badge/badge';
+import { Spinner } from '../../../shared/spinner/spinner';
+import { EstadoVacio } from '../../../shared/estado-vacio/estado-vacio';
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Boton, Modal, Badge, Spinner, EstadoVacio],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css',
 })
 export class Usuarios implements OnInit {
-  usuarios: Usuario[] = [];
-  usuariosFiltrados: Usuario[] = []; // Lista para renderizar en pantalla
+  pagina: PageResponse<Usuario> | null = null;
   cargando = true;
   error = '';
   mensaje = '';
@@ -21,6 +25,8 @@ export class Usuarios implements OnInit {
   //Filtros
   terminoBusqueda = '';
   estadoFiltro = '';
+  paginaActual = 0;
+  tamano = 20;
 
   //El backend siempre crea al usuario con rol EMPLEADO.
   mostrarFormulario = false;
@@ -30,10 +36,20 @@ export class Usuarios implements OnInit {
   password = '';
   guardando = false;
 
+  columnas: { clave: string; titulo: string }[] = [];
+
   constructor(
     private adminService: AdminService,
     private token: Token
   ) {}
+
+  get usuarios(): Usuario[] {
+    return this.pagina?.contenido ?? [];
+  }
+
+  get totalPaginas(): number {
+    return this.pagina?.totalPaginas ?? 0;
+  }
 
   ngOnInit(): void {
     this.cargar();
@@ -41,10 +57,9 @@ export class Usuarios implements OnInit {
 
   cargar(): void {
     this.cargando = true;
-    this.adminService.listarUsuarios().subscribe({
-      next: (u) => {
-        this.usuarios = u;
-        this.aplicarFiltros(); // aplicación de filtros cada vez que cargamos datos
+    this.adminService.listarUsuarios(this.paginaActual, this.tamano, this.terminoBusqueda, this.estadoFiltro).subscribe({
+      next: (p) => {
+        this.pagina = p;
         this.cargando = false;
       },
       error: () => {
@@ -54,17 +69,15 @@ export class Usuarios implements OnInit {
     });
   }
 
-  // Nueva función de filtro
   aplicarFiltros(): void {
-    this.usuariosFiltrados = this.usuarios.filter(u => {
-      const coincideBusqueda =
-        u.dni.includes(this.terminoBusqueda) ||
-        u.nombreCompleto.toLowerCase().includes(this.terminoBusqueda.toLowerCase());
+    this.paginaActual = 0;
+    this.cargar();
+  }
 
-      const coincideEstado = this.estadoFiltro ? u.estado === this.estadoFiltro : true;
-
-      return coincideBusqueda && coincideEstado;
-    });
+  irPagina(p: number): void {
+    if (p < 0 || p >= this.totalPaginas) return;
+    this.paginaActual = p;
+    this.cargar();
   }
 
   abrirFormulario(): void {
@@ -107,7 +120,6 @@ export class Usuarios implements OnInit {
       });
   }
 
-  //El backend lo marcará como inactivo, no lo va a borrar
   desactivar(usuario: Usuario): void {
     if (!confirm(`Inactivar a ${usuario.nombreCompleto}?`)) return;
 
@@ -120,12 +132,10 @@ export class Usuarios implements OnInit {
     });
   }
 
-  //Marca si la fila es del usuario logueado
   esMiUsuario(usuario: Usuario): boolean {
     return usuario.dni === this.token.getDni();
   }
 
-  // Cambia el rol de un usuario. Si el backend lo rechaza, la UI no cambia.
   cambiarRol(usuario: Usuario, nuevoRol: Rol): void {
     if (usuario.rol === nuevoRol) return;
 
@@ -135,7 +145,6 @@ export class Usuarios implements OnInit {
     this.adminService.cambiarRol(usuario.id!, nuevoRol).subscribe({
       next: (u) => {
         usuario.rol = u.rol;
-        this.aplicarFiltros(); // Actualiza la vista para reflejar el cambio
         this.mensaje = `Rol de ${u.nombreCompleto} actualizado a ${u.rol}`;
       },
       error: (e) => {

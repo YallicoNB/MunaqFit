@@ -13,12 +13,17 @@ import { ToastService } from '../../../shared/toast/toast.service';
 })
 export class OrdenesAdmin implements OnInit {
   ventas: any[] = [];
-  cargando: boolean = false;
+  cargando = false;
+  paginaActual = 0;
+  tamano = 20;
+  totalPaginas = 0;
 
   filtros = {
     fecha: '',
     empleadoId: '',
-    estado: ''
+    estado: '',
+    pagina: 0,
+    tamano: 20,
   };
 
   constructor(
@@ -33,8 +38,9 @@ export class OrdenesAdmin implements OnInit {
   cargarOrdenes(): void {
     this.cargando = true;
     this.adminService.listarVentas(this.filtros).subscribe({
-      next: (data) => {
-        this.ventas = data;
+      next: (p: any) => {
+        this.ventas = p?.contenido ?? [];
+        this.totalPaginas = p?.totalPaginas ?? 0;
         this.cargando = false;
       },
       error: () => {
@@ -45,11 +51,21 @@ export class OrdenesAdmin implements OnInit {
   }
 
   aplicarFiltros(): void {
+    this.filtros.pagina = 0;
+    this.paginaActual = 0;
     this.cargarOrdenes();
   }
 
   limpiarFiltros(): void {
-    this.filtros = { fecha: '', empleadoId: '', estado: '' };
+    this.filtros = { fecha: '', empleadoId: '', estado: '', pagina: 0, tamano: 20 };
+    this.paginaActual = 0;
+    this.cargarOrdenes();
+  }
+
+  irPagina(p: number): void {
+    if (p < 0 || p >= this.totalPaginas) return;
+    this.filtros.pagina = p;
+    this.paginaActual = p;
     this.cargarOrdenes();
   }
 
@@ -59,7 +75,7 @@ export class OrdenesAdmin implements OnInit {
     this.adminService.cambiarEstadoVenta(id, nuevoEstado).subscribe({
       next: () => {
         this.toast.success('Estado actualizado correctamente', 'Órdenes');
-        this.cargarOrdenes(); // Recargamos para ver el cambio reflejado
+        this.cargarOrdenes();
       },
       error: (err) => {
         this.toast.error(err?.error?.message || 'Error al actualizar el estado', 'Órdenes');

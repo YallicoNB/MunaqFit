@@ -50,8 +50,8 @@
         <tbody>
           <tr *ngFor="let v of ventas">
             <td>#{{ v.id }}</td>
-            <td>{{ v.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td>{{ v.empleado?.nombreCompleto || 'N/A' }}</td>
+            <td>{{ v.fechaHora | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ v.empleado || 'N/A' }}</td>
             <td>S/ {{ v.total | number:'1.2-2' }}</td>
             <td>
               <span class="badge"
@@ -83,5 +83,11 @@
     <div class="text-center py-5 text-muted" *ngIf="!cargando && ventas.length === 0">
       No se encontraron órdenes con los filtros actuales.
     </div>
+
+    <nav class="paginacion d-flex align-items-center justify-content-center gap-3 py-3" *ngIf="totalPaginas > 1" aria-label="Paginación de órdenes">
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="paginaActual === 0" (click)="irPagina(paginaActual - 1)">Anterior</button>
+      <span>Página {{ paginaActual + 1 }} de {{ totalPaginas }}</span>
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="paginaActual + 1 >= totalPaginas" (click)="irPagina(paginaActual + 1)">Siguiente</button>
+    </nav>
   </div>
 </div>

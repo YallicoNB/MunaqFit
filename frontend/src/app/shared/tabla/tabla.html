@@ -25,6 +25,7 @@
           >
             <ng-container *ngIf="columna">{{ columna.titulo }}</ng-container>
           </th>
+          <th *ngIf="mostrarAcciones" scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -39,6 +40,11 @@
             [ngClass]="claseCelda(fila, columna)"
           >
             {{ valorCelda(fila, columna) }}
+          </td>
+          <td *ngIf="mostrarAcciones" class="mq-tabla__acciones">
+            <app-boton tamano="sm" tipo="secondary" (accion)="accion.emit(fila)">
+              {{ textoAccion }}
+            </app-boton>
           </td>
         </tr>
       </tbody>

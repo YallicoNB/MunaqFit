@@ -2,19 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
-import { ProductoInventario } from '../../../models/admin';
+import { ProductoInventario, PageResponse } from '../../../models/admin';
+import { Tabla, ColumnaTabla } from '../../../shared/tabla/tabla';
+import { Boton } from '../../../shared/boton/boton';
+import { Modal } from '../../../shared/modal/modal';
+import { Badge } from '../../../shared/badge/badge';
+import { EstadoVacio } from '../../../shared/estado-vacio/estado-vacio';
+import { Spinner } from '../../../shared/spinner/spinner';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, DecimalPipe, FormsModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, Tabla, Boton, Modal, Badge, EstadoVacio, Spinner],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
 export class Inventario implements OnInit {
-  productos: ProductoInventario[] = [];
+  pagina: PageResponse<ProductoInventario> | null = null;
   criticos: ProductoInventario[] = [];
   bajos: ProductoInventario[] = [];
   busqueda = '';
+  paginaActual = 0;
+  tamano = 20;
   cargando = true;
   error = '';
   mensaje = '';
@@ -25,16 +33,31 @@ export class Inventario implements OnInit {
   cantidad = 0;
   motivo = '';
   guardando = false;
+  productoSeleccionado: ProductoInventario | null = null;
+
+  columnas: ColumnaTabla[] = [
+    { clave: 'nombre', titulo: 'Insumo' },
+    { clave: 'categoria', titulo: 'Categoría' },
+    { clave: 'stockActual', titulo: 'Stock', alineacion: 'centro' },
+    { clave: 'stockMinimo', titulo: 'Mín.', alineacion: 'centro' },
+    { clave: 'stockCritico', titulo: 'Crítico', alineacion: 'centro' },
+    { clave: 'unidadMedida', titulo: 'Unidad', alineacion: 'centro' },
+    { clave: 'costoUnitario', titulo: 'Costo', alineacion: 'derecha' },
+    { clave: 'ultimaReposicion', titulo: 'Últ. reposición' },
+  ];
 
   constructor(private adminService: AdminService) {}
 
-  get productosFiltrados(): ProductoInventario[] {
-    const termino = this.busqueda.trim().toLocaleLowerCase();
-    if (!termino) return this.productos;
+  get productos(): ProductoInventario[] {
+    return this.pagina?.contenido ?? [];
+  }
 
-    return this.productos.filter((producto) =>
-      producto.nombre.toLocaleLowerCase().includes(termino),
-    );
+  get totalPaginas(): number {
+    return this.pagina?.totalPaginas ?? 0;
+  }
+
+  get productosFiltrados(): ProductoInventario[] {
+    return this.productos;
   }
 
   abreviarUnidad(unidad: string): string {
@@ -47,10 +70,11 @@ export class Inventario implements OnInit {
 
   cargar(): void {
     this.cargando = true;
+    this.error = '';
 
-    this.adminService.inventario().subscribe({
+    this.adminService.inventario(this.paginaActual, this.tamano, this.busqueda).subscribe({
       next: (p) => {
-        this.productos = p;
+        this.pagina = p;
         this.cargando = false;
       },
       error: () => {
@@ -63,10 +87,21 @@ export class Inventario implements OnInit {
     this.adminService.stockBajo().subscribe((p) => (this.bajos = p));
   }
 
+  buscar(): void {
+    this.paginaActual = 0;
+    this.cargar();
+  }
+
+  irPagina(p: number): void {
+    if (p < 0 || p >= this.totalPaginas) return;
+    this.paginaActual = p;
+    this.cargar();
+  }
+
   /** Nivel de stock de un producto: critico, bajo o normal. */
   nivel(p: ProductoInventario): 'critico' | 'bajo' | 'normal' {
-    if (p.stockActual <= p.stockCritico) return 'critico';
-    if (p.stockActual <= p.stockMinimo) return 'bajo';
+    if (p.estadoStock === 'CRITICO' || p.stockActual <= p.stockCritico) return 'critico';
+    if (p.estadoStock === 'BAJO' || p.stockActual <= p.stockMinimo) return 'bajo';
     return 'normal';
   }
 
@@ -76,11 +111,13 @@ export class Inventario implements OnInit {
   }
 
   abrirFormulario(producto: ProductoInventario): void {
+    this.productoSeleccionado = producto;
     this.productoId = producto.id;
     this.cantidad = 0;
     this.motivo = `Reabastecimiento de ${producto.nombre}`;
     this.mostrarFormulario = true;
     this.mensaje = '';
+    this.error = '';
   }
 
   reabastecer(): void {

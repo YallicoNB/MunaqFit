@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// NUEVO: Importar ng2-charts
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
@@ -10,8 +9,8 @@ import { RankingBebida, ReporteVentas } from '../../../models/admin';
 
 @Component({
   selector: 'app-reportes',
-  standalone: true, // Asegúrate de que esté como standalone
-  imports: [CommonModule, DecimalPipe, FormsModule, BaseChartDirective], // Agregado BaseChartDirective
+  standalone: true,
+  imports: [CommonModule, DecimalPipe, FormsModule, BaseChartDirective],
   templateUrl: './reportes.html',
   styleUrl: './reportes.css',
 })
@@ -26,6 +25,7 @@ export class Reportes implements OnInit {
   desde = '';
   hasta = '';
   filtrado = false;
+  periodo: 'dia' | 'semana' | 'mes' | 'personalizado' = 'mes';
 
   // --- REQ-029: Configuración de Gráficos (Chart.js) ---
 
@@ -33,19 +33,19 @@ export class Reportes implements OnInit {
   public barChartType: ChartType = 'bar';
   public barChartData: ChartConfiguration['data'] = {
     labels: [],
-    datasets: [{ data: [], label: 'Cantidad Vendida', backgroundColor: '#4caf50' }]
+    datasets: [{ data: [], label: 'Cantidad Vendida', backgroundColor: '#4caf50' }],
   };
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } }
+    plugins: { legend: { display: false } },
   };
 
   // Gráfico 2: Métodos de Pago (Pie)
   public pieChartType: ChartType = 'pie';
   public pieChartData: ChartConfiguration['data'] = {
     labels: [],
-    datasets: [{ data: [] }]
+    datasets: [{ data: [] }],
   };
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -55,7 +55,6 @@ export class Reportes implements OnInit {
   constructor(private reporteService: ReporteService) {}
 
   ngOnInit(): void {
-    // Por defecto, el último mes
     const fin = new Date();
     const inicio = new Date();
     inicio.setMonth(inicio.getMonth() - 1);
@@ -69,14 +68,13 @@ export class Reportes implements OnInit {
     this.error = '';
     this.filtrado = true;
 
-    // El backend espera fecha y hora completas
     const inicio = `${this.desde}T00:00:00`;
     const fin = `${this.hasta}T23:59:59`;
 
     this.reporteService.ventas(inicio, fin).subscribe({
       next: (r) => {
         this.reporte = r;
-        this.actualizarGraficoPagos(); // Actualizamos el gráfico
+        this.actualizarGraficoPagos();
       },
       error: () => (this.error = 'No se pudo cargar el reporte de ventas'),
     });
@@ -84,7 +82,7 @@ export class Reportes implements OnInit {
     this.reporteService.ranking(inicio, fin).subscribe({
       next: (r) => {
         this.ranking = r;
-        this.actualizarGraficoRanking(); // Actualizamos el gráfico
+        this.actualizarGraficoRanking();
       },
       error: () => (this.error = 'No se pudo cargar el ranking'),
     });
@@ -101,17 +99,17 @@ export class Reportes implements OnInit {
     return this.reporte ? Object.keys(this.reporte.ingresosPorMetodoPago ?? {}) : [];
   }
 
-  // --- REQ-029: Actualización dinámica de los datos de los gráficos ---
   private actualizarGraficoRanking(): void {
-    // Tomamos el top 5 para que el gráfico no se sature
     const top5 = this.ranking.slice(0, 5);
     this.barChartData = {
-      labels: top5.map(item => item.nombreBebida),
-      datasets: [{
-        data: top5.map(item => item.cantidadVendida),
-        label: 'Cantidad Vendida',
-        backgroundColor: '#4caf50'
-      }]
+      labels: top5.map((item) => item.nombreBebida),
+      datasets: [
+        {
+          data: top5.map((item) => item.cantidadVendida),
+          label: 'Cantidad Vendida',
+          backgroundColor: '#4caf50',
+        },
+      ],
     };
   }
 
@@ -120,15 +118,75 @@ export class Reportes implements OnInit {
 
     this.pieChartData = {
       labels: this.clavesPago,
-      datasets: [{
-        data: this.clavesPago.map(k => this.reporte!.ingresosPorMetodoPago[k]),
-        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0']
-      }]
+      datasets: [
+        {
+          data: this.clavesPago.map((k) => this.reporte!.ingresosPorMetodoPago[k]),
+          backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0'],
+        },
+      ],
     };
   }
 
-  // --- REQ-032: Simulación de Exportación ---
+  // --- REQ-032: exportación real a CSV ---
+  exportarCSV(): void {
+    if (!this.reporte) return;
+
+    const filas: string[][] = [];
+    filas.push(['Reporte', 'Valor']);
+    filas.push(['Total ingresos', String(this.reporte.totalIngresos)]);
+    filas.push(['Total transacciones', String(this.reporte.totalTransacciones)]);
+    filas.push(['Promedio diario', String(this.reporte.promedioDiario)]);
+    filas.push(['Producto más vendido', this.reporte.productoMasVendido ?? '—']);
+    filas.push([]);
+    filas.push(['Método de pago', 'Ingresos']);
+    for (const clave of this.clavesPago) {
+      filas.push([clave, String(this.reporte.ingresosPorMetodoPago[clave])]);
+    }
+    filas.push([]);
+    filas.push(['Puesto', 'Bebida', 'Cantidad', 'Recaudado']);
+    for (const item of this.ranking) {
+      filas.push([
+        String(item.posicion),
+        item.nombreBebida,
+        String(item.cantidadVendida),
+        String(item.totalRecaudado),
+      ]);
+    }
+
+    const csv = filas
+      .map((fila) => fila.map((celda) => `"${(celda ?? '').replace(/"/g, '""')}"`).join(','))
+      .join('\r\n');
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_${this.desde}_${this.hasta}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  /** Atajos de período: día, semana o mes (REQ-029). */
+  aplicarPeriodo(p: 'dia' | 'semana' | 'mes'): void {
+    this.periodo = p;
+    const fin = new Date();
+    const inicio = new Date();
+
+    if (p === 'dia') {
+      inicio.setDate(fin.getDate());
+    } else if (p === 'semana') {
+      inicio.setDate(fin.getDate() - 6);
+    } else {
+      inicio.setMonth(fin.getMonth() - 1);
+    }
+
+    this.desde = inicio.toISOString().slice(0, 10);
+    this.hasta = fin.toISOString().slice(0, 10);
+    this.cargar();
+  }
+
+  /** Compatibilidad con el botón existente: exporta CSV. */
   exportarPDF(): void {
-    alert('Función de exportación a PDF en construcción. (Se conectará con la librería jspdf)');
+    this.exportarCSV();
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
-import { DashboardMetrics, ReporteVentas, RankingBebida } from '../models/admin';
+import { DashboardMetrics, ReporteVentas, RankingBebida, PageResponse } from '../models/admin';
 
 @Injectable({
   providedIn: 'root',
@@ -48,15 +48,17 @@ export class ReporteService {
     const { inicio, fin } = this.ultimoMes();
     return this.ranking(inicio, fin);
   }
- obtenerKardex(filtros: any): Observable<any[]> {
+ obtenerKardex(filtros: any): Observable<PageResponse<any>> {
     let params = new HttpParams();
     if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
     if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
     if (filtros.productoId) params = params.set('productoId', filtros.productoId);
     if (filtros.tipo) params = params.set('tipo', filtros.tipo);
     if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
+    params = params.set('pagina', filtros.pagina ?? 0);
+    params = params.set('tamano', filtros.tamano ?? 20);
 
-    return this.http.get<any[]>(`${this.urlReportes}/kardex`, { params });
+    return this.http.get<PageResponse<any>>(`${this.urlReportes}/kardex`, { params });
   }
 
   descargarKardexCsv(filtros: any): void {

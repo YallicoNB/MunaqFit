@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
-import { ProductoInventario, ReabastecerRequest, Usuario, Proveedor, CrearUsuarioRequest, Rol } from '../models/admin';
+import { ProductoInventario, ReabastecerRequest, Usuario, Proveedor, CrearUsuarioRequest, Rol, PageResponse } from '../models/admin';
 
 
 @Injectable({
@@ -18,8 +18,20 @@ export class AdminService {
 
   // ---- Inventario ----
 
-  inventario(): Observable<ProductoInventario[]> {
-    return this.http.get<ProductoInventario[]>(this.urlInventario);
+  inventario(
+    pagina = 0,
+    tamano = 20,
+    busqueda?: string,
+    categoriaId?: number,
+    soloBajo = false
+  ): Observable<PageResponse<ProductoInventario>> {
+    let params = new HttpParams()
+      .set('pagina', pagina)
+      .set('tamano', tamano);
+    if (busqueda) params = params.set('busqueda', busqueda);
+    if (categoriaId) params = params.set('categoriaId', categoriaId);
+    if (soloBajo) params = params.set('soloBajo', 'true');
+    return this.http.get<PageResponse<ProductoInventario>>(this.urlInventario, { params });
   }
 
   stockCritico(): Observable<ProductoInventario[]> {
@@ -36,8 +48,18 @@ export class AdminService {
 
   // ---- Usuarios ----
 
-  listarUsuarios(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.urlUsuarios);
+  listarUsuarios(
+    pagina = 0,
+    tamano = 20,
+    busqueda?: string,
+    estado?: string
+  ): Observable<PageResponse<Usuario>> {
+    let params = new HttpParams()
+      .set('pagina', pagina)
+      .set('tamano', tamano);
+    if (busqueda) params = params.set('busqueda', busqueda);
+    if (estado) params = params.set('estado', estado);
+    return this.http.get<PageResponse<Usuario>>(this.urlUsuarios, { params });
   }
 
   /** Crea un empleado nuevo. El backend siempre le asigna el rol EMPLEADO. */
@@ -75,19 +97,21 @@ export class AdminService {
 
   // ---- Ventas ----
 
-  listarVentas(filtros?: any): Observable<any[]> {
-    let params = new HttpParams();
+  listarVentas(filtros?: any): Observable<PageResponse<any>> {
+    let params = new HttpParams()
+      .set('pagina', filtros?.pagina ?? 0)
+      .set('tamano', filtros?.tamano ?? 20);
 
-    if (filtros) {
-      if (filtros.fecha) params = params.set('fecha', filtros.fecha);
-      if (filtros.empleadoId) params = params.set('empleadoId', filtros.empleadoId);
-      if (filtros.estado) params = params.set('estado', filtros.estado);
-    }
+    if (filtros?.fecha) params = params.set('fecha', filtros.fecha);
+    if (filtros?.empleadoId) params = params.set('empleadoId', filtros.empleadoId);
+    if (filtros?.estado) params = params.set('estado', filtros.estado);
 
-    return this.http.get<any[]>(this.urlVentas, { params });
+    return this.http.get<PageResponse<any>>(this.urlVentas, { params });
   }
 
   cambiarEstadoVenta(id: number, estado: string): Observable<unknown> {
-    return this.http.put<unknown>(`${this.urlVentas}/${id}/estado`, { estado });
+    return this.http.put<unknown>(`${this.urlVentas}/${id}/estado`, null, {
+      params: new HttpParams().set('nuevoEstado', estado),
+    });
   }
 }
