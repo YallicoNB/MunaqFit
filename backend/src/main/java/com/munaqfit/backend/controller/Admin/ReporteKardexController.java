@@ -1,13 +1,17 @@
 package com.munaqfit.backend.controller.Admin;
 
 import com.munaqfit.backend.dto.KardexFilaDTO;
+import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.model.MovimientoInventario.TipoMovimiento;
 import com.munaqfit.backend.service.ReporteKardexService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -17,25 +21,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/reportes")
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Reportes - Kardex", description = "Movimientos de inventario y exportacion CSV")
 public class ReporteKardexController {
 
     @Autowired
     private ReporteKardexService kardexService;
 
-    // Tarea 2.4: Endpoint JSON normal
+    // Tarea 2.5 (etapa 3): endpoint JSON paginado con el contrato del equipo.
+    @Operation(summary = "Lista el kardex de inventario paginado y filtrado")
     @GetMapping("/kardex")
-    public ResponseEntity<List<KardexFilaDTO>> obtenerKardex(
+    public ResponseEntity<PageResponse<KardexFilaDTO>> obtenerKardex(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaDesde,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaHasta,
             @RequestParam(required = false) Long productoId,
             @RequestParam(required = false) TipoMovimiento tipo,
-            @RequestParam(required = false) Long usuarioId) {
-        
-        List<KardexFilaDTO> reporte = kardexService.obtenerReporteKardex(fechaDesde, fechaHasta, productoId, tipo, usuarioId);
-        return ResponseEntity.ok(reporte);
+            @RequestParam(required = false) Long usuarioId,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamano) {
+
+        return ResponseEntity.ok(kardexService.obtenerReporteKardexPaginado(
+                fechaDesde, fechaHasta, productoId, tipo, usuarioId, pagina, tamano));
     }
 
-    // Tarea 2.5: Endpoint CSV
+    @Operation(summary = "Exporta el kardex filtrado como CSV (sin paginar)")
     @GetMapping("/kardex/csv")
     public ResponseEntity<byte[]> descargarKardexCsv(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaDesde,

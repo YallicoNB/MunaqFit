@@ -21,6 +21,9 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     List<Venta> findByUsuarioIdAndFechaHoraBetween(Long usuarioId, LocalDateTime inicio, LocalDateTime fin);
 
+    List<Venta> findByUsuarioIdAndFechaHoraBetweenOrderByFechaHoraDesc(
+            Long usuarioId, LocalDateTime inicio, LocalDateTime fin);
+
     long countByEstado(EstadoVenta estado);
 
     //Calculos necesarios para los dashboards
@@ -33,6 +36,29 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     );
 
     List<Venta> findAllByOrderByFechaHoraDesc();
+
+    /**
+     * Bandeja administrativa con filtros combinables (REQ-014, tarea 2.6).
+     * El JOIN con usuario permite filtrar por empleado y evita el N+1 al
+     * mapear el resumen que consume el frontend.
+     */
+    @Query(value = "SELECT v FROM Venta v JOIN v.usuario u WHERE " +
+           "(:inicio IS NULL OR v.fechaHora >= :inicio) " +
+           "AND (:fin IS NULL OR v.fechaHora < :fin) " +
+           "AND (:empleadoId IS NULL OR u.id = :empleadoId) " +
+           "AND (:estado IS NULL OR v.estado = :estado) " +
+           "ORDER BY v.fechaHora DESC",
+           countQuery = "SELECT COUNT(v) FROM Venta v JOIN v.usuario u WHERE " +
+           "(:inicio IS NULL OR v.fechaHora >= :inicio) " +
+           "AND (:fin IS NULL OR v.fechaHora < :fin) " +
+           "AND (:empleadoId IS NULL OR u.id = :empleadoId) " +
+           "AND (:estado IS NULL OR v.estado = :estado)")
+    org.springframework.data.domain.Page<Venta> buscarAdmin(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin,
+            @Param("empleadoId") Long empleadoId,
+            @Param("estado") EstadoVenta estado,
+            Pageable pageable);
 
     /**
      * Ultimos numeros de pedido emitidos hoy, para continuar la secuencia

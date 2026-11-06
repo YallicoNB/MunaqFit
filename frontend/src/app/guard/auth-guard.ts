@@ -9,7 +9,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   console.log('authGuard | ruta evaluada:', route.routeConfig?.path);
   console.log('authGuard | URL destino:', state.url);
 
-  if (token.decodificarToken()) {
+  if (token.haySesion()) {
     return true;
   }
 
@@ -23,7 +23,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
   console.log('guestGuard | ruta evaluada:', route.routeConfig?.path);
   console.log('guestGuard | URL destino:', state.url);
 
-  if (token.decodificarToken()) {
+  if (token.haySesion()) {
     return router.createUrlTree(['/home']);
   }
 

@@ -1,14 +1,19 @@
 package com.munaqfit.backend.controller;
 
+import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.model.Venta;
 import com.munaqfit.backend.model.DetalleVenta;
+import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.repository.VentaRepository;
 import com.munaqfit.backend.repository.DetalleVentaRepository;
+import com.munaqfit.backend.util.Sanitizacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,10 +27,28 @@ public class EmpleadoOrdenController {
     @Autowired
     private DetalleVentaRepository detalleVentaRepository;
 
-    // 1. Ver todas las órdenes (ventas), de la más reciente a la más antigua
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // 1. REQ-014 (tarea 2.6): historial del empleado autenticado, solo de HOY.
     @GetMapping("/historial")
-    public ResponseEntity<List<Venta>> verTodasLasOrdenes() {
-        List<Venta> ordenes = ventaRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public ResponseEntity<List<Venta>> verTodasLasOrdenes(Authentication authentication) {
+        String dni = null;
+        if (authentication != null && authentication.getName() != null) {
+            dni = Sanitizacion.dni(authentication.getName());
+        }
+
+        Usuario usuario = (dni == null ? null : usuarioRepository.findByDni(dni).orElse(null));
+        if (usuario == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        LocalDate hoy = LocalDate.now();
+        List<Venta> ordenes = ventaRepository.findByUsuarioIdAndFechaHoraBetweenOrderByFechaHoraDesc(
+                usuario.getId(),
+                hoy.atStartOfDay(),
+                hoy.plusDays(1).atStartOfDay());
+
         if (ordenes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

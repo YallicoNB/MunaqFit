@@ -7,6 +7,7 @@ import com.munaqfit.backend.exception.CustomExceptions;
 import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.security.JwtTokenProvider;
+import com.munaqfit.backend.util.Sanitizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,9 +53,10 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        Usuario usuario = usuarioRepository.findByDni(request.getDni())
+        String dni = Sanitizacion.dni(request.getDni());
+        Usuario usuario = usuarioRepository.findByDni(dni)
                 .orElseThrow(() -> {
-                    log.warn("Intento de login fallido - DNI no registrado: {}", request.getDni());
+                    log.warn("Intento de login fallido - DNI no registrado: {}", dni);
                     return new CustomExceptions.UnauthorizedException("DNI o contraseña incorrectos");
                 });
 
@@ -88,10 +90,49 @@ public class AuthService {
         usuarioRepository.save(usuario);
 
         String token = jwtTokenProvider.generateToken(usuario.getDni(), usuario.getRol().name());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(usuario.getDni(), usuario.getRol().name());
         log.info("Login exitoso - DNI: {}, rol: {}", usuario.getDni(), usuario.getRol().name());
 
         return new LoginResponse(
                 token,
+                refreshToken,
+                "Bearer",
+                usuario.getId(),
+                usuario.getDni(),
+                usuario.getNombreCompleto(),
+                usuario.getEmail(),
+                usuario.getRol().name(),
+                jwtConfig.getExpirationMs()
+        );
+    }
+
+    /**
+     * Renueva el access token (15 min) a partir de un refresh token valido
+     * (7 dias). Rota tambien el refresh: si alguien reutiliza uno viejo,
+     * deja de servir en cuanto el legitimo se renueva.
+     */
+    public LoginResponse refrescarToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank() || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new CustomExceptions.UnauthorizedException("Refresh token invalido o expirado");
+        }
+        if (!jwtTokenProvider.esRefreshToken(refreshToken)) {
+            throw new CustomExceptions.UnauthorizedException("El token enviado no es un refresh token");
+        }
+
+        String dni = jwtTokenProvider.getDniFromToken(refreshToken);
+        Usuario usuario = usuarioRepository.findByDni(dni)
+                .orElseThrow(() -> new CustomExceptions.UnauthorizedException("Usuario no encontrado"));
+
+        if (usuario.getEstado() == Usuario.EstadoUsuario.INACTIVO) {
+            throw new CustomExceptions.UnauthorizedException("La cuenta esta inactiva");
+        }
+
+        String nuevoAccess = jwtTokenProvider.generateToken(usuario.getDni(), usuario.getRol().name());
+        String nuevoRefresh = jwtTokenProvider.generateRefreshToken(usuario.getDni(), usuario.getRol().name());
+
+        return new LoginResponse(
+                nuevoAccess,
+                nuevoRefresh,
                 "Bearer",
                 usuario.getId(),
                 usuario.getDni(),
@@ -110,8 +151,9 @@ public class AuthService {
     public String solicitarRecuperacion(String email) {
         purgarTokensVencidos();
         String token = UUID.randomUUID().toString();
+        String correo = Sanitizacion.email(email);
 
-        Optional<Usuario> encontrado = usuarioRepository.findByEmail(email);
+        Optional<Usuario> encontrado = usuarioRepository.findByEmail(correo);
         if (encontrado.isEmpty()) {
             log.info("Recuperacion solicitada para correo no registrado: {}", email);
             return token;

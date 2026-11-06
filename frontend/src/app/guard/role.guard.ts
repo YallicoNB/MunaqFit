@@ -11,7 +11,7 @@ export function roleGuard(roles: string[]): CanActivateFn {
     const router = inject(Router);
     const token = inject(Token);
 
-    const payload = token.decodificarToken();
+    const payload = token.decodificarToken() ?? token.decodificarPayload();
     if (!payload) {
       return router.createUrlTree(['/']);
     }

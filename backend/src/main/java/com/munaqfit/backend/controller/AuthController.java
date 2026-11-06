@@ -4,6 +4,8 @@ import com.munaqfit.backend.dto.LoginRequest;
 import com.munaqfit.backend.dto.LoginResponse;
 import com.munaqfit.backend.security.JwtTokenProvider;
 import com.munaqfit.backend.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticacion", description = "Login, refresh token y recuperacion de contrasena")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,9 +30,22 @@ public class AuthController {
 
     /** Publico: es justamente aqui donde se obtiene el token. */
     @SecurityRequirements
+    @Operation(summary = "Inicia sesion y devuelve access + refresh token")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    /**
+     * Publico: el refresh token es la credencial. Devuelve un access token
+     * nuevo y rota el refresh. El frontend lo llama de forma transparente
+     * cuando una peticion responde 401.
+     */
+    @SecurityRequirements
+    @Operation(summary = "Renueva el access token con un refresh token")
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(authService.refrescarToken(body.get("refreshToken")));
     }
 
     /** Publico: la respuesta es identica exista o no el correo. */

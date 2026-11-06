@@ -26,13 +26,30 @@ public class JwtTokenProvider {
         this.secretKey = io.jsonwebtoken.security.Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public static final String TIPO_ACCESS = "access";
+    public static final String TIPO_REFRESH = "refresh";
+
     public String generateToken(String dni, String rol) {
+        return generar(dni, rol, jwtConfig.getExpirationMs(), TIPO_ACCESS);
+    }
+
+    /**
+     * Refresh token de vida larga (7 dias por defecto). Lleva el claim
+     * "tipo=refresh" para que no pueda usarse como access token en las
+     * rutas protegidas.
+     */
+    public String generateRefreshToken(String dni, String rol) {
+        return generar(dni, rol, jwtConfig.getRefreshExpirationMs(), TIPO_REFRESH);
+    }
+
+    private String generar(String dni, String rol, long duracionMs, String tipo) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + jwtConfig.getExpirationMs());
+        Date expiry = new Date(now.getTime() + duracionMs);
 
         return Jwts.builder()
                 .subject(dni)
                 .claim("rol", rol)
+                .claim("tipo", tipo)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(this.secretKey)
@@ -46,6 +63,19 @@ public class JwtTokenProvider {
     public String getRolFromToken(String token) {
         Object rol = parseClaims(token).get("rol");
         return rol != null ? rol.toString() : null;
+    }
+
+    /**
+     * "access" o "refresh". Los tokens anteriores a la etapa 3 no traian el
+     * claim: se asumen access para no invalidar sesiones ya abiertas.
+     */
+    public String getTipoFromToken(String token) {
+        Object tipo = parseClaims(token).get("tipo");
+        return tipo != null ? tipo.toString() : TIPO_ACCESS;
+    }
+
+    public boolean esRefreshToken(String token) {
+        return TIPO_REFRESH.equals(getTipoFromToken(token));
     }
 
     public boolean validateToken(String token) {

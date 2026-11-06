@@ -1,18 +1,27 @@
 package com.munaqfit.backend.service;
 
+import com.munaqfit.backend.dto.InventarioProductoDTO;
+import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.dto.ReabastecimientoRequest;
 import com.munaqfit.backend.model.MovimientoInventario;
 import com.munaqfit.backend.model.Producto;
+import com.munaqfit.backend.model.ProductoProveedor;
 import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.repository.MovimientoInventarioRepository;
 import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.repository.UsuarioRepository;
+import com.munaqfit.backend.util.Sanitizacion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,6 +42,72 @@ public class InventarioService {
     // REQ-019: Ver stock actual
     public List<Producto> obtenerTodoElInventario() {
         return productoRepository.findAll();
+    }
+
+    /**
+     * Inventario paginado con los datos de REQ-019/REQ-020 (tareas 2.5 y 2.7):
+     * categoria, unidad de medida, ultima reposicion, caducidad y proveedores.
+     */
+    @Transactional(readOnly = true)
+    public PageResponse<InventarioProductoDTO> listarInventarioPaginado(int pagina,
+                                                                        int tamano,
+                                                                        String busqueda,
+                                                                        Long categoriaId,
+                                                                        boolean soloBajo) {
+        Pageable pageable = PageRequest.of(
+                Math.max(pagina, 0),
+                Math.min(Math.max(tamano, 1), 100),
+                Sort.by(Sort.Direction.ASC, "nombre"));
+
+        Page<Producto> page = productoRepository.buscarInventario(
+                Sanitizacion.texto(busqueda), categoriaId, soloBajo, pageable);
+        return PageResponse.desde(page, this::aInventarioDto);
+    }
+
+    private InventarioProductoDTO aInventarioDto(Producto p) {
+        InventarioProductoDTO dto = new InventarioProductoDTO();
+        dto.setId(p.getId());
+        dto.setNombre(p.getNombre());
+        dto.setStockActual(p.getStockActual());
+        dto.setStockMinimo(p.getStockMinimo());
+        dto.setStockCritico(p.getStockCritico());
+        dto.setCostoUnitario(p.getCostoUnitario());
+        dto.setFechaCaducidad(p.getFechaCaducidad());
+        dto.setUltimaReposicion(p.getUltimaReposicion());
+        dto.setUnidadMedida(p.getUnidadMedida() != null ? p.getUnidadMedida().name() : null);
+
+        if (p.getCategoria() != null) {
+            dto.setCategoriaId(p.getCategoria().getId());
+            dto.setCategoria(p.getCategoria().getNombre());
+        }
+
+        BigDecimal actual = p.getStockActual() != null ? p.getStockActual() : BigDecimal.ZERO;
+        BigDecimal critico = p.getStockCritico() != null ? p.getStockCritico() : BigDecimal.ZERO;
+        BigDecimal minimo = p.getStockMinimo() != null ? p.getStockMinimo() : BigDecimal.ZERO;
+
+        if (actual.compareTo(critico) <= 0) {
+            dto.setEstadoStock("CRITICO");
+        } else if (actual.compareTo(minimo) <= 0) {
+            dto.setEstadoStock("BAJO");
+        } else {
+            dto.setEstadoStock("OK");
+        }
+
+        List<InventarioProductoDTO.ProveedorInfo> proveedores = new ArrayList<>();
+        if (p.getProductoProveedores() != null) {
+            for (ProductoProveedor pp : p.getProductoProveedores()) {
+                if (pp.getProveedor() == null) {
+                    continue;
+                }
+                proveedores.add(new InventarioProductoDTO.ProveedorInfo(
+                        pp.getProveedor().getId(),
+                        pp.getProveedor().getNombre(),
+                        pp.getPrecioUnitario(),
+                        Boolean.TRUE.equals(pp.getEsPrincipal())));
+            }
+        }
+        dto.setProveedores(proveedores);
+        return dto;
     }
 
     // REQ-021: Alertas de stock critico
@@ -70,7 +145,10 @@ public class InventarioService {
         movimiento.setCantidad(request.getCantidad());
         movimiento.setStockAnterior(stockAnterior);
         movimiento.setStockNuevo(nuevoStock);
-        movimiento.setMotivo(request.getMotivo() != null ? request.getMotivo() : "Reabastecimiento de administrador");
+        String motivo = Sanitizacion.texto(request.getMotivo());
+        movimiento.setMotivo(motivo != null && !motivo.isBlank()
+                ? motivo
+                : "Reabastecimiento de administrador");
         movimiento.setFechaMovimiento(LocalDateTime.now());
         movimiento.setUsuario(admin);
 
@@ -79,6 +157,7 @@ public class InventarioService {
 
         // Actualizar los datos del producto
         producto.setStockActual(nuevoStock);
+        producto.setUltimaReposicion(LocalDateTime.now());
         if (request.getFechaCaducidad() != null) {
             producto.setFechaCaducidad(request.getFechaCaducidad());
         }
