@@ -9,7 +9,8 @@ import { ToastService } from '../../../shared/toast/toast.service';
   selector: 'app-proveedores',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './proveedores.html'
+  templateUrl: './proveedores.html',
+  styleUrl: './proveedores.css'
 })
 export class Proveedores implements OnInit {
   proveedores: Proveedor[] = [];

@@ -8,7 +8,8 @@ import { ToastService } from '../../../shared/toast/toast.service';
   selector: 'app-admin-ordenes',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './ordenes.html'
+  templateUrl: './ordenes.html',
+  styleUrl: './ordenes.css'
 })
 export class OrdenesAdmin implements OnInit {
   ventas: any[] = [];

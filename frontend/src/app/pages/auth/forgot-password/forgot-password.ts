@@ -10,7 +10,8 @@ import { AuthService } from '../../../service/auth/auth.service';
   selector: 'app-forgot-password',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './forgot-password.html'
+  templateUrl: './forgot-password.html',
+  styleUrl: './forgot-password.css'
 })
 export class ForgotPassword {
   email: string = '';
