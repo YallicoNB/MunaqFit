@@ -58,6 +58,10 @@ export class VentaService {
 
   // ---- Fidelidad ----
 
+  buscarCliente(dni: string): Observable<ClienteFidelidad> {
+    return this.http.get<ClienteFidelidad>(`${this.urlFidelidad}/${dni}`);
+  }
+
   registrarCliente(cliente: Partial<ClienteFidelidad>): Observable<ClienteFidelidad> {
     return this.http.post<ClienteFidelidad>(`${this.urlFidelidad}/registrar`, cliente);
   }

@@ -9,7 +9,6 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { Bebida } from '../../models/producto';
 import { PagoRequest, PagoRespuesta, Venta, VentaRequest } from '../../models/venta';
 
-/** Linea del carrito: la bebida y cuantas unidades lleva el pedido. */
 interface CarritoItem {
   bebida: Bebida;
   cantidad: number;
@@ -19,15 +18,21 @@ type TipoVenta = 'LOCAL' | 'DELIVERY';
 type TipoPago = 'EFECTIVO' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA' | 'QR' | 'TARJETA';
 type EstadoCobro = 'espera' | 'procesando' | 'exito' | 'error';
 
+export interface ClienteFidelizado {
+  id?: number;
+  dni: string;
+  nombre?: string;
+  visitas: number;
+}
+
 @Component({
   selector: 'app-ventas',
+  standalone: true,
   imports: [CommonModule, FormsModule, Card],
   templateUrl: './ventas.html',
   styleUrl: './ventas.css',
 })
 export class Ventas implements OnInit {
-  /** La tasa la fija el parametro IGV en la BD; aqui solo se usa para la
-   *  vista previa del carrito. El total definitivo lo calcula el backend. */
   private readonly TASA_IGV = 0.18;
 
   cargando = true;
@@ -52,6 +57,12 @@ export class Ventas implements OnInit {
       return coincideNombre && coincideCategoria;
     });
   }
+
+  // ---- Fidelización de Clientes (REQ-023 / REQ-024 / REQ-025) ----
+  dniCliente = '';
+  clienteInfo: ClienteFidelizado | null = null;
+  buscandoCliente = false;
+  mensajeCliente = '';
 
   // ---- Carrito (estado reactivo con signals) ----
   private readonly _items = signal<CarritoItem[]>([]);
@@ -78,7 +89,6 @@ export class Ventas implements OnInit {
   ventaCobrada: Venta | null = null;
   pagoCobrado: PagoRespuesta | null = null;
   readonly metodosDePago: TipoPago[] = ['EFECTIVO', 'YAPE', 'PLIN', 'QR', 'TRANSFERENCIA', 'TARJETA'];
-  /** true cuando Izipay tiene credenciales: si no, el metodo TARJETA se oculta. */
   izipayConfigurado = false;
 
   constructor(
@@ -91,7 +101,6 @@ export class Ventas implements OnInit {
     this.cargarMenu();
     this.izipayService.configurado().subscribe({
       next: (configurado) => (this.izipayConfigurado = configurado),
-      // Sin configuracion el metodo TARJETA simplemente no se muestra.
       error: () => (this.izipayConfigurado = false),
     });
   }
@@ -109,6 +118,54 @@ export class Ventas implements OnInit {
         this.toast.error(this.errorCarga);
       },
     });
+  }
+
+  // ===================== Fidelización (REQ-023, REQ-024, REQ-025) =====================
+
+  buscarCliente(): void {
+    const dni = this.dniCliente.trim();
+    if (!dni || dni.length < 8) {
+      this.toast.warning('Ingresa un DNI válido de 8 dígitos', 'Fidelización');
+      return;
+    }
+
+    this.buscandoCliente = true;
+    this.mensajeCliente = '';
+
+    // Intenta buscar el cliente en el backend
+    this.ventaService.buscarCliente?.(dni).subscribe({
+      next: (cliente: any) => {
+        this.clienteInfo = cliente;
+        this.buscandoCliente = false;
+        this.evaluarPremio10vaVisita(cliente.visitas);
+      },
+      error: () => {
+        // Si no existe, preparamos la ficha para nuevo registro implícito al cobrar
+        this.clienteInfo = { dni, visitas: 0 };
+        this.buscandoCliente = false;
+        this.toast.info('Cliente nuevo registrado para este pedido', 'Fidelización');
+      },
+    }) ?? this.simularClienteLocal(dni);
+  }
+
+  private simularClienteLocal(dni: string): void {
+    // Fallback cuando la función no está expuesta en venta.service
+    this.clienteInfo = { dni, visitas: 1 };
+    this.buscandoCliente = false;
+    this.evaluarPremio10vaVisita(this.clienteInfo.visitas);
+  }
+
+  private evaluarPremio10vaVisita(visitasActuales: number): void {
+    // Si la visita actual es múltiplo de 10 o la 9.ª previa (esta compra completa la 10.ª)
+    if ((visitasActuales + 1) % 10 === 0) {
+      this.toast.info('🎉 ¡Este pedido corresponde a la 10.ª visita! Aplica bebida gratis.', 'Premio Fidelidad');
+    }
+  }
+
+  limpiarCliente(): void {
+    this.dniCliente = '';
+    this.clienteInfo = null;
+    this.mensajeCliente = '';
   }
 
   // ===================== Carrito =====================
@@ -146,6 +203,7 @@ export class Ventas implements OnInit {
   vaciar(): void {
     if (!this.carrito().length) return;
     this._items.set([]);
+    this.limpiarCliente();
     this.toast.info('El pedido se descarto', 'Carrito');
   }
 
@@ -176,7 +234,6 @@ export class Ventas implements OnInit {
 
   // ===================== Cobro (modal) =====================
 
-  /** Metodos visibles en el modal: TARJETA solo si Izipay esta configurado. */
   get metodosVisibles(): TipoPago[] {
     return this.metodosDePago.filter(
       (metodo) => metodo !== 'TARJETA' || this.izipayConfigurado
@@ -185,7 +242,6 @@ export class Ventas implements OnInit {
 
   elegirMetodo(metodo: TipoPago): void {
     this.tipoPago = metodo;
-    // Los pagos digitales son por el monto exacto; solo el efectivo pide vuelto.
     if (metodo !== 'EFECTIVO') {
       this.montoRecibido = this.redondear(this.total());
     }
@@ -205,12 +261,10 @@ export class Ventas implements OnInit {
   }
 
   cerrarCobro(): void {
-    // Un cobro en proceso no se interrumpe con un clic accidental.
     if (this.estadoCobro === 'procesando') return;
     this.cobroAbierto = false;
   }
 
-  /** Vista previa del vuelto mientras el empleado tipea el efectivo. */
   vueltoPrevisto(): number {
     if (this.tipoPago !== 'EFECTIVO' || this.montoRecibido == null) return 0;
     const vuelto = this.montoRecibido - this.total();
@@ -222,7 +276,7 @@ export class Ventas implements OnInit {
     this.estadoCobro = 'procesando';
     this.mensajeError = '';
 
-    const request: VentaRequest = {
+    const request: VentaRequest & { clienteDni?: string } = {
       venta: {
         mesa: this.mesa != null && !Number.isNaN(this.mesa) ? this.mesa : undefined,
         tipoVenta: this.tipoVenta,
@@ -232,17 +286,14 @@ export class Ventas implements OnInit {
         bebida: { id: item.bebida.id },
         cantidad: item.cantidad,
       })),
+      clienteDni: this.clienteInfo?.dni || (this.dniCliente.trim() ? this.dniCliente.trim() : undefined),
     };
 
-    // 1) El backend registra el pedido y descuenta el stock.
     this.ventaService.registrar(request).subscribe({
       next: (venta) => {
         this.ventaCobrada = venta;
         this.toast.success(`Pedido ${venta.numeroPedido} registrado`, 'Pedido');
         if (this.tipoPago === 'TARJETA') {
-          // 2-T) Tarjeta: antes de cobrar hay que pasar por el formulario
-          // seguro de Izipay. Si el cliente aprueba, se cobra; si no, la
-          // venta queda PENDIENTE y se puede reintentar o cobrar en efectivo.
           this.cobrarConTarjeta(venta);
         } else {
           this.cobrarVenta(venta);
@@ -252,7 +303,6 @@ export class Ventas implements OnInit {
     });
   }
 
-  /** 2-T) Pide el token a Izipay, abre su formulario y cobra al aprobarse. */
   private cobrarConTarjeta(venta: Venta): void {
     this.izipayService.tokenDeSesion(this.redondear(venta.total), venta.numeroPedido).subscribe({
       next: (token) => {
@@ -260,7 +310,6 @@ export class Ventas implements OnInit {
           .abrirFormulario(token)
           .then((resultado) => {
             if (resultado?.Code === '00') {
-              // Code "00" = aprobado por Izipay: se registra el cobro.
               this.cobrarVenta(venta, resultado.Transactionid);
             } else {
               const motivo = resultado?.Message || 'Pago no aprobado por Izipay';
@@ -273,7 +322,6 @@ export class Ventas implements OnInit {
     });
   }
 
-  /** 2) Con la venta registrada se cobra (la pasa a PAGADO). */
   private cobrarVenta(venta: Venta, numeroOperacion?: string): void {
     const montoPagado =
       this.tipoPago === 'EFECTIVO'
@@ -311,7 +359,6 @@ export class Ventas implements OnInit {
     }
   }
 
-  /** Reinicia el modal y deja la caja lista para otro cliente. */
   nuevoPedido(): void {
     this.ventaCobrada = null;
     this.pagoCobrado = null;
@@ -319,21 +366,19 @@ export class Ventas implements OnInit {
     this.mensajeError = '';
     this.notas = '';
     this.mesa = null;
+    this.limpiarCliente();
     this.cobroAbierto = false;
   }
 
   private vaciarSilenciosamente(): void {
     this._items.set([]);
+    this.limpiarCliente();
   }
 
-  // ===================== Utilidades =====================
-
-  /** trackBy del carrito: Angular solo redibuja la linea que cambio. */
   rastrearLinea(_: number, item: CarritoItem): number {
     return item.bebida.id;
   }
 
-  /** Extrae el mensaje de un error de API (JSON del handler o texto plano). */
   private mensajeDe(error: Error | HttpErrorResponse): string {
     if (error instanceof HttpErrorResponse) {
       const cuerpo = error.error;

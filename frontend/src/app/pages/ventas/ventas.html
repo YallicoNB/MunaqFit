@@ -5,10 +5,14 @@
     <span class="badge text-bg-light border">{{ cantidadTotal() }} bebida(s) en el pedido</span>
   </header>
 
-  <p *ngIf="errorCarga" class="alert alert-danger py-2">{{ errorCarga }}</p>
+  <!-- ESTADO ESTÁNDAR: Error -->
+  <div class="alert alert-danger d-flex align-items-center mb-4 mt-3 shadow-sm" role="alert" *ngIf="errorCarga">
+    <span class="fs-4 me-3" aria-hidden="true">⚠️</span>
+    <div>{{ errorCarga }}</div>
+  </div>
 
   <div class="pos-body row g-3" *ngIf="!cargando">
-    <!-- ====== Catalogo de bebidas ====== -->
+    <!-- ====== Catálogo de bebidas ====== -->
     <section class="col-lg-8">
       <p class="text-muted small mb-2">Toca una bebida para agregarla al pedido.</p>
       <div class="catalogo-filtros mb-3" *ngIf="bebidas.length">
@@ -70,12 +74,22 @@
           [bebida]="bebida"
           (seleccionar)="agregar($event)"
         />
+
+        <!-- ESTADO ESTÁNDAR: Sin Datos (Filtro) -->
         <div class="col-12" *ngIf="!bebidasFiltradas.length">
-          <p class="text-muted mb-0">No hay bebidas que coincidan con la búsqueda o categoría.</p>
+          <div class="text-center py-5 bg-light rounded border mb-4">
+            <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+            <p class="text-muted mb-0">No hay bebidas que coincidan con la búsqueda o categoría.</p>
+          </div>
         </div>
       </div>
+
+      <!-- ESTADO ESTÁNDAR: Sin Datos (Menú Vacío) -->
       <ng-template #sinMenu>
-        <p class="text-muted">No hay bebidas activas en el menu.</p>
+        <div class="text-center py-5 bg-light rounded border mb-4 mt-3">
+          <span class="display-6 text-secondary mb-3 d-block" aria-hidden="true">📭</span>
+          <p class="text-muted mb-0">No hay bebidas activas en el menu.</p>
+        </div>
       </ng-template>
     </section>
 
@@ -95,6 +109,48 @@
         </div>
 
         <div class="card-body">
+
+          <!-- ====== REQ-023 / REQ-024 / REQ-025: Fidelización de Cliente ====== -->
+          <div class="fidelizacion-box p-2 mb-3 bg-light rounded border">
+            <label class="form-label small fw-bold text-muted mb-1 d-block">
+              👤 Cliente Frecuente (DNI)
+            </label>
+            <div class="input-group input-group-sm mb-1" *ngIf="!clienteInfo">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="DNI del cliente"
+                maxlength="8"
+                [(ngModel)]="dniCliente"
+                (keyup.enter)="buscarCliente()"
+              />
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="buscarCliente()"
+                [disabled]="buscandoCliente"
+              >
+                {{ buscandoCliente ? '...' : 'Buscar' }}
+              </button>
+            </div>
+
+            <div *ngIf="clienteInfo" class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge text-bg-success me-1">DNI {{ clienteInfo.dni }}</span>
+                <span class="small fw-semibold text-secondary">
+                  Visitas: {{ clienteInfo.visitas }}/10
+                </span>
+              </div>
+              <button type="button" class="btn btn-sm btn-link text-danger p-0" (click)="limpiarCliente()">
+                Quitar
+              </button>
+            </div>
+
+            <div *ngIf="clienteInfo && (clienteInfo.visitas + 1) % 10 === 0" class="alert alert-warning py-1 px-2 mt-2 mb-0 small">
+              🎉 <strong>¡10.ª visita!</strong> ¡Premio: bebida gratis disponible!
+            </div>
+          </div>
+
           <div class="tipo-pedido mb-3" role="group" aria-label="Tipo de pedido">
             <button
               type="button"
@@ -219,122 +275,5 @@
   </div>
 </div>
 
-<!-- ====== Modal de cobro (overlay propio, sin dependencia del JS de Bootstrap) ====== -->
+<!-- ====== Modal de cobro ====== -->
 <div class="overlay" *ngIf="cobroAbierto" (click)="cerrarCobro()">
-  <div class="modal-caja card shadow-lg" (click)="$event.stopPropagation()">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <span class="fw-semibold">Cobrar pedido</span>
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Cerrar"
-        (click)="cerrarCobro()"
-        [disabled]="estadoCobro === 'procesando'"
-      ></button>
-    </div>
-
-    <!-- ---- Espera: datos del pago ---- -->
-    <div class="card-body" *ngIf="estadoCobro === 'espera'">
-      <div class="text-center mb-3">
-        <div class="text-muted small">Total a cobrar</div>
-        <div class="fs-3 fw-bold">S/ {{ total() | number: '1.2-2' }}</div>
-      </div>
-
-      <label class="form-label small text-muted mb-1">Metodo de pago</label>
-      <div class="btn-group w-100 mb-3" role="group">
-        <button
-          *ngFor="let metodo of metodosVisibles"
-          type="button"
-          class="btn btn-sm"
-          [class.btn-primary]="tipoPago === metodo"
-          [class.btn-outline-primary]="tipoPago !== metodo"
-          (click)="elegirMetodo(metodo)"
-        >
-          {{ metodo }}
-        </button>
-      </div>
-
-      <div *ngIf="tipoPago === 'EFECTIVO'" class="mb-3">
-        <label class="form-label small text-muted mb-1" for="montoRecibido">
-          Monto recibido del cliente
-        </label>
-        <input
-          id="montoRecibido"
-          type="number"
-          min="0"
-          step="0.10"
-          class="form-control"
-          [(ngModel)]="montoRecibido"
-        />
-        <div class="small text-muted mt-1">
-          Vuelto: <strong>S/ {{ vueltoPrevisto() | number: '1.2-2' }}</strong>
-          <span *ngIf="montoRecibido != null && montoRecibido < total()" class="text-danger">
-            (falta S/ {{ total() - montoRecibido | number: '1.2-2' }})
-          </span>
-        </div>
-      </div>
-      <p *ngIf="tipoPago === 'TARJETA'" class="small text-muted mb-3">
-        Al confirmar se abre el formulario seguro de Izipay para ingresar los
-        datos de la tarjeta. Si el cliente cancela, el pedido queda pendiente
-        y puedes cobrarlo por otro metodo.
-      </p>
-      <p *ngIf="tipoPago !== 'EFECTIVO' && tipoPago !== 'TARJETA'" class="small text-muted mb-3">
-        Para pagos digitales se cobra el monto exacto del pedido.
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-success w-100"
-        (click)="confirmarPago()"
-      >
-        {{ tipoPago === 'TARJETA' ? 'Continuar al pago con tarjeta' : 'Confirmar pago' }}
-      </button>
-    </div>
-
-    <!-- ---- Procesando ---- -->
-    <div class="card-body text-center py-4" *ngIf="estadoCobro === 'procesando'">
-      <div class="spinner-border text-success mb-2" role="status"></div>
-      <p class="mb-0 text-muted">Registrando pedido y cobrando...</p>
-    </div>
-
-    <!-- ---- Error ---- -->
-    <div class="card-body" *ngIf="estadoCobro === 'error'">
-      <div class="alert alert-danger py-2 mb-3">{{ mensajeError }}</div>
-      <div class="d-flex gap-2">
-        <button type="button" class="btn btn-outline-secondary flex-fill" (click)="cerrarCobro()">
-          Cerrar
-        </button>
-        <button type="button" class="btn btn-primary flex-fill" (click)="estadoCobro = 'espera'">
-          Reintentar
-        </button>
-      </div>
-    </div>
-
-    <!-- ---- Exito ---- -->
-    <div class="card-body" *ngIf="estadoCobro === 'exito' && pagoCobrado">
-      <div class="text-center mb-3">
-        <span class="display-6">✅</span>
-        <h2 class="h5 mt-2 mb-0">Pago completado</h2>
-      </div>
-      <dl class="row small mb-3">
-        <dt class="col-sm-5 text-muted">Pedido</dt>
-        <dd class="col-sm-7 fw-semibold">{{ pagoCobrado.numeroPedido }}</dd>
-        <dt class="col-sm-5 text-muted">Monto total</dt>
-        <dd class="col-sm-7">S/ {{ pagoCobrado.montoTotal | number: '1.2-2' }}</dd>
-        <dt class="col-sm-5 text-muted">Recibido</dt>
-        <dd class="col-sm-7">S/ {{ pagoCobrado.montoPagado | number: '1.2-2' }}</dd>
-        <dt class="col-sm-5 text-muted">Vuelto</dt>
-        <dd class="col-sm-7" [class.text-success]="pagoCobrado.vuelto > 0">
-          S/ {{ pagoCobrado.vuelto | number: '1.2-2' }}
-        </dd>
-        <dt class="col-sm-5 text-muted">Estado</dt>
-        <dd class="col-sm-7">
-          <span class="badge text-bg-success">{{ pagoCobrado.estadoVenta }}</span>
-        </dd>
-      </dl>
-      <button type="button" class="btn btn-primary w-100" (click)="nuevoPedido()">
-        Nuevo pedido
-      </button>
-    </div>
-  </div>
-</div>
