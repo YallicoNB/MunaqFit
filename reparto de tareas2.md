@@ -350,27 +350,27 @@ Esta sección se conserva como registro de cómo se desbloqueó a los demás dev
 
 ## Verificacion local de cierre (integracion-local)
 
-Se ejecuto el backend con SPRING_PROFILES_ACTIVE=local contra munaqfit_dev
-y se probaron los flujos con Invoke-RestMethod:
+Se ejecuto el backend con `SPRING_PROFILES_ACTIVE=local` contra `munaqfit_dev`
+y se probaron los flujos con `Invoke-RestMethod`:
 
 | Comprobacion | Resultado |
 |:---|:---|
-| mvn -DskipTests compile | BUILD SUCCESS |
-| 
-g build | Application bundle generation complete |
-| Login admin (12345678) | 200 + access token (15 min) + refresh token (7 dias) |
-| POST /api/auth/refresh | 200; access y refresh rotados (jti unico) |
-| Refresh token usado como access | 401 (rechazado por JwtAuthenticationFilter) |
-| GET /api/admin/usuarios?pagina=0&tamano=2 | PageResponse con 4 usuarios, 2 paginas |
-| GET /api/admin/inventario?pagina=0&tamano=3 | PageResponse con categoria, unidad, caducidad, ultima reposicion y proveedores |
-| GET /api/admin/ventas?pagina=0&tamano=3 | PageResponse con fecha/empleado/estado |
-| GET /api/admin/reportes/kardex?pagina=0&tamano=3 | PageResponse con 12 movimientos, 4 paginas |
+| `mvn -DskipTests compile` | BUILD SUCCESS |
+| `ng build` | Application bundle generation complete |
+| Login admin (`12345678`) | 200 + access token (15 min) + refresh token (7 dias) |
+| `POST /api/auth/refresh` | 200; access y refresh rotados (jti unico) |
+| Refresh token usado como access | 401 (rechazado por `JwtAuthenticationFilter`) |
+| `GET /api/admin/usuarios?pagina=0&tamano=2` | `PageResponse` con 4 usuarios, 2 paginas |
+| `GET /api/admin/inventario?pagina=0&tamano=3` | `PageResponse` con categoria, unidad, caducidad, ultima reposicion y proveedores |
+| `GET /api/admin/ventas?pagina=0&tamano=3` | `PageResponse` con fecha/empleado/estado |
+| `GET /api/admin/reportes/kardex?pagina=0&tamano=3` | `PageResponse` con 12 movimientos, 4 paginas |
 | Empleado en endpoint admin | 403 |
 | Historial de ordenes del empleado | Solo ventas del JWT y de hoy (204 si no hay) |
 | Rate limit login (11 intentos, misma IP) | 10 x 401 + 1 x 429 |
-| GET /api/izipay/configuracion con pp.izipay.mock=true | 	rue |
-| POST /api/get-izipay-token en modo mock | keyRSA=MOCK, mount correcto; el frontend simula la aprobacion |
+| `GET /api/izipay/configuracion` con `app.izipay.mock=true` | `true` |
+| `POST /api/get-izipay-token` en modo mock | `keyRSA=MOCK`, `amount` correcto; el frontend simula la aprobacion |
+| Venta con tarjeta (modo mock) | Venta `PAGADO` + pago con `tipo_pago=TARJETA` |
 
-> El modo mock de Izipay vive **solo** en pplication-local.properties
-> (gitignored). En produccion pp.izipay.mock=false y el flujo real queda
+> El modo mock de Izipay vive **solo** en `application-local.properties`
+> (gitignored). En produccion `app.izipay.mock=false` y el flujo real queda
 > intacto hasta cargar las credenciales sandbox.

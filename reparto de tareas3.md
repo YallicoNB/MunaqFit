@@ -338,42 +338,42 @@ Antes de dar una tarea por hecha, verifica **todo**:
 
 ## 15. Estado final de la integracion local (sin push)
 
-Rama local: integracion-local, creada desde main (2be30a6). Integra
-p4-tokens-diseno (Yazid) y dev-3-intento-2 (Fabian), y reimplementa P2
-desde main sin reutilizar la rama rota de Jair. **Nada fue pusheado.**
+Rama local: `integracion-local`, creada desde `main` (`2be30a6`). Integra
+`p4-tokens-diseno` (Yazid) y `dev-3-intento-2` (Fabian), y reimplementa P2
+desde `main` sin reutilizar la rama rota de Jair. **Nada fue pusheado.**
 
 | Persona | Tareas | Estado |
 |:---|:---|:---|
-| **P1** | 1.2, 1.3, 1.4, 1.6, 1.7, 1.8 | Completado (Izipay + SSE ya en main) |
-| **P1** | 1.1, 1.5 | Credenciales sandbox reales pendientes del dueno. Se aprobo un **modo simulado local** (pp.izipay.mock=true solo en pplication-local.properties, gitignored) para demostrar el flujo de cobro con tarjeta |
-| **P2** | 2.1 | @PreAuthorize("hasRole('ADMIN')") en ReporteKardexController; auditoria confirmo que ningun otro controller admin lo faltaba |
-| **P2** | 2.2 | RateLimitFilter: 10 req/min por IP en POST /api/auth/login, 429 con el contrato de errores, X-Forwarded-For |
-| **P2** | 2.3 | Sanitizacion en usuarios, productos, proveedores, motivos de inventario y DNI/email de login |
-| **P2** | 2.4 | Access 15 min + refresh 7 dias, POST /api/auth/refresh, rotacion con jti, refresh rechazado como access, renovacion transparente en el interceptor |
-| **P2** | 2.5 | PageResponse<T> en usuarios, inventario, kardex y ventas con pagina/	amano (max 100) |
-| **P2** | 2.6 | Historial del empleado por JWT + hoy; filtros fecha/empleado/estado en /api/admin/ventas |
-| **P2** | 2.7 | InventarioProductoDTO con categoria, unidad, ultima reposicion, caducidad, proveedores y estado de stock |
-| **P2** | 2.8 | Endpoints nuevos/alterados documentados; /v3/api-docs responde 40 endpoints |
-| **P2** | 2.9 | GlobalExceptionHandler intacto |
+| **P1** | 1.2, 1.3, 1.4, 1.6, 1.7, 1.8 | Completado (Izipay + SSE ya en `main`) |
+| **P1** | 1.1, 1.5 | Credenciales sandbox reales pendientes del dueno. Se aprobo un **modo simulado local** (`app.izipay.mock=true` solo en `application-local.properties`, gitignored) para demostrar el flujo de cobro con tarjeta |
+| **P2** | 2.1 | `@PreAuthorize("hasRole('ADMIN')")` en `ReporteKardexController`; auditoria confirmo que ningun otro controller admin lo faltaba |
+| **P2** | 2.2 | `RateLimitFilter`: 10 req/min por IP en `POST /api/auth/login`, 429 con el contrato de errores, `X-Forwarded-For` |
+| **P2** | 2.3 | `Sanitizacion` en usuarios, productos, proveedores, motivos de inventario y DNI/email de login |
+| **P2** | 2.4 | Access 15 min + refresh 7 dias, `POST /api/auth/refresh`, rotacion con `jti`, refresh rechazado como access, renovacion transparente en el interceptor |
+| **P2** | 2.5 | `PageResponse<T>` en usuarios, inventario, kardex y ventas con `pagina`/`tamano` (max 100) |
+| **P2** | 2.6 | Historial del empleado por JWT + hoy; filtros fecha/empleado/estado en `/api/admin/ventas` |
+| **P2** | 2.7 | `InventarioProductoDTO` con categoria, unidad, ultima reposicion, caducidad, proveedores y estado de stock |
+| **P2** | 2.8 | Endpoints nuevos/alterados documentados; `/v3/api-docs` responde 40 endpoints |
+| **P2** | 2.9 | `GlobalExceptionHandler` intacto |
 | **P3** | 3.1 | Navbar por rol (admin y empleado) |
 | **P3** | 3.2 | Recuperar contrasena: enlace + pantallas + endpoints corregidos |
-| **P3** | 3.3 | Ordenes admin con filtros y cambio de estado (PAGADO/CANCELADO) |
-| **P3** | 3.4 | Modal de receta con ecetaDe() |
+| **P3** | 3.3 | Ordenes admin con filtros y cambio de estado (`PAGADO`/`CANCELADO`) |
+| **P3** | 3.4 | Modal de receta con `recetaDe()` |
 | **P3** | 3.5 | Informacion nutricional con fallback "no disponible" |
 | **P3** | 3.6 | Fidelizacion: busqueda de cliente, visitas y aviso de decima visita |
 | **P3** | 3.7 | CRUD de proveedores con ruta y enlace |
-| **P3** | 3.8 | Busqueda/filtro/ultimo acceso en usuarios; stub /empleados inexistente |
+| **P3** | 3.8 | Busqueda/filtro/ultimo acceso en usuarios; stub `/empleados` inexistente |
 | **P3** | 3.9 | Periodos dia/semana/mes, graficos Chart.js y export CSV real |
 | **P3** | 3.10 | Paginacion en UI (usuarios, inventario, kardex, ordenes) |
-| **P3** | 3.11 | Kardex renombrado a kardex.ts/.html/.css |
-| **P3** | 3.12 | .prettierrc con printWidth: 100 |
-| **P3** | 3.13 | Estados cargando/error/vacio con Spinner, EstadoVacio y Tabla |
-| **P4** | 4.1 | Tokens --mq-* en styles.css |
+| **P3** | 3.11 | Kardex renombrado a `kardex.ts/.html/.css` |
+| **P3** | 3.12 | `.prettierrc` con `printWidth: 100` |
+| **P3** | 3.13 | Estados cargando/error/vacio con `Spinner`, `EstadoVacio` y `Tabla` |
+| **P4** | 4.1 | Tokens `--mq-*` en `styles.css` |
 | **P4** | 4.2 | Navbar/sidebar/footer con estilo y responsive |
 | **P4** | 4.3 | Vistas migradas a tokens/Bootstrap (CSS de Yazid + nuevas pantallas) |
 | **P4** | 4.4 | Responsivo 1920/1366/768/375 y foco visible |
-| **P4** | 4.5 | Clases globales .mq-estado--cargando/error/vacio |
-| **P4** | 4.6 | Accesibilidad: ria-label, ole, <label> real, contraste AA |
+| **P4** | 4.5 | Clases globales `.mq-estado--cargando/error/vacio` |
+| **P4** | 4.6 | Accesibilidad: `aria-label`, `role`, `<label>` real, contraste AA |
 | **P4** | 4.7 | Dashboard y reportes con tarjetas KPI y graficos |
 | **P4** | 4.8 | Verificacion de build y contratos; revision visual final en los 4 tamanos queda como paso manual de sustentacion |
 
@@ -385,13 +385,12 @@ como acordaron los cuatro developers.
 
 ### Verificacion ejecutada
 
-- mvn -DskipTests compile -> BUILD SUCCESS.
-- 
-px ng build -> Application bundle generation complete.
-- Backend local contra munaqfit_dev: login admin/empleado, refresh rotado,
+- `mvn -DskipTests compile` -> BUILD SUCCESS.
+- `npx ng build` -> Application bundle generation complete.
+- Backend local contra `munaqfit_dev`: login admin/empleado, refresh rotado,
   refresh rechazado como access, 403 de empleado en endpoint admin, rate limit
-  10x401 + 429, paginacion en los 4 endpoints, Izipay mock y /v3/api-docs.
-- **No se toco Informe MunaqFit.docx** y **no hubo push ni cambios en GitHub**.
+  10x401 + 429, paginacion en los 4 endpoints, Izipay mock y `/v3/api-docs`.
+- **No se toco `Informe MunaqFit.docx`** y **no hubo push ni cambios en GitHub**.
 - Migracion nueva: `V10__pago_tarjeta.sql` agrega `TARJETA` al ENUM
   `pago.tipo_pago` (el baseline V1 solo tenia los metodos manuales).
 - Flujo POS verificado en el navegador: login -> agregar bebida -> cobrar con
