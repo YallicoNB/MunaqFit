@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.dto.InventarioProductoDTO;
 import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.dto.ReabastecimientoRequest;
@@ -11,6 +13,7 @@ import com.munaqfit.backend.repository.MovimientoInventarioRepository;
 import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.util.Sanitizacion;
+import com.munaqfit.backend.util.Ordenamiento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class InventarioService {
 
@@ -53,11 +57,15 @@ public class InventarioService {
                                                                         int tamano,
                                                                         String busqueda,
                                                                         Long categoriaId,
-                                                                        boolean soloBajo) {
+                                                                        boolean soloBajo,
+                                                                        String orden) {
         Pageable pageable = PageRequest.of(
                 Math.max(pagina, 0),
                 Math.min(Math.max(tamano, 1), 100),
-                Sort.by(Sort.Direction.ASC, "nombre"));
+                Ordenamiento.parsear(orden,
+                        java.util.Set.of("nombre", "stockActual", "stockMinimo", "stockCritico",
+                                "costoUnitario", "ultimaReposicion", "fechaCaducidad"),
+                        "nombre", Sort.Direction.ASC));
 
         Page<Producto> page = productoRepository.buscarInventario(
                 Sanitizacion.texto(busqueda), categoriaId, soloBajo, pageable);
@@ -164,6 +172,8 @@ public class InventarioService {
 
         // Guardar y retornar el producto actualizado
         Producto guardado = productoRepository.save(producto);
+        log.info("Reabastecimiento: producto={} cantidad={} nuevoStock={} admin={}",
+                guardado.getNombre(), request.getCantidad(), nuevoStock, admin.getDni());
 
         // REQ-031 (reparto 3, P1): si el reabastecimiento saco al insumo del
         // stock critico, se avisa en tiempo real para que el equipo sepa que

@@ -1,5 +1,7 @@
 package com.munaqfit.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.munaqfit.backend.model.Venta;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Resumen de venta para la bandeja administrativa.")
 public class VentaResumenDTO {
 
     private Long id;

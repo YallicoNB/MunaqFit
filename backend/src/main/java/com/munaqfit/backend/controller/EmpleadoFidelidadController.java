@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.munaqfit.backend.model.ClienteFidelidad;
 import com.munaqfit.backend.service.FidelidadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +14,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/empleado/fidelidad")
 @CrossOrigin(origins = "*")
+@Tag(name = "Fidelidad")
 public class EmpleadoFidelidadController {
 
     @Autowired
     private FidelidadService fidelidadService;
 
     //Se inscribe a un cliente frecuente
+    @Operation(summary = "Registra un cliente frecuente")
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarClienteFrecuente(@RequestBody ClienteFidelidad cliente) {
         try {
@@ -28,6 +33,7 @@ public class EmpleadoFidelidadController {
     }
 
     // Se suma una visita a un cliente existente y comprobar si toca premio
+    @Operation(summary = "Registra una visita y evalua el premio de fidelidad")
     @PostMapping("/{clienteId}/visita")
     public ResponseEntity<?> registrarVisita(@PathVariable Long clienteId) {
         try {

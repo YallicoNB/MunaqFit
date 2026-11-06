@@ -5,6 +5,7 @@ import com.munaqfit.backend.dto.LoginResponse;
 import com.munaqfit.backend.security.JwtTokenProvider;
 import com.munaqfit.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
@@ -31,6 +32,9 @@ public class AuthController {
     /** Publico: es justamente aqui donde se obtiene el token. */
     @SecurityRequirements
     @Operation(summary = "Inicia sesion y devuelve access + refresh token")
+    @ApiResponse(responseCode = "200", description = "Credenciales correctas")
+    @ApiResponse(responseCode = "400", description = "Datos invalidos")
+    @ApiResponse(responseCode = "401", description = "Credenciales incorrectas o cuenta bloqueada")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
@@ -43,6 +47,8 @@ public class AuthController {
      */
     @SecurityRequirements
     @Operation(summary = "Renueva el access token con un refresh token")
+    @ApiResponse(responseCode = "200", description = "Token renovado")
+    @ApiResponse(responseCode = "401", description = "Refresh token invalido o expirado")
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(@RequestBody Map<String, String> body) {
         return ResponseEntity.ok(authService.refrescarToken(body.get("refreshToken")));

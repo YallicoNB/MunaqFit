@@ -1,5 +1,7 @@
 package com.munaqfit.backend.controller.Admin;
 
+import jakarta.validation.Valid;
+
 import com.munaqfit.backend.dto.InventarioProductoDTO;
 import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.dto.ReabastecimientoRequest;
@@ -36,9 +38,10 @@ public class AdminInventarioController {
             @RequestParam(defaultValue = "20") int tamano,
             @RequestParam(required = false) String busqueda,
             @RequestParam(required = false) Long categoriaId,
-            @RequestParam(defaultValue = "false") boolean soloBajo) {
+            @RequestParam(defaultValue = "false") boolean soloBajo,
+            @RequestParam(defaultValue = "nombre,asc") String orden) {
         return ResponseEntity.ok(inventarioService.listarInventarioPaginado(
-                pagina, tamano, busqueda, categoriaId, soloBajo));
+                pagina, tamano, busqueda, categoriaId, soloBajo, orden));
     }
 
     @Operation(summary = "Lista los insumos en stock critico")
@@ -55,7 +58,7 @@ public class AdminInventarioController {
 
     @Operation(summary = "Registra un reabastecimiento y actualiza el stock + kardex")
     @PostMapping("/reabastecer")
-    public ResponseEntity<?> reabastecer(@RequestBody ReabastecimientoRequest request, Authentication authentication) {
+    public ResponseEntity<?> reabastecer(@Valid @RequestBody ReabastecimientoRequest request, Authentication authentication) {
         // 1. Obtenemos el DNI del token JWT
         String dniAdmin = authentication.getName(); 
         

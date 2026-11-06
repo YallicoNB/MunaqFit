@@ -4,6 +4,7 @@ import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.dto.VentaResumenDTO;
 import com.munaqfit.backend.model.Venta;
 import com.munaqfit.backend.repository.VentaRepository;
+import com.munaqfit.backend.util.Ordenamiento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,13 @@ public class AdminVentaController {
             @RequestParam(defaultValue = "20") int tamano,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam(required = false) Long empleadoId,
-            @RequestParam(required = false) Venta.EstadoVenta estado) {
+            @RequestParam(required = false) Venta.EstadoVenta estado,
+            @RequestParam(defaultValue = "fechaHora,desc") String orden) {
 
-        Pageable pageable = PageRequest.of(Math.max(pagina, 0), Math.min(Math.max(tamano, 1), 100));
+        Pageable pageable = PageRequest.of(Math.max(pagina, 0), Math.min(Math.max(tamano, 1), 100),
+                Ordenamiento.parsear(orden,
+                        java.util.Set.of("fechaHora", "total", "estado", "numeroPedido"),
+                        "fechaHora", org.springframework.data.domain.Sort.Direction.DESC));
 
         LocalDateTime inicio = fecha != null ? fecha.atStartOfDay() : null;
         LocalDateTime fin = fecha != null ? fecha.plusDays(1).atStartOfDay() : null;

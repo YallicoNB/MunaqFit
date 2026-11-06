@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.model.DetalleVenta;
 import com.munaqfit.backend.model.MovimientoInventario;
 import com.munaqfit.backend.model.Parametro;
@@ -25,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class VentaService {
 
@@ -124,7 +127,10 @@ public class VentaService {
         // ---- 4. Descontar stock de los insumos y registrar en el kardex ----
         descontarInventario(guardada, detalles);
 
-        return ventaRepository.save(guardada);
+        Venta confirmada = ventaRepository.save(guardada);
+        log.info("Venta {} registrada por {} por S/ {}", confirmada.getNumeroPedido(),
+                confirmada.getUsuario().getDni(), confirmada.getTotal());
+        return confirmada;
     }
 
     /**

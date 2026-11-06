@@ -46,8 +46,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
            "(:inicio IS NULL OR v.fechaHora >= :inicio) " +
            "AND (:fin IS NULL OR v.fechaHora < :fin) " +
            "AND (:empleadoId IS NULL OR u.id = :empleadoId) " +
-           "AND (:estado IS NULL OR v.estado = :estado) " +
-           "ORDER BY v.fechaHora DESC",
+           "AND (:estado IS NULL OR v.estado = :estado)",
            countQuery = "SELECT COUNT(v) FROM Venta v JOIN v.usuario u WHERE " +
            "(:inicio IS NULL OR v.fechaHora >= :inicio) " +
            "AND (:fin IS NULL OR v.fechaHora < :fin) " +

@@ -53,8 +53,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
            "AND (:fechaHasta IS NULL OR m.fechaMovimiento <= :fechaHasta) " +
            "AND (:productoId IS NULL OR p.id = :productoId) " +
            "AND (:tipo IS NULL OR m.tipoMovimiento = :tipo) " +
-           "AND (:usuarioId IS NULL OR u.id = :usuarioId) " +
-           "ORDER BY m.fechaMovimiento DESC",
+           "AND (:usuarioId IS NULL OR u.id = :usuarioId)",
            countQuery = "SELECT COUNT(m) FROM MovimientoInventario m " +
            "JOIN m.producto p " +
            "LEFT JOIN m.usuario u " +

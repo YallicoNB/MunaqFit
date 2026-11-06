@@ -1,5 +1,7 @@
 package com.munaqfit.backend.controller.Admin;
 
+import jakarta.validation.Valid;
+
 import com.munaqfit.backend.model.Proveedor;
 import com.munaqfit.backend.repository.ProveedorRepository;
 import com.munaqfit.backend.util.Sanitizacion;
@@ -29,7 +31,7 @@ public class AdminProveedorController {
 
     @Operation(summary = "Crea un proveedor")
     @PostMapping
-    public ResponseEntity<Proveedor> crearProveedor(@RequestBody Proveedor proveedor) {
+    public ResponseEntity<Proveedor> crearProveedor(@Valid @RequestBody Proveedor proveedor) {
         proveedor.setNombre(Sanitizacion.texto(proveedor.getNombre()));
         proveedor.setRuc(Sanitizacion.ruc(proveedor.getRuc()));
         proveedor.setTelefono(Sanitizacion.telefono(proveedor.getTelefono()));
@@ -40,7 +42,7 @@ public class AdminProveedorController {
 
     @Operation(summary = "Actualiza un proveedor")
     @PutMapping("/{id}")
-    public ResponseEntity<Proveedor> actualizarProveedor(@PathVariable Long id, @RequestBody Proveedor proveedorDetalles) {
+    public ResponseEntity<Proveedor> actualizarProveedor(@PathVariable Long id, @Valid @RequestBody Proveedor proveedorDetalles) {
         Proveedor proveedor = proveedorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
         

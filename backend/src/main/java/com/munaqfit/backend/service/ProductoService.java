@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.dto.ProductoRequestDTO;
 import com.munaqfit.backend.model.Categoria;
 import com.munaqfit.backend.model.Producto;
@@ -13,6 +15,7 @@ import com.munaqfit.backend.util.Sanitizacion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class ProductoService {
 
@@ -72,6 +75,7 @@ public class ProductoService {
             }
         }
 
+        log.info("Producto creado: id={} nombre={}", productoGuardado.getId(), productoGuardado.getNombre());
         return productoGuardado;
     }
 
@@ -119,6 +123,7 @@ public class ProductoService {
             }
         }
 
+        log.info("Producto actualizado: id={} nombre={}", productoActualizado.getId(), productoActualizado.getNombre());
         return productoActualizado;
     }
 
@@ -129,5 +134,6 @@ public class ProductoService {
             
         productoProveedorRepository.deleteAll(producto.getProductoProveedores());
         productoRepository.deleteById(id);
+        log.info("Producto eliminado: id={}", id);
     }
 }

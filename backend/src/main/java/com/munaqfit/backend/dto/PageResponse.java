@@ -1,5 +1,7 @@
 package com.munaqfit.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.function.Function;
  * frontend pueda construir los controles de pagina (tarea 3.10) sin
  * depender de un formato distinto por pantalla.</p>
  */
+@Schema(description = "Respuesta paginada estandar: contenido, pagina, tamano, totalElementos y totalPaginas.")
 public record PageResponse<T>(
         List<T> contenido,
         int pagina,

@@ -6,6 +6,7 @@ import com.munaqfit.backend.dto.UsuarioCreateRequest;
 import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.util.Sanitizacion;
+import com.munaqfit.backend.util.Ordenamiento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +45,15 @@ public class AdminUsuarioController {
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamano,
             @RequestParam(required = false) String busqueda,
-            @RequestParam(required = false) String estado) {
+            @RequestParam(required = false) String estado,
+            @RequestParam(defaultValue = "fechaCreacion,desc") String orden) {
 
         int size = Math.min(Math.max(tamano, 1), 100);
         Pageable pageable = PageRequest.of(Math.max(pagina, 0), size,
-                Sort.by(Sort.Direction.DESC, "fechaCreacion"));
+                Ordenamiento.parsear(orden,
+                        java.util.Set.of("fechaCreacion", "nombreCompleto", "dni", "estado",
+                                "ultimoLogin", "rol"),
+                        "fechaCreacion", Sort.Direction.DESC));
 
         Usuario.EstadoUsuario estadoEnum = null;
         if (estado != null && !estado.isBlank()) {
@@ -67,7 +72,7 @@ public class AdminUsuarioController {
     // REQ-006: Crear un nuevo empleado
     @Operation(summary = "Crea un empleado (rol EMPLEADO, estado ACTIVO)")
     @PostMapping
-    public ResponseEntity<?> crearEmpleado(@RequestBody UsuarioCreateRequest request) {
+    public ResponseEntity<?> crearEmpleado(@Valid @RequestBody UsuarioCreateRequest request) {
         String dni = Sanitizacion.dni(request.getDni());
         String email = Sanitizacion.email(request.getEmail());
         String nombre = Sanitizacion.texto(request.getNombreCompleto());
@@ -165,7 +170,7 @@ public class AdminUsuarioController {
      */
     @PutMapping("/{id}/rol")
     public ResponseEntity<?> cambiarRol(@PathVariable Long id,
-                                        @RequestBody CambiarRolRequest request,
+                                        @Valid @RequestBody CambiarRolRequest request,
                                         Authentication authentication) {
 
         // 1. Validar el rol recibido

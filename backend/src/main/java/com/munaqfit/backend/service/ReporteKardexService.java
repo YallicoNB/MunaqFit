@@ -4,6 +4,7 @@ import com.munaqfit.backend.dto.KardexFilaDTO;
 import com.munaqfit.backend.dto.PageResponse;
 import com.munaqfit.backend.model.MovimientoInventario.TipoMovimiento;
 import com.munaqfit.backend.repository.MovimientoInventarioRepository;
+import com.munaqfit.backend.util.Ordenamiento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +31,12 @@ public class ReporteKardexService {
                                                                      TipoMovimiento tipo,
                                                                      Long usuarioId,
                                                                      int pagina,
-                                                                     int tamano) {
-        Pageable pageable = PageRequest.of(Math.max(pagina, 0), normalizarTamano(tamano));
+                                                                     int tamano,
+                                                                     String orden) {
+        Pageable pageable = PageRequest.of(Math.max(pagina, 0), normalizarTamano(tamano),
+                Ordenamiento.parsear(orden,
+                        java.util.Set.of("fechaMovimiento", "cantidad", "stockAnterior", "stockNuevo"),
+                        "fechaMovimiento", org.springframework.data.domain.Sort.Direction.DESC));
         Page<KardexFilaDTO> page = inventarioRepository.consultarKardexFiltrosPaginado(
                 desde, hasta, productoId, tipo, usuarioId, pageable);
         return PageResponse.desde(page);

@@ -38,10 +38,11 @@ public class ReporteKardexController {
             @RequestParam(required = false) TipoMovimiento tipo,
             @RequestParam(required = false) Long usuarioId,
             @RequestParam(defaultValue = "0") int pagina,
-            @RequestParam(defaultValue = "20") int tamano) {
+            @RequestParam(defaultValue = "20") int tamano,
+            @RequestParam(defaultValue = "fechaMovimiento,desc") String orden) {
 
         return ResponseEntity.ok(kardexService.obtenerReporteKardexPaginado(
-                fechaDesde, fechaHasta, productoId, tipo, usuarioId, pagina, tamano));
+                fechaDesde, fechaHasta, productoId, tipo, usuarioId, pagina, tamano, orden));
     }
 
     @Operation(summary = "Exporta el kardex filtrado como CSV (sin paginar)")

@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.model.Venta;
 import com.munaqfit.backend.model.DetalleVenta;
@@ -19,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/empleado/ordenes")
 @CrossOrigin(origins = "*")
+@Tag(name = "Ordenes (empleado)")
 public class EmpleadoOrdenController {
 
     @Autowired
@@ -31,6 +35,7 @@ public class EmpleadoOrdenController {
     private UsuarioRepository usuarioRepository;
 
     // 1. REQ-014 (tarea 2.6): historial del empleado autenticado, solo de HOY.
+    @Operation(summary = "Historial de ordenes del empleado autenticado (solo hoy)")
     @GetMapping("/historial")
     public ResponseEntity<List<Venta>> verTodasLasOrdenes(Authentication authentication) {
         String dni = null;
@@ -55,12 +60,28 @@ public class EmpleadoOrdenController {
     }
 
     // 2. Ver el detalle de una orden específica (qué productos se vendieron en esa venta)
+    @Operation(summary = "Detalle de una orden; solo el dueno o un ADMIN")
     @GetMapping("/{ventaId}/detalle")
-    public ResponseEntity<?> verDetalleOrden(@PathVariable Long ventaId) {
+    public ResponseEntity<?> verDetalleOrden(@PathVariable Long ventaId,
+                                               Authentication authentication) {
         Venta venta = ventaRepository.findById(ventaId).orElse(null);
 
         if (venta == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        String dni = authentication != null ? Sanitizacion.dni(authentication.getName()) : null;
+        Usuario usuario = dni == null ? null : usuarioRepository.findByDni(dni).orElse(null);
+        if (usuario == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        boolean esAdmin = usuario.getRol() == Usuario.Rol.ADMIN;
+        boolean esDuenio = venta.getUsuario() != null
+                && venta.getUsuario().getId().equals(usuario.getId());
+        if (!esAdmin && !esDuenio) {
+            return ResponseEntity.status(403)
+                    .body("No puedes consultar una orden que no te pertenece");
         }
 
         try {

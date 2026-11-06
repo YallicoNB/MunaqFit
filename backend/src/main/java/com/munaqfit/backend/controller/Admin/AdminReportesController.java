@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller.Admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.munaqfit.backend.dto.RankingBebidaDTO;
 import com.munaqfit.backend.dto.ReporteVentasDTO;
 import com.munaqfit.backend.service.ReporteService;
@@ -16,12 +19,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/reportes")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin - Reportes")
 public class AdminReportesController {
 
     @Autowired
     private ReporteService reporteService;
 
     // REQ-029: Obtener ranking de bebidas mas vendidas
+    @Operation(summary = "Ranking de bebidas mas vendidas en un rango")
     @GetMapping("/ranking")
     public ResponseEntity<List<RankingBebidaDTO>> obtenerRanking(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -30,6 +35,7 @@ public class AdminReportesController {
     }
 
     // REQ-030: Obtener reporte consolidado de ventas
+    @Operation(summary = "Reporte consolidado de ventas en un rango")
     @GetMapping("/ventas")
     public ResponseEntity<ReporteVentasDTO> obtenerReporteVentas(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -38,6 +44,7 @@ public class AdminReportesController {
     }
 
     // REQ-032: Obtener valorizacion total del inventario
+    @Operation(summary = "Valorizacion total del inventario")
     @GetMapping("/valorizacion")
     public ResponseEntity<BigDecimal> obtenerValorizacion() {
         return ResponseEntity.ok(reporteService.obtenerValorizacionInventario());
