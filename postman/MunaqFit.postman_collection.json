@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "6f4f0f0e-2f6a-4c1e-9d0e-munaqfit2026",
+    "_postman_id": "6f4f0f0e-2f6a-4c1e-9d0e-123456789abc",
     "name": "MunaqFit API",
     "description": "Coleccion de contrato y humo para MunaqFit. Variables: baseUrl, token, refreshToken, empleadoToken, bebidaId, ventaId, ventaTotal.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
