@@ -58,6 +58,14 @@ public class IzipayService {
     @Value("${app.izipay.key-rsa}")
     private String keyRsa;
 
+    /**
+     * Modo demostracion (solo local): aprueba el cobro con tarjeta sin
+     * llamar a Izipay. Se activa con IZIPAY_MOCK=true en
+     * application-local.properties (archivo que no se sube a git).
+     */
+    @Value("${app.izipay.mock:false}")
+    private boolean modoMock;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /** Timeouts cortos: si Izipay no responde, el empleado no debe quedar
@@ -73,10 +81,11 @@ public class IzipayService {
         return factory;
     }
 
-    /** true si ya llegaron las credenciales del comercio (sandbox o reales). */
+    /** true si ya llegaron las credenciales del comercio (sandbox o reales)
+     *  o si esta activo el modo simulacion local. */
     public boolean estaConfigurado() {
-        return !isBlank(tokenUrl) && !isBlank(merchantCode)
-                && !isBlank(apiPassword) && !isBlank(keyRsa);
+        return modoMock || (!isBlank(tokenUrl) && !isBlank(merchantCode)
+                && !isBlank(apiPassword) && !isBlank(keyRsa));
     }
 
     /**
@@ -87,18 +96,34 @@ public class IzipayService {
      */
     public IzipayTokenResponse crearTokenDeSesion(IzipayTokenRequest request) {
 
-        if (!estaConfigurado()) {
-            throw new IllegalStateException(
-                    "Izipay no esta configurado: faltan las credenciales del comercio "
-                            + "(variables IZIPAY_MERCHANT_CODE / IZIPAY_API_PASSWORD / IZIPAY_KEY_RSA). "
-                            + "Cobra en efectivo o digital mientras se completan.");
-        }
         if (request == null || request.getMonto() == null
                 || request.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El monto del cobro debe ser mayor a cero");
         }
         if (isBlank(request.getPedido())) {
             throw new IllegalArgumentException("El numero de pedido es obligatorio");
+        }
+
+        // Modo demostracion local: no se llama a Izipay. La respuesta lleva
+        // keyRSA "MOCK" y scriptUrl vacio para que el frontend muestre el
+        // formulario simulado en lugar del SDK real.
+        if (modoMock) {
+            log.info("Izipay MOCK: aprobando token simulado para el pedido {}", request.getPedido());
+            return new IzipayTokenResponse(
+                    "MOCK-" + java.util.UUID.randomUUID(),
+                    "MOCK",
+                    "MOCK-MERCHANT",
+                    "",
+                    "PEN",
+                    request.getMonto().setScale(2).toPlainString(),
+                    request.getPedido());
+        }
+
+        if (!estaConfigurado()) {
+            throw new IllegalStateException(
+                    "Izipay no esta configurado: faltan las credenciales del comercio "
+                            + "(variables IZIPAY_MERCHANT_CODE / IZIPAY_API_PASSWORD / IZIPAY_KEY_RSA). "
+                            + "Cobra en efectivo o digital mientras se completan.");
         }
 
         // Cuerpo del llamado "Crear Token de sesion". Moneda siempre PEN.

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
@@ -10,7 +10,7 @@ import { RankingBebida, ReporteVentas } from '../../../models/admin';
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, FormsModule, BaseChartDirective],
+  imports: [CommonModule, DecimalPipe, ReactiveFormsModule, BaseChartDirective],
   templateUrl: './reportes.html',
   styleUrl: './reportes.css',
 })
@@ -21,9 +21,8 @@ export class Reportes implements OnInit {
   cargando = true;
   error = '';
 
-  // Filtro de fechas
-  desde = '';
-  hasta = '';
+  // Filtro de fechas (formulario reactivo, tarea 4.5)
+  formFiltros: FormGroup;
   filtrado = false;
   periodo: 'dia' | 'semana' | 'mes' | 'personalizado' = 'mes';
 
@@ -52,18 +51,38 @@ export class Reportes implements OnInit {
     maintainAspectRatio: false,
   };
 
-  constructor(private reporteService: ReporteService) {}
+  constructor(private fb: FormBuilder, private reporteService: ReporteService) {
+    this.formFiltros = this.fb.group({
+      desde: ['', [Validators.required]],
+      hasta: ['', [Validators.required]],
+    });
+  }
+
+  get desde(): string {
+    return this.formFiltros.get('desde')?.value ?? '';
+  }
+
+  get hasta(): string {
+    return this.formFiltros.get('hasta')?.value ?? '';
+  }
 
   ngOnInit(): void {
     const fin = new Date();
     const inicio = new Date();
     inicio.setMonth(inicio.getMonth() - 1);
-    this.desde = inicio.toISOString().slice(0, 10);
-    this.hasta = fin.toISOString().slice(0, 10);
+    this.formFiltros.setValue({
+      desde: inicio.toISOString().slice(0, 10),
+      hasta: fin.toISOString().slice(0, 10),
+    });
     this.cargar();
   }
 
   cargar(): void {
+    if (this.formFiltros.invalid) {
+      this.formFiltros.markAllAsTouched();
+      return;
+    }
+
     this.cargando = true;
     this.error = '';
     this.filtrado = true;
@@ -180,8 +199,10 @@ export class Reportes implements OnInit {
       inicio.setMonth(fin.getMonth() - 1);
     }
 
-    this.desde = inicio.toISOString().slice(0, 10);
-    this.hasta = fin.toISOString().slice(0, 10);
+    this.formFiltros.setValue({
+      desde: inicio.toISOString().slice(0, 10),
+      hasta: fin.toISOString().slice(0, 10),
+    });
     this.cargar();
   }
 

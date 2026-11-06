@@ -61,19 +61,31 @@
   </nav>
 
   <app-modal [abierto]="mostrarFormulario" titulo="Reabastecer insumo" (cerrar)="mostrarFormulario = false">
-    <label>
-      Cantidad
-      <input type="number" [(ngModel)]="cantidad" min="0" step="0.01" />
-    </label>
-    <label>
-      Motivo
-      <input type="text" [(ngModel)]="motivo" />
-    </label>
-    <div acciones>
-      <app-boton [cargando]="guardando" (accion)="reabastecer()">
-        {{ guardando ? 'Guardando...' : 'Confirmar' }}
-      </app-boton>
-      <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
-    </div>
+    <form [formGroup]="formReabastecer" (ngSubmit)="reabastecer()">
+      <app-input
+        label="Cantidad"
+        tipo="number"
+        formControlName="cantidad"
+        [min]="0.01"
+        step="0.01"
+        [sufijo]="productoSeleccionado?.unidadMedida || ''"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Motivo"
+        tipo="text"
+        formControlName="motivo"
+        placeholder="Motivo del reabastecimiento"
+        [requerido]="true"
+      ></app-input>
+
+      <div acciones>
+        <app-boton type="submit" [cargando]="guardando">
+          {{ guardando ? 'Guardando...' : 'Confirmar' }}
+        </app-boton>
+        <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
+      </div>
+    </form>
   </app-modal>
 </div>

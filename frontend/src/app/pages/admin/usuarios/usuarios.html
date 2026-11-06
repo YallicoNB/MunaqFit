@@ -95,28 +95,48 @@
   </nav>
 
   <app-modal [abierto]="mostrarFormulario" titulo="Nuevo empleado" (cerrar)="mostrarFormulario = false">
-    <label>
-      DNI
-      <input type="text" [(ngModel)]="dni" maxlength="8" />
-    </label>
-    <label>
-      Nombre completo
-      <input type="text" [(ngModel)]="nombreCompleto" />
-    </label>
-    <label>
-      Email
-      <input type="email" [(ngModel)]="email" />
-    </label>
-    <label>
-      Contraseña
-      <input type="password" [(ngModel)]="password" />
-    </label>
-    <p class="nota">El usuario se creará con el rol EMPLEADO.</p>
-    <div acciones>
-      <app-boton [cargando]="guardando" (accion)="crear()">
-        {{ guardando ? 'Guardando...' : 'Crear' }}
-      </app-boton>
-      <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
-    </div>
+    <form [formGroup]="formularioUsuario" (ngSubmit)="crear()">
+      <app-input
+        label="DNI"
+        tipo="text"
+        formControlName="dni"
+        placeholder="8 dígitos"
+        ayuda="Documento de identidad, solo números"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Nombre completo"
+        tipo="text"
+        formControlName="nombreCompleto"
+        placeholder="Nombres y apellidos"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Email"
+        tipo="email"
+        formControlName="email"
+        placeholder="correo@ejemplo.com"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Contraseña"
+        tipo="password"
+        formControlName="password"
+        placeholder="Mínimo 8 caracteres"
+        [requerido]="true"
+      ></app-input>
+
+      <p class="nota">El usuario se creará con el rol EMPLEADO.</p>
+
+      <div acciones>
+        <app-boton type="submit" [cargando]="guardando">
+          {{ guardando ? 'Guardando...' : 'Crear' }}
+        </app-boton>
+        <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
+      </div>
+    </form>
   </app-modal>
 </div>

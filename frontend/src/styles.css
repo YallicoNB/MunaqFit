@@ -103,3 +103,71 @@ body {
   border-color: var(--mq-purple);
   box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
 }
+
+/* =========================================
+   ESTADOS GLOBALES (TAREA 4.5)
+   Un solo look de cargando / error / vacío para todas las pantallas.
+========================================= */
+.mq-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  border-radius: var(--mq-radius);
+  text-align: center;
+}
+
+.mq-estado--cargando {
+  color: var(--mq-text-muted);
+}
+
+.mq-estado--error {
+  background-color: #fde2e1;
+  color: #a52a26;
+  border: 1px solid #f5b7b4;
+}
+
+.mq-estado--vacio {
+  background-color: var(--mq-pink-light);
+  color: var(--mq-text-muted);
+  border: 1px dashed var(--mq-purple);
+}
+
+/* Foco visible en toda la app (RNF accesibilidad) */
+:focus-visible {
+  outline: 3px solid var(--mq-purple-dark);
+  outline-offset: 2px;
+}
+
+/* Navbar / layout responsivo base (TAREA 4.4) */
+.navbar {
+  background-color: var(--mq-white);
+  border-bottom: 1px solid var(--mq-border);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .navbar-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

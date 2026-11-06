@@ -7,7 +7,7 @@
   </div>
 
   <div class="card shadow-sm mb-4">
-    <div class="card-body filtros d-flex flex-wrap gap-3 align-items-end">
+    <div class="card-body filtros d-flex flex-wrap gap-3 align-items-end" [formGroup]="formFiltros">
       <div class="btn-group" role="group" aria-label="Períodos rápidos">
         <button class="btn btn-outline-primary" [class.active]="periodo === 'dia'" (click)="aplicarPeriodo('dia')">Día</button>
         <button class="btn btn-outline-primary" [class.active]="periodo === 'semana'" (click)="aplicarPeriodo('semana')">Semana</button>
@@ -15,11 +15,11 @@
       </div>
       <div>
         <label class="form-label small text-muted">Desde</label>
-        <input type="date" class="form-control" [(ngModel)]="desde" />
+        <input type="date" class="form-control" formControlName="desde" />
       </div>
       <div>
         <label class="form-label small text-muted">Hasta</label>
-        <input type="date" class="form-control" [(ngModel)]="hasta" />
+        <input type="date" class="form-control" formControlName="hasta" />
       </div>
       <button class="btn btn-primary px-4" (click)="cargar()" [disabled]="cargando">
         {{ cargando ? 'Consultando...' : 'Consultar Período' }}

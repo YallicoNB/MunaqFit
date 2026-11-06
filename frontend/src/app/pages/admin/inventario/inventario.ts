@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
 import { ProductoInventario, PageResponse } from '../../../models/admin';
 import { Tabla, ColumnaTabla } from '../../../shared/tabla/tabla';
 import { Boton } from '../../../shared/boton/boton';
 import { Modal } from '../../../shared/modal/modal';
-import { Badge } from '../../../shared/badge/badge';
-import { EstadoVacio } from '../../../shared/estado-vacio/estado-vacio';
+import { CampoInput } from '../../../shared/input/input';
 import { Spinner } from '../../../shared/spinner/spinner';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, DecimalPipe, FormsModule, Tabla, Boton, Modal, Badge, EstadoVacio, Spinner],
+  imports: [CommonModule, DecimalPipe, FormsModule, ReactiveFormsModule, Tabla, Boton, Modal, CampoInput, Spinner],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
@@ -30,10 +29,9 @@ export class Inventario implements OnInit {
   // Formulario de reabastecimiento
   mostrarFormulario = false;
   productoId = 0;
-  cantidad = 0;
-  motivo = '';
-  guardando = false;
   productoSeleccionado: ProductoInventario | null = null;
+  guardando = false;
+  formReabastecer: FormGroup;
 
   columnas: ColumnaTabla[] = [
     { clave: 'nombre', titulo: 'Insumo' },
@@ -46,7 +44,12 @@ export class Inventario implements OnInit {
     { clave: 'ultimaReposicion', titulo: 'Últ. reposición' },
   ];
 
-  constructor(private adminService: AdminService) {}
+  constructor(private fb: FormBuilder, private adminService: AdminService) {
+    this.formReabastecer = this.fb.group({
+      cantidad: [0, [Validators.required, Validators.min(0.01)]],
+      motivo: ['', [Validators.required, Validators.minLength(3)]],
+    });
+  }
 
   get productos(): ProductoInventario[] {
     return this.pagina?.contenido ?? [];
@@ -113,16 +116,18 @@ export class Inventario implements OnInit {
   abrirFormulario(producto: ProductoInventario): void {
     this.productoSeleccionado = producto;
     this.productoId = producto.id;
-    this.cantidad = 0;
-    this.motivo = `Reabastecimiento de ${producto.nombre}`;
+    this.formReabastecer.reset({
+      cantidad: 0,
+      motivo: `Reabastecimiento de ${producto.nombre}`,
+    });
     this.mostrarFormulario = true;
     this.mensaje = '';
     this.error = '';
   }
 
   reabastecer(): void {
-    if (this.cantidad <= 0) {
-      this.error = 'La cantidad debe ser mayor a cero';
+    if (this.formReabastecer.invalid) {
+      this.formReabastecer.markAllAsTouched();
       return;
     }
 
@@ -130,8 +135,10 @@ export class Inventario implements OnInit {
     this.error = '';
     this.mensaje = '';
 
+    const { cantidad, motivo } = this.formReabastecer.value;
+
     this.adminService
-      .reabastecer({ productoId: this.productoId, cantidad: this.cantidad, motivo: this.motivo })
+      .reabastecer({ productoId: this.productoId, cantidad, motivo })
       .subscribe({
         next: (respuesta) => {
           this.mensaje = respuesta || 'Stock actualizado';
