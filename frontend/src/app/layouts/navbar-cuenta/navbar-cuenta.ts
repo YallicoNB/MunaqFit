@@ -33,6 +33,7 @@ export class NavbarCuenta {
     { ruta: '/admin/inventario', texto: 'Inventario' },
     { ruta: '/admin/usuarios', texto: 'Empleados' },
     { ruta: '/admin/reportes', texto: 'Reportes' },
+    { ruta: '/admin/kardex', texto: 'Kardex' },
     { ruta: '/cuenta', texto: 'Mi cuenta' },
   ];
 

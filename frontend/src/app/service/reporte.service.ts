@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../core/api';
-import { DashboardMetrics, ReporteVentas, RankingBebida } from '../models/admin';
+import {
+  DashboardMetrics,
+  FiltrosKardex,
+  KardexFila,
+  RankingBebida,
+  ReporteVentas,
+} from '../models/admin';
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +19,21 @@ export class ReporteService {
 
   constructor(private http: HttpClient) {}
 
-  getDashboardMetrics(): Observable<DashboardMetrics> {
+  metricas(): Observable<DashboardMetrics> {
     return this.http.get<DashboardMetrics>(`${this.urlDashboard}/metricas`);
   }
 
-  getReporteVentas(inicio: string, fin: string): Observable<ReporteVentas> {
+  ventas(inicio: string, fin: string): Observable<ReporteVentas> {
     const params = new HttpParams().set('inicio', inicio).set('fin', fin);
     return this.http.get<ReporteVentas>(`${this.urlReportes}/ventas`, { params });
   }
 
-  getRankingBebidas(inicio: string, fin: string): Observable<RankingBebida[]> {
+  ranking(inicio: string, fin: string): Observable<RankingBebida[]> {
     const params = new HttpParams().set('inicio', inicio).set('fin', fin);
     return this.http.get<RankingBebida[]>(`${this.urlReportes}/ranking`, { params });
   }
 
-  getValorizacionInventario(): Observable<number> {
+  valorizacion(): Observable<number> {
     return this.http.get<number>(`${this.urlReportes}/valorizacion`);
   }
 
@@ -39,41 +45,40 @@ export class ReporteService {
     return { inicio: inicio.toISOString(), fin: fin.toISOString() };
   }
 
-  getReporteVentasUltimoMes(): Observable<ReporteVentas> {
+  ventasUltimoMes(): Observable<ReporteVentas> {
     const { inicio, fin } = this.ultimoMes();
-    return this.getReporteVentas(inicio, fin);
+    return this.ventas(inicio, fin);
   }
 
-  getRankingBebidasUltimoMes(): Observable<RankingBebida[]> {
+  rankingUltimoMes(): Observable<RankingBebida[]> {
     const { inicio, fin } = this.ultimoMes();
-    return this.getRankingBebidas(inicio, fin);
-  }
- obtenerKardex(filtros: any): Observable<any[]> {
-    let params = new HttpParams();
-    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
-    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
-    if (filtros.productoId) params = params.set('productoId', filtros.productoId);
-    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
-    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
-
-    return this.http.get<any[]>(`${this.urlReportes}/kardex`, { params });
+    return this.ranking(inicio, fin);
   }
 
-  descargarKardexCsv(filtros: any): void {
-    let params = new HttpParams();
-    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
-    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
-    if (filtros.productoId) params = params.set('productoId', filtros.productoId);
-    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
-    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
-
-    this.http.get(`${this.urlReportes}/kardex/csv`, { params, responseType: 'blob' }).subscribe(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'kardex_reporte.csv';
-      a.click();
-      window.URL.revokeObjectURL(url);
+  obtenerKardex(filtros: FiltrosKardex): Observable<KardexFila[]> {
+    return this.http.get<KardexFila[]>(`${this.urlReportes}/kardex`, {
+      params: this.parametrosKardex(filtros),
     });
+  }
+
+  descargarKardexCsv(filtros: FiltrosKardex): Observable<Blob> {
+    return this.http.get(`${this.urlReportes}/kardex/csv`, {
+      params: this.parametrosKardex(filtros),
+      responseType: 'blob',
+    });
+  }
+
+  private parametrosKardex(filtros: FiltrosKardex): HttpParams {
+    let params = new HttpParams();
+    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
+    if (filtros.productoId !== null) {
+      params = params.set('productoId', filtros.productoId);
+    }
+    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
+    if (filtros.usuarioId !== null) {
+      params = params.set('usuarioId', filtros.usuarioId);
+    }
+    return params;
   }
 }
