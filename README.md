@@ -2,6 +2,18 @@
 
 Sistema de gestión para **Munaq Fit**, tienda de bebidas saludables (Ubicación: Av. Independencia 198, Ate).
 
+## Documentación del proyecto
+
+| Documento | Contenido |
+|:--|:--|
+| `docs/arquitectura.md` | Diagramas C4 (contexto, contenedores, componentes) y capas |
+| `docs/api.md` | Contratos REST, paginación, ordenamiento y errores |
+| `docs/seguridad.md` | Tokens, roles, guards y matriz de permisos |
+| `docs/despliegue.md` | Entornos, variables, Render/Vercel y CI/CD |
+| `docs/observabilidad.md` | Health-checks, Actuator, logs y métricas |
+| `docs/pruebas.md` | Estrategia de pruebas, cobertura y Postman |
+| `docs/criterios-aceptacion.md` | Mapa REQ → endpoint → prueba |
+
 ## Estructura del proyecto
 
 | Carpeta | Descripción |

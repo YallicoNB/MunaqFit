@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: munaqfit-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_JWT_EXPIRATION_MS
+        value: "900000"
+      - key: APP_JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: APP_CORS_ALLOW_ALL
+        value: "false"
+      - key: APP_RATE_LIMIT_LOGIN_MAX
+        value: "10"
+      - key: APP_RATE_LIMIT_LOGIN_WINDOW
+        value: "60"
+      - key: SWAGGER_ENABLED
+        value: "false"
+      - key: SPRING_JPA_SHOW_SQL
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: IZIPAY_MOCK
+        value: "false"
+      - key: IZIPAY_TOKEN_URL
+        sync: false
+      - key: IZIPAY_SCRIPT_URL
+        sync: false
+      - key: IZIPAY_MERCHANT_CODE
+        sync: false
+      - key: IZIPAY_API_USER
+        sync: false
+      - key: IZIPAY_API_PASSWORD
+        sync: false
+      - key: IZIPAY_KEY_RSA
+        sync: false
