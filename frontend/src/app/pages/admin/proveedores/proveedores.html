@@ -12,25 +12,52 @@
       <h5 class="mb-0">{{ modoEdicion ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h5>
     </div>
     <div class="card-body">
-      <form (ngSubmit)="guardar()" #form="ngForm" class="row g-3">
+      <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" novalidate>
         <div class="col-md-3">
-          <label class="form-label">RUC *</label>
-          <input type="text" class="form-control" name="ruc" [(ngModel)]="proveedorActual.ruc" required maxlength="11">
+          <app-input
+            label="RUC"
+            tipo="text"
+            formControlName="ruc"
+            placeholder="11 dígitos"
+            ayuda="RUC de 11 dígitos, solo números"
+            [requerido]="true"
+            [deshabilitado]="guardando"
+            [error]="errorRuc">
+          </app-input>
         </div>
         <div class="col-md-5">
-          <label class="form-label">Nombre / Razón Social *</label>
-          <input type="text" class="form-control" name="nombre" [(ngModel)]="proveedorActual.nombre" required>
+          <app-input
+            label="Nombre / Razón Social"
+            tipo="text"
+            formControlName="nombre"
+            placeholder="Razón social del proveedor"
+            [requerido]="true"
+            [deshabilitado]="guardando">
+          </app-input>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Nombre de Contacto</label>
-          <input type="text" class="form-control" name="contactoNombre" [(ngModel)]="proveedorActual.contactoNombre">
+          <app-input
+            label="Nombre de Contacto"
+            tipo="text"
+            formControlName="contactoNombre"
+            placeholder="Persona de contacto"
+            autocomplete="name"
+            [deshabilitado]="guardando">
+          </app-input>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Teléfono</label>
-          <input type="text" class="form-control" name="telefono" [(ngModel)]="proveedorActual.telefono">
+          <app-input
+            label="Teléfono"
+            tipo="tel"
+            formControlName="telefono"
+            placeholder="9 dígitos"
+            autocomplete="tel"
+            [deshabilitado]="guardando"
+            [error]="errorTelefono">
+          </app-input>
         </div>
         <div class="col-12 mt-4 d-flex gap-2">
-          <button type="submit" class="btn btn-success" [disabled]="form.invalid || guardando">
+          <button type="submit" class="btn btn-success" [disabled]="guardando">
             {{ guardando ? 'Guardando...' : 'Guardar' }}
           </button>
           <button type="button" class="btn btn-outline-secondary" (click)="cerrarFormulario()" [disabled]="guardando">

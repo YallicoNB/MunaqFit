@@ -9,7 +9,7 @@ prueba.
 | REQ-001 | Login | `POST /api/auth/login` | `/login` | Postman: login 200/401 |
 | REQ-002 | Logout | `POST /api/auth/logout` + limpieza local | menú de cuenta | `Token.cerrarSesion` |
 | REQ-003 | Bloqueo por intentos | `AuthService` | mensaje de error | unitaria AuthService |
-| REQ-004 | Recuperar contraseña | `/forgot-password`, `/reset-password` | `/forgot-password`, `/reset-password` | Postman |
+| REQ-004 | Recuperar contraseña | `/forgot-password`, `/reset-password` | `/forgot-password`, `/reset-password` | Postman + unitarias Forgot/Reset |
 | REQ-005 | Roles | `SecurityConfig` + `@PreAuthorize` | `roleGuard` | 403 en admin |
 | REQ-006 | Crear empleado | `POST /api/admin/usuarios` | `/admin/usuarios` | Postman |
 | REQ-007 | Listar/buscar usuarios | `GET /api/admin/usuarios` paginado | tabla + filtros | Postman paginación |
@@ -27,7 +27,7 @@ prueba.
 | REQ-021 | Alertas stock | SSE `/api/alertas/stock` | toast global | conexión SSE |
 | REQ-022 | Kardex | `GET /api/admin/reportes/kardex` | `/admin/kardex` | Postman |
 | REQ-023/024/025 | Fidelización | `/api/empleado/fidelidad/**` | POS | Postman/unitarias |
-| REQ-026 | Proveedores | CRUD `/api/admin/proveedores` | `/admin/proveedores` | Postman |
+| REQ-026 | Proveedores | CRUD `/api/admin/proveedores` | `/admin/proveedores` | Postman + unitaria Proveedores |
 | REQ-029/030/032 | Reportes | `/api/admin/reportes/**` | `/admin/reportes` | navegador + CSV |
 | REQ-031 | Stock bajo | `GET /api/admin/inventario/bajo` | alertas | Postman |
 | REQ-033 | Paginación | `PageResponse` | tablas | Postman |

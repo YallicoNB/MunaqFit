@@ -39,7 +39,7 @@ npm run test:coverage    # cobertura
 ### Resultado actual
 
 - Backend: **32 pruebas**, 0 fallos (`mvn test` / `mvn verify`).
-- Frontend: **21 pruebas**, 0 fallos (`npm run test:ci`).
+- Frontend: **33 pruebas**, 0 fallos (`npm run test:ci`).
 - Cobertura JaCoCo: `backend/target/site/jacoco/index.html`.
 - Cobertura Karma: `frontend/coverage/frontend/index.html`.
 - Postman: `postman/MunaqFit.postman_collection.json`.
@@ -61,6 +61,11 @@ npm run test:coverage    # cobertura
 - `authGuard` / `roleGuard`: sesión y roles.
 - `Card`: muestra `imagenUrl`, fallback sin foto y fallback por error.
 - `Login`: formulario inválido no llama al servicio; válido sí.
+- `Proveedores`: RUC de 11 dígitos, teléfono opcional de 9, normalización de
+  espacios y conservación de estado/dirección/tipo de contrato al editar.
+- `ForgotPassword`: correo obligatorio y con formato; envía sin espacios.
+- `ResetPassword`: mínimo 8 caracteres, contraseñas coincidentes y navegación
+  al login tras el cambio.
 
 ## 4. Postman
 
