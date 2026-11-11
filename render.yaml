@@ -36,17 +36,8 @@ services:
         value: "false"
       - key: LOG_LEVEL
         value: INFO
+      # Demo publica sin credenciales sandbox: el flujo de tarjeta se simula.
+      # Cuando lleguen las credenciales reales, cambiar a "false" y agregar
+      # las variables IZIPAY_* desde el dashboard de Render.
       - key: IZIPAY_MOCK
-        value: "false"
-      - key: IZIPAY_TOKEN_URL
-        sync: false
-      - key: IZIPAY_SCRIPT_URL
-        sync: false
-      - key: IZIPAY_MERCHANT_CODE
-        sync: false
-      - key: IZIPAY_API_USER
-        sync: false
-      - key: IZIPAY_API_PASSWORD
-        sync: false
-      - key: IZIPAY_KEY_RSA
-        sync: false
+        value: "true"

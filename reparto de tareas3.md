@@ -97,12 +97,15 @@ contraseña auto-gestionado por correo) — requiere SMTP que el proyecto no tie
 
 ```properties
 # backend/src/main/resources/application-local.properties  (NUNCA se sube a git)
-spring.datasource.url=jdbc:mysql://gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/munaqfit_dev?sslMode=REQUIRED&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
-spring.datasource.username=272nBWgPwrYcTkf.dev_munaq
-spring.datasource.password=MunaqDev2026
+spring.datasource.url=jdbc:mysql://HOST:4000/munaqfit_dev?sslMode=REQUIRED&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+spring.datasource.username=USUARIO
+spring.datasource.password=CONTRASENA
 spring.datasource.hikari.maximum-pool-size=4
 spring.jpa.show-sql=false
 ```
+
+> Las credenciales reales se comparten por el gestor de contrasenas del
+> equipo, nunca en este documento ni en el repositorio.
 
 **Cómo arrancar el backend en local:**
 
