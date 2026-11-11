@@ -1,99 +1,127 @@
-# Guia de deploy: MunaqFit (Render + Vercel + MySQL gratis)
+# Guía de deploy: MunaqFit (Render + Vercel + TiDB Cloud)
 
-Arquitectura:
+Arquitectura vigente:
 
 ```
-Frontend  ->  Vercel   (Angular estatico)   ->  https://munaqfit.vercel.app
+Frontend  ->  Vercel   (Angular estático)     ->  https://munaq-fit-rho.vercel.app
 Backend   ->  Render   (Spring Boot + Docker) ->  https://munaqfit-backend.onrender.com
-Base BD   ->  TiDB Cloud Serverless (MySQL gratis)
-Swagger   ->  https://munaqfit-backend.onrender.com/swagger-ui/index.html
+Base BD   ->  TiDB Cloud Serverless (MySQL)   ->  munaqfit (us-west-2)
 ```
+
+> Esta guía describe el despliegue público del proyecto. No incluye contraseñas
+> ni cadenas de conexión reales: esos valores viven en Render y en
+> `application-local.properties` (archivo ignorado por Git).
 
 ---
 
-## 1. Crear la cuenta compartida del equipo
+## 1. Cuentas del proyecto
 
-1. Crea un Gmail nuevo del proyecto (por ejemplo `munaqfitproyecto@gmail.com`).
-2. Todos los del equipo entran con ese correo a Render, Vercel y TiDB.
-
-> En Vercel el plan Hobby es gratis pero es de **un solo miembro**, asi que
-> conviene compartir la misma cuenta en vez de invitar a cada compañero.
-
----
-
-## 2. Crear la base de datos MySQL gratis (TiDB Cloud)
-
-1. Entra en <https://www.tidbcloud.com> e inicia sesion con el Gmail del proyecto.
-2. Crea un **Serverless Tier** en la region mas cercana.
-3. Anota estos tres datos (los pide TiDB al crear el cluster):
-   - **Host / endpoint** (parecido a `gateway01.xxxx.prod.aws.tidbcloud.com`)
-   - **User**
-   - **Password**
-4. Concede permisos a tu IP o deja el cluster publico para el proyecto (mas facil para deploy).
-
-### Construir la JDBC URL
-
-Si el host es `gateway01.prod.region.aws.tidbcloud.com`, TiDB normalmente **no** da puerto explicito; el driver usa el **4000** para MySQL. La JDBC URL queda:
-
-```
-jdbc:mysql://GATEWAY_HOST:4000/munaqfit?useSSL=true&serverTimezone=UTC
-```
-
-Si TiDB te muestra un puerto especifico, usa ese:
-
-```
-jdbc:mysql://GATEWAY_HOST:PUERTO/munaqfit?useSSL=true&serverTimezone=UTC
-```
-
-> Tip: puedes probar la conexion desde Workbench o DBeaver antes de tocar el codigo.
-
-### Cargar el esquema y los datos
-
-El backend usa **Flyway**, asi que las tablas se crean solas al arrancar. Pero los datos de prueba se cargan aparte.
-
-Despues del primer deploy del backend:
-
-```bash
-mysql -h GATEWAY_HOST -P 4000 -u USER -p munaqfit < database/seed.sql
-```
+- **GitHub:** `YallicoNB` — repositorio público `YallicoNB/MunaqFit`.
+- **Render, Vercel y TiDB Cloud:** se accede con GitHub OAuth usando la cuenta
+  `YallicoNB`. El correo de contacto del proyecto es `yalliconoe@gmail.com`.
+- No se reutilizan servicios de cuentas anteriores: Render, Vercel y la base de
+  datos se crearon desde cero para esta entrega.
 
 ---
 
-## 3. Variables de entorno del backend (en Render)
+## 2. Base de datos (TiDB Cloud)
 
-Crea un **Web Service** en <https://render.com> conectado al repo `MunaqFit`.
+1. Entra en <https://tidbcloud.com> con GitHub.
+2. Crea un cluster **Serverless** llamado `munaqfit` en la región **Oregon
+   (`us-west-2`)**.
+3. En **Connect** copia:
+   - Host: `gateway01.us-west-2.prod.aws.tidbcloud.com`
+   - Puerto: `4000`
+   - Usuario y contraseña del cluster
+   - Certificado TLS (TiDB lo exige)
+4. Crea la base de datos (una sola vez):
 
-**Opciones del servicio:**
-- Environment: `Docker`
-- Region: la misma que tu BD (o la mas cercana)
-- Instance type: `Free`
+   ```sql
+   CREATE DATABASE IF NOT EXISTS munaqfit;
+   ```
 
-**Variables de entorno (Settings -> Environment):**
+   No uses la base `sys`: es del sistema.
+
+### JDBC URL
+
+```text
+jdbc:mysql://gateway01.us-west-2.prod.aws.tidbcloud.com:4000/munaqfit?useSSL=true&requireSSL=true&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+```
+
+### Esquema y datos
+
+Flyway se ejecuta al arrancar el backend y aplica las migraciones `V1`–`V16`.
+Una base vacía queda lista con:
+
+- 4 usuarios demo.
+- 21 bebidas activas del catálogo oficial.
+- 25 insumos y 98 recetas.
+- IGV `0.18`.
+
+> **No ejecutes `database/seed.sql` en producción.** Ese archivo hace
+> `TRUNCATE` y borraría los datos de las migraciones.
+
+---
+
+## 3. Backend en Render
+
+1. En Render: **New → Blueprint**.
+2. Selecciona el repo `YallicoNB/MunaqFit`, rama `main` y `render.yaml`.
+3. Nombre del Blueprint: `munaqfit-produccion`.
+4. Render crea el servicio **`munaqfit-backend`** (Docker, Free, Oregon).
+5. Completa las variables marcadas con `sync: false`:
 
 | Variable | Valor |
 |:--|:--|
-| `SPRING_DATASOURCE_URL` | `jdbc:mysql://GATEWAY_HOST:4000/munaqfit?useSSL=true&serverTimezone=UTC` |
-| `SPRING_DATASOURCE_USERNAME` | tu user de TiDB |
-| `SPRING_DATASOURCE_PASSWORD` | tu password de TiDB |
-| `APP_JWT_SECRET` | una cadena larga y aleatoria (min. 32 chars) |
-| `APP_CORS_ALLOWED_ORIGINS` | `https://munaqfit.vercel.app` |
-| `SWAGGER_ENABLED` | `true` (pon `false` si no quieres que se vea en linea) |
-| `SPRING_JPA_SHOW_SQL` | `false` (en produccion no hace falta ver el SQL) |
+| `SPRING_DATASOURCE_URL` | JDBC URL de la sección anterior |
+| `SPRING_DATASOURCE_USERNAME` | usuario de TiDB |
+| `SPRING_DATASOURCE_PASSWORD` | contraseña de TiDB |
+| `APP_CORS_ALLOWED_ORIGINS` | `https://munaq-fit-rho.vercel.app` |
 
-> El puerto lo pone Render solo con `PORT`. No lo definas a mano.
+`render.yaml` ya define el resto:
 
-**Health check path:** `/v3/api-docs` (o `/api/auth/validar-token`)
+- `SPRING_PROFILES_ACTIVE=prod`
+- `APP_JWT_SECRET` generado automáticamente
+- `APP_JWT_EXPIRATION_MS=900000`
+- `APP_JWT_REFRESH_EXPIRATION_MS=604800000`
+- `APP_CORS_ALLOW_ALL=false`
+- `APP_RATE_LIMIT_LOGIN_MAX=10`, `APP_RATE_LIMIT_LOGIN_WINDOW=60`
+- `SWAGGER_ENABLED=false`, `SPRING_JPA_SHOW_SQL=false`, `LOG_LEVEL=INFO`
+- `IZIPAY_MOCK=true` para la demo sin credenciales sandbox
 
-Cuando Render termine, te da una URL tipo `https://munaqfit-backend.onrender.com`.
-**Copia esa URL** para el siguiente paso.
+**Health check:** `/api/health`.
+
+Cuando termine el build, la URL es:
+
+```text
+https://munaqfit-backend.onrender.com
+```
+
+> Render Free duerme por inactividad. La primera petición puede tardar ~50 s.
 
 ---
 
 ## 4. Frontend en Vercel
 
-### 4.1 Ajustar la URL del backend
+1. En Vercel: **Add New → Project** e importa `YallicoNB/MunaqFit`.
+2. **Root Directory:** `frontend`.
+3. Framework Preset: **Angular**.
+4. Build Command: `npm run build`.
+5. Output Directory: `dist/frontend/browser`.
+6. Deploy.
 
-Abre `frontend/src/environments/environment.prod.ts` y pon la URL real de Render:
+El dominio de producción actual es:
+
+```text
+https://munaq-fit-rho.vercel.app
+```
+
+`frontend/vercel.json` ya incluye el rewrite SPA, por lo que rutas como
+`/dashboard` o `/admin/usuarios` funcionan al recargar.
+
+### URL del backend en el frontend
+
+`frontend/src/environments/environment.prod.ts` debe apuntar a Render:
 
 ```ts
 export const environment = {
@@ -102,83 +130,70 @@ export const environment = {
 };
 ```
 
-Sube el cambio:
-
-```bash
-git add .
-git commit -m "chore(frontend): apunta al backend desplegado en Render"
-git push
-```
-
-### 4.2 Importar el proyecto
-
-1. Entra en <https://vercel.com> con el Gmail del proyecto.
-2. **Add New -> Project** e importa `YallicoNB/MunaqFit`.
-3. En **Root Directory** pon `frontend`.
-4. Vercel detecta Angular (Framework Preset: Angular). deberia usar:
-   - Build Command: `npm run build`
-   - Output Directory: `dist/frontend/browser`
-5. Clic en **Deploy**.
-
-> El `vercel.json` ya tiene el rewrite SPA, asi que rutas como `/dashboard`
-> o `/admin/usuarios` funcionaran al recargar la pagina.
-
-Cuando termine, Vercel te da `https://munaqfit.vercel.app`.
+Si cambia el dominio de Render, actualiza este archivo, haz commit y push a
+`main` para que Vercel redepliegue.
 
 ---
 
-## 5. Cerrar el circulo: CORS
+## 5. CORS
 
-Si el frontend ya esta desplegado y cambiaste la URL de Render despues:
+En Render, `APP_CORS_ALLOWED_ORIGINS` debe coincidir exactamente con el dominio
+de Vercel:
 
-1. Actualiza `APP_CORS_ALLOWED_ORIGINS` en Render con el dominio final de Vercel.
-2. Reinicia el servicio en Render.
-
-Si Vercel te dio un dominio tipo `munaqfit-abc123.vercel.app`, puedes incluir ambos separados por coma:
-
+```text
+https://munaq-fit-rho.vercel.app
 ```
-https://munaqfit-abc123.vercel.app,https://munaqfit.vercel.app
+
+Si usas un dominio adicional, sepáralos con coma:
+
+```text
+https://munaq-fit-rho.vercel.app,https://otro-dominio.vercel.app
 ```
+
+Después de cambiar una variable de entorno, Render reinicia el servicio.
 
 ---
 
-## 6. Verificar que todo funciona en linea
+## 6. Verificar el despliegue
 
-| Prueba | URL | Resultado esperado |
+| Prueba | URL / acción | Resultado esperado |
 |:--|:--|:--|
-| Frontend | `https://munaqfit.vercel.app` | Login visible |
-| Backend vivo | `https://munaqfit-backend.onrender.com/v3/api-docs` | JSON de OpenAPI |
-| Swagger UI | `https://munaqfit-backend.onrender.com/swagger-ui/index.html` | Documentacion navegable |
-| Login desde la UI | `POST /api/auth/login` con `{ "dni": "12345678", "password": "12345678" }` | 200 + token |
-| Endpoint protegido | `GET /api/admin/dashboard/metricas` con token | 200 + metricas |
+| Frontend | <https://munaq-fit-rho.vercel.app> | Pantalla de login |
+| Backend vivo | <https://munaqfit-backend.onrender.com/api/health> | `{"status":"UP"}` |
+| Login | admin `12345678` / `12345678` | Entra al dashboard con rol `ADMIN` |
+| Catálogo | Menú **Ventas** | 21 bebidas activas |
+| POS | Agregar bebida → Local → Mesa → Cobrar | Subtotal, IGV 18 % y total |
+| Pago tarjeta | Método **TARJETA** → Confirmar cobro | Pedido registrado con pago simulado |
+| CORS | Login desde el dominio de Vercel | Sin errores en la consola |
 
-> **Render free se duerme** tras unos minutos de inactividad. La primera carga
-> puede tardar ~30-60 s mientras el contenedor despierta. Es normal.
+Credenciales demo:
+
+- Admin: `12345678` / `12345678`
+- Empleado: `11111111` / `12345678`
+- Usuario inactivo: `22222222`
 
 ---
 
 ## 7. Volver a local
 
-`application.properties` y los `environment.ts` tienen valores por defecto para
-local, asi que para trabajar en tu maquina solo levantas:
-
 ```bash
-cd backend && mvn spring-boot:run    # MySQL local en 3306
+cd backend && mvn spring-boot:run    # http://localhost:8080
 cd frontend && npm start             # http://localhost:4200
 ```
 
-Los `environment.ts` siguen apuntando a `localhost:8080` y el CORS solo permite
-`localhost:4200`. No se toco nada del flujo local.
+El perfil local usa `application-local.properties` (ignorado por Git) y el
+frontend usa `environment.ts` con `http://localhost:8080/api`.
 
 ---
 
-## 8. Problemas frecuentes del deploy
+## 8. Problemas frecuentes
 
 | Síntoma | Causa probable | Solución |
 |:--|:--|:--|
-| Render no encuentra el puerto | Falta exponer `PORT` | El Dockerfile ya usa `-Dserver.port=$PORT` |
-| `403` o error de CORS en el navegador | `APP_CORS_ALLOWED_ORIGINS` no coincide con el dominio de Vercel | Agrega el dominio exacto |
-| La app carga pero "no se conecta" | `environment.prod.ts` tiene la URL vieja de Render | Actualizala y vuelve a desplegar Vercel |
-| Vercel da 404 al recargar `/dashboard` | Falta rewrite SPA | Ya esta en `vercel.json` |
-| La base no conecta | JDBC URL mal (puerto/SSL) | Revisa el host y el puerto de TiDB |
-| La primera carga tarda mucho | Render free se despierta | Espera, es normal |
+| Render no encuentra el puerto | Falta `PORT` | El Dockerfile ya usa `-Dserver.port=$PORT` |
+| Error de CORS en el navegador | Origen distinto al configurado | Ajusta `APP_CORS_ALLOWED_ORIGINS` y reinicia Render |
+| La app carga pero no conecta | `environment.prod.ts` con URL vieja | Corrige la URL y redeploya Vercel |
+| Vercel da 404 al recargar `/dashboard` | Falta rewrite SPA | Ya está en `frontend/vercel.json` |
+| La base no conecta | JDBC URL o TLS mal configurado | Revisa host, puerto `4000` y `useSSL=true&requireSSL=true` |
+| Faltan datos en la base | Se esperaba `seed.sql` | Flyway ya carga los datos; no ejecutes `seed.sql` |
+| La primera carga tarda ~50 s | Render Free estaba dormido | Es normal; espera o usa un ping a `/api/health` |
