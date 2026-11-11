@@ -18,7 +18,7 @@ public class CorsConfig {
      *
      * En local (sin definir la variable) solo se permite el frontend de Angular.
      * En produccion se define APP_CORS_ALLOWED_ORIGINS con los dominios reales:
-     *   https://munaqfit.vercel.app,https://otro-dominio.vercel.app
+     *   https://munaq-fit-rho.vercel.app
      *
      * Si se define APP_CORS_ALLOW_ALL=true se permiten todos los origenes
      * (util mientras se configura el deploy, se puede quitar al terminar).
