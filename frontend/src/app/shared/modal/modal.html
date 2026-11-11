@@ -1,0 +1,35 @@
+<div
+  *ngIf="abierto"
+  class="mq-modal__fondo"
+  (click)="alClicFondo($event)"
+>
+  <div
+    class="mq-modal__dialogo"
+    [class.mq-modal__dialogo--sm]="tamano === 'sm'"
+    [class.mq-modal__dialogo--lg]="tamano === 'lg'"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="titulo || 'Diálogo'"
+  >
+    <header class="mq-modal__cabecera">
+      <h2 *ngIf="titulo" class="mq-modal__titulo">{{ titulo }}</h2>
+      <button
+        *ngIf="mostrarCerrar"
+        type="button"
+        class="mq-modal__cerrar"
+        aria-label="Cerrar diálogo"
+        (click)="cerrarModal()"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="mq-modal__cuerpo">
+      <ng-content></ng-content>
+    </div>
+
+    <footer class="mq-modal__pie">
+      <ng-content select="[acciones]"></ng-content>
+    </footer>
+  </div>
+</div>

@@ -14,14 +14,15 @@
   margin-top: 0;
   overflow: hidden;
   isolation: isolate;
-  background: #1b4d3e;
+  background: var(--mq-pink-frame); /* Fondo pastel */
 }
 
 .hero-header::after {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(90deg, transparent 20%, rgba(12, 35, 28, 0.28) 48%, rgba(12, 35, 28, 0.82) 100%);
+  /* Degradado blanco suave para que lea el texto morado */
+  background: linear-gradient(90deg, transparent 20%, rgba(255, 255, 255, 0.6) 48%, rgba(255, 255, 255, 0.95) 100%);
   content: "";
 }
 
@@ -38,15 +39,15 @@
 .hero-copy {
   width: min(500px, 42%);
   margin-right: max(50px, calc((100vw - 1400px) / 2));
-  color: #ffffff;
+  color: var(--mq-text-main); /* Color de texto base */
   text-align: right;
 }
 
 .hero-eyebrow {
   margin-bottom: 14px;
-  color: #a3e4d7;
+  color: var(--mq-purple); /* Morado claro */
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -60,11 +61,11 @@
 
 .hero-carousel h1 {
   max-width: 500px;
-  color: #ffffff;
+  color: var(--mq-purple-dark); /* Título morado oscuro */
   font-size: clamp(32px, 4vw, 54px);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.12;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.8); /* Sombra blanca para resaltar */
   opacity: 1;
   transform: translateY(0);
   transition:
@@ -88,7 +89,7 @@
   width: 10px;
   height: 10px;
   padding: 0;
-  border: 1px solid #ffffff;
+  border: 1px solid var(--mq-border); /* Borde gris suave */
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
@@ -96,16 +97,16 @@
 
 .hero-indicator.activo {
   width: 26px;
-  border-color: #40e0d0;
+  border-color: var(--mq-purple);
   border-radius: 8px;
-  background: #40e0d0;
+  background: var(--mq-purple);
 }
 
 .promociones-section {
   padding: 56px 24px 24px;
   overflow: hidden;
-  background: #e8f8f5;
-  font-family: Arial, sans-serif;
+  background: var(--mq-bg); /* Fondo general MunaqFit */
+  font-family: inherit;
 }
 
 .promociones-heading {
@@ -115,7 +116,7 @@
 
 .promociones-eyebrow {
   margin-bottom: 8px;
-  color: #2e8b57;
+  color: var(--mq-purple);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -124,7 +125,7 @@
 
 .promociones-heading h2 {
   margin: 0;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
   font-size: clamp(26px, 3vw, 36px);
   font-weight: 800;
 }
@@ -153,21 +154,23 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border: 1px solid #2e8b57;
+  border: 2px solid var(--mq-purple);
   border-radius: 50%;
-  background: #a3e4d7;
-  color: #1b4d3e;
+  background: var(--mq-white);
+  color: var(--mq-purple);
   font-size: 27px;
   line-height: 1;
   cursor: pointer;
   transition:
     background-color 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease;
 }
 
 .promocion-flecha:hover {
   transform: scale(1.08);
-  background: #40e0d0;
+  background: var(--mq-purple);
+  color: var(--mq-white);
 }
 
 .promociones-indicadores {
@@ -180,7 +183,7 @@
   width: 9px;
   height: 9px;
   padding: 0;
-  border: 1px solid #2e8b57;
+  border: 1px solid var(--mq-border);
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
@@ -188,16 +191,16 @@
 
 .promocion-indicador.activo {
   width: 24px;
-  border-color: #2e8b57;
+  border-color: var(--mq-purple);
   border-radius: 8px;
-  background: #2e8b57;
+  background: var(--mq-purple);
 }
 
 .menu-cinta-section {
   padding: 42px 24px 48px;
   overflow: hidden;
-  background: #e8f8f5;
-  font-family: Arial, sans-serif;
+  background: var(--mq-white); /* Cinta blanca para hacer contraste */
+  font-family: inherit;
 }
 
 .menu-cinta-cabecera {
@@ -211,7 +214,7 @@
 
 .menu-cinta-sobretitulo {
   margin: 0 0 6px;
-  color: #2e8b57;
+  color: var(--mq-purple);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -220,7 +223,7 @@
 
 .menu-cinta-titulo {
   margin: 0;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
   font-size: clamp(24px, 3vw, 34px);
   font-weight: 800;
 }
@@ -236,22 +239,24 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border: 1px solid #2e8b57;
+  border: 2px solid var(--mq-purple);
   border-radius: 50%;
-  background: #a3e4d7;
-  color: #1b4d3e;
+  background: var(--mq-white);
+  color: var(--mq-purple);
   font-size: 27px;
   line-height: 1;
   cursor: pointer;
   transition:
     background-color 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease;
 }
 
 .menu-cinta-flecha:hover,
 .menu-cinta-flecha:focus-visible {
   transform: scale(1.08);
-  background: #40e0d0;
+  background: var(--mq-purple);
+  color: var(--mq-white);
 }
 
 .menu-cinta-escenario {
@@ -265,19 +270,19 @@
 .menu-cinta-estado {
   margin: 0;
   padding: 20px 16px;
-  color: #1b4d3e;
+  color: var(--mq-text-muted);
   font-weight: 600;
   text-align: center;
 }
 
 .menu-cinta-error {
-  color: #8b1e1e;
+  color: #d62852;
 }
 
 .ubicacion-section {
   padding: 54px 24px 58px;
-  background: #a3e4d7;
-  font-family: Arial, sans-serif;
+  background: var(--mq-pink-frame);
+  font-family: inherit;
 }
 
 .ubicacion-encabezado {
@@ -288,15 +293,16 @@
 .ubicacion-encabezado h2,
 .redes-section h2 {
   margin: 0;
-  color: #1b4d3e;
+  color: var(--mq-purple-dark);
   font-size: clamp(26px, 3vw, 36px);
   font-weight: 800;
 }
 
 .ubicacion-encabezado > p:last-child {
   margin: 10px 0 0;
-  color: #1b4d3e;
+  color: var(--mq-text-main);
   font-size: 14px;
+  font-weight: 600;
 }
 
 .mapa-contenedor {
@@ -304,10 +310,10 @@
   height: clamp(280px, 38vw, 440px);
   margin: 0 auto;
   overflow: hidden;
-  border: 1px solid #2e8b57;
+  border: 4px solid var(--mq-white);
   border-radius: 18px;
-  background: #e8f8f5;
-  box-shadow: 0 12px 28px rgba(27, 77, 62, 0.14);
+  background: var(--mq-white);
+  box-shadow: 0 12px 28px rgba(166, 140, 242, 0.15);
 }
 
 .mapa-contenedor iframe {
@@ -322,8 +328,8 @@
   flex-direction: column;
   align-items: center;
   padding: 48px 24px 56px;
-  background: #e8f8f5;
-  font-family: Arial, sans-serif;
+  background: var(--mq-bg);
+  font-family: inherit;
   text-align: center;
 }
 
@@ -344,21 +350,21 @@
   width: 52px;
   height: 52px;
   place-items: center;
-  border: 1px solid #2e8b57;
+  border: 2px solid transparent;
   border-radius: 50%;
-  background: #a3e4d7;
-  color: #1b4d3e;
+  background: var(--mq-white);
+  color: var(--mq-purple);
   transition:
     transform 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .red-social:hover,
 .red-social:focus-visible {
   transform: translateY(-4px);
-  background: #2e8b57;
-  color: #ffffff;
+  border-color: var(--mq-purple);
+  box-shadow: 0 8px 24px rgba(166, 140, 242, 0.2);
 }
 
 .red-social svg {
@@ -367,24 +373,39 @@
   fill: currentColor;
 }
 
+.red-social.instagram:hover svg { fill: #E1306C; }
+.red-social.facebook:hover svg { fill: #1877F2; }
+.red-social.x-social:hover svg { fill: #000000; }
+.red-social.tiktok:hover svg { fill: #000000; }
+.red-social.youtube:hover svg { fill: #FF0000; }
+
 .red-social.instagram svg {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
 }
 
+.red-social.instagram:hover svg {
+  stroke: #E1306C;
+}
+
 .red-social.instagram svg .punto {
   fill: currentColor;
   stroke: none;
 }
+.red-social.instagram:hover svg .punto {
+  fill: #E1306C;
+}
 
+/* MEDIAS QUERIES INTACTAS */
 @media (max-width: 767.98px) {
   .hero-header {
     height: 340px;
   }
 
   .hero-header::after {
-    background: linear-gradient(90deg, rgba(12, 35, 28, 0.18), rgba(12, 35, 28, 0.78));
+    /* Degradado móvil adaptado al tono claro */
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.95));
   }
 
   .hero-image {

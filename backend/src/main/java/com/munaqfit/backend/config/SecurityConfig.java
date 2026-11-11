@@ -67,6 +67,10 @@ public class SecurityConfig {
                         // Sonda de disponibilidad que usa el cron para que Render
                         // no duerma la instancia. Sin token a proposito.
                         .requestMatchers("/api/health").permitAll()
+                        // Health/info de Actuator son publicos para Render y
+                        // para el dashboard. metrics/prometheus exigen sesion.
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/info").permitAll()
                         // Stream SSE de alertas de stock: EventSource no puede
                         // mandar el header Authorization, asi que el JWT viaja
                         // en ?token= y el controller lo valida a mano. Se abre

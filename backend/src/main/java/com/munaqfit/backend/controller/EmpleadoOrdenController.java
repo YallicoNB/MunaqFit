@@ -1,19 +1,28 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import com.munaqfit.backend.model.Usuario;
 import com.munaqfit.backend.model.Venta;
 import com.munaqfit.backend.model.DetalleVenta;
+import com.munaqfit.backend.repository.UsuarioRepository;
 import com.munaqfit.backend.repository.VentaRepository;
 import com.munaqfit.backend.repository.DetalleVentaRepository;
+import com.munaqfit.backend.util.Sanitizacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/empleado/ordenes")
 @CrossOrigin(origins = "*")
+@Tag(name = "Ordenes (empleado)")
 public class EmpleadoOrdenController {
 
     @Autowired
@@ -22,23 +31,57 @@ public class EmpleadoOrdenController {
     @Autowired
     private DetalleVentaRepository detalleVentaRepository;
 
-    // 1. Ver todas las órdenes (ventas), de la más reciente a la más antigua
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // 1. REQ-014 (tarea 2.6): historial del empleado autenticado, solo de HOY.
+    @Operation(summary = "Historial de ordenes del empleado autenticado (solo hoy)")
     @GetMapping("/historial")
-    public ResponseEntity<List<Venta>> verTodasLasOrdenes() {
-        List<Venta> ordenes = ventaRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-        if (ordenes.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<List<Venta>> verTodasLasOrdenes(Authentication authentication) {
+        String dni = null;
+        if (authentication != null && authentication.getName() != null) {
+            dni = Sanitizacion.dni(authentication.getName());
         }
+
+        Usuario usuario = (dni == null ? null : usuarioRepository.findByDni(dni).orElse(null));
+        if (usuario == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        LocalDate hoy = LocalDate.now();
+        List<Venta> ordenes = ventaRepository.findByUsuarioIdAndFechaHoraBetweenOrderByFechaHoraDesc(
+                usuario.getId(),
+                hoy.atStartOfDay(),
+                hoy.plusDays(1).atStartOfDay());
+
+        // Se devuelve la lista vacia (200) para que la UI muestre su estado
+        // "sin ordenes" sin tener que tratar un 204 como caso especial.
         return ResponseEntity.ok(ordenes);
     }
 
     // 2. Ver el detalle de una orden específica (qué productos se vendieron en esa venta)
+    @Operation(summary = "Detalle de una orden; solo el dueno o un ADMIN")
     @GetMapping("/{ventaId}/detalle")
-    public ResponseEntity<?> verDetalleOrden(@PathVariable Long ventaId) {
+    public ResponseEntity<?> verDetalleOrden(@PathVariable Long ventaId,
+                                               Authentication authentication) {
         Venta venta = ventaRepository.findById(ventaId).orElse(null);
 
         if (venta == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        String dni = authentication != null ? Sanitizacion.dni(authentication.getName()) : null;
+        Usuario usuario = dni == null ? null : usuarioRepository.findByDni(dni).orElse(null);
+        if (usuario == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        boolean esAdmin = usuario.getRol() == Usuario.Rol.ADMIN;
+        boolean esDuenio = venta.getUsuario() != null
+                && venta.getUsuario().getId().equals(usuario.getId());
+        if (!esAdmin && !esDuenio) {
+            return ResponseEntity.status(403)
+                    .body("No puedes consultar una orden que no te pertenece");
         }
 
         try {

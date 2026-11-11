@@ -1,0 +1,399 @@
+{
+  "info": {
+    "_postman_id": "6f4f0f0e-2f6a-4c1e-9d0e-123456789abc",
+    "name": "MunaqFit API",
+    "description": "Coleccion de contrato y humo para MunaqFit. Variables: baseUrl, token, refreshToken, empleadoToken, bebidaId, ventaId, ventaTotal.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "empleadoToken", "value": "" },
+    { "key": "bebidaId", "value": "1" },
+    { "key": "ventaId", "value": "" },
+    { "key": "ventaTotal", "value": "18.88" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('health 200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Login admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dni\": \"12345678\",\n  \"password\": \"12345678\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('login 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('devuelve access y refresh', () => { pm.expect(j.token).to.be.a('string'); pm.expect(j.refreshToken).to.be.a('string'); });",
+                  "pm.collectionVariables.set('token', j.token);",
+                  "pm.collectionVariables.set('refreshToken', j.refreshToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('refresh 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('token', j.token);",
+                  "pm.collectionVariables.set('refreshToken', j.refreshToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validar token",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/validar-token", "host": ["{{baseUrl}}"], "path": ["api", "auth", "validar-token"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('token valido', () => pm.response.to.have.status(200));"] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Admin",
+      "item": [
+        {
+          "name": "Usuarios paginado + orden",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/usuarios?pagina=0&tamano=5&orden=nombreCompleto,asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "usuarios"],
+              "query": [
+                { "key": "pagina", "value": "0" },
+                { "key": "tamano", "value": "5" },
+                { "key": "orden", "value": "nombreCompleto,asc" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('contrato PageResponse', () => { pm.expect(j).to.have.keys('contenido','pagina','tamano','totalElementos','totalPaginas'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inventario paginado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/inventario?pagina=0&tamano=5&orden=stockActual,asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "inventario"],
+              "query": [
+                { "key": "pagina", "value": "0" },
+                { "key": "tamano", "value": "5" },
+                { "key": "orden", "value": "stockActual,asc" }
+              ]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Ventas paginado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/ventas?pagina=0&tamano=5&orden=fechaHora,desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "ventas"],
+              "query": [
+                { "key": "pagina", "value": "0" },
+                { "key": "tamano", "value": "5" },
+                { "key": "orden", "value": "fechaHora,desc" }
+              ]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Kardex paginado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reportes/kardex?pagina=0&tamano=5&orden=fechaMovimiento,desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "reportes", "kardex"],
+              "query": [
+                { "key": "pagina", "value": "0" },
+                { "key": "tamano", "value": "5" },
+                { "key": "orden", "value": "fechaMovimiento,desc" }
+              ]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Proveedores",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/proveedores", "host": ["{{baseUrl}}"], "path": ["api", "admin", "proveedores"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Empleado / POS",
+      "item": [
+        {
+          "name": "Menu activo",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/empleado/menu/bebidas", "host": ["{{baseUrl}}"], "path": ["api", "empleado", "menu", "bebidas"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('hay bebidas', () => pm.expect(j.length).to.be.greaterThan(0));",
+                  "pm.collectionVariables.set('bebidaId', j[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Receta de la primera bebida",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/empleado/menu/receta/{{bebidaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "empleado", "menu", "receta", "{{bebidaId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('receta con ingredientes', () => pm.expect(j.length).to.be.greaterThan(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historial del empleado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{empleadoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/empleado/ordenes/historial", "host": ["{{baseUrl}}"], "path": ["api", "empleado", "ordenes", "historial"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Registrar venta (POS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"venta\": { \"mesa\": 1, \"tipoVenta\": \"LOCAL\", \"notas\": \"Prueba Postman\" },\n  \"detalles\": [ { \"bebida\": { \"id\": {{bebidaId}} }, \"cantidad\": 1 } ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/empleado/ventas/registrar", "host": ["{{baseUrl}}"], "path": ["api", "empleado", "ventas", "registrar"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('venta registrada', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('ventaId', j.id);",
+                  "pm.collectionVariables.set('ventaTotal', j.total);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pagar venta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ventaId\": {{ventaId}},\n  \"montoPagado\": {{ventaTotal}},\n  \"tipoPago\": \"EFECTIVO\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/empleado/ventas/pago", "host": ["{{baseUrl}}"], "path": ["api", "empleado", "ventas", "pago"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('pago 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('venta PAGADA', () => pm.expect(j.estadoVenta).to.eql('PAGADO'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Seguridad",
+      "item": [
+        {
+          "name": "Login empleado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dni\": \"11111111\",\n  \"password\": \"12345678\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('empleadoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empleado en admin (403)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{empleadoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios?pagina=0&tamano=5", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('403', () => pm.response.to.have.status(403));"] } }
+          ]
+        },
+        {
+          "name": "Refresh token como access (401)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{refreshToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios?pagina=0&tamano=5", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('401', () => pm.response.to.have.status(401));"] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Integraciones",
+      "item": [
+        {
+          "name": "Izipay configurado",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/izipay/configuracion", "host": ["{{baseUrl}}"], "path": ["api", "izipay", "configuracion"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('200', () => pm.response.to.have.status(200));"] } }
+          ]
+        },
+        {
+          "name": "Izipay token (mock local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"monto\": 18.88,\n  \"pedido\": \"PED-POSTMAN-0001\",\n  \"descripcion\": \"Prueba Postman\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/get-izipay-token", "host": ["{{baseUrl}}"], "path": ["api", "get-izipay-token"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('trae authorization', () => pm.expect(j.authorization).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

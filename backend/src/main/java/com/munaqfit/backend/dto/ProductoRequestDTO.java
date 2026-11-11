@@ -1,5 +1,7 @@
 package com.munaqfit.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -7,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(description = "Datos para crear o actualizar un insumo y sus proveedores.")
 public class ProductoRequestDTO {
     
     @NotBlank(message = "El nombre no puede estar vacío")

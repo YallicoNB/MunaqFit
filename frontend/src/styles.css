@@ -1,184 +1,174 @@
+/* =========================================
+   MUNAQFIT - NUEVOS TOKENS PASTEL (TAREA 4.1)
+========================================= */
 :root {
-  --bs-primary: #2e8b57;
-  --bs-primary-rgb: 46, 139, 87;
-  --bs-link-color: #1b4d3e;
-  --bs-link-hover-color: #2e8b57;
-  --munaq-deep: #1b4d3e;
-  --munaq-sea: #2e8b57;
-  --munaq-turquoise: #40e0d0;
-  --munaq-foam: #a3e4d7;
-  --munaq-ocean: #e8f8f5;
-  --munaq-text: #1b4d3e;
-  --munaq-muted: #2e8b57;
-  --munaq-border: #2e8b57;
-  --munaq-soft: #a3e4d7;
+  /* Fondos suaves que no cansan la vista */
+  --mq-bg: #fcfafc;          /* Un lila-blanco ultra claro para toda la app */
+  --mq-white: #ffffff;       /* Blanco puro para las tarjetas de contenido */
+  
+  /* Tus colores principales refinados */
+  --mq-purple: #6f4fd0;      /* Morado lila con contraste AA sobre blanco */
+  --mq-purple-dark: #5a3cb8; /* Morado más oscuro para hover y texto */
+  
+  --mq-pink: #ff7eb6;        /* Tu rosado original para acentos y detalles */
+  --mq-pink-light: #fbe6ff;  /* Rosado ultra suave para fondos secundarios */
+  --mq-pink-frame: #fdf0ff;  /* Rosado casi blanco para cabeceras y guías */
+  
+  --mq-text-main: #4a3f69;   /* Morado muy oscuro para los textos (súper legible) */
+  --mq-text-muted: #8b82a5;  /* Gris-lila para textos secundarios */
+  
+  --mq-border: #f0e1f7;      /* Bordes lila muy sutiles */
+  
+  /* Radios y Sombras modernas */
+  --mq-radius: 16px;
+  --mq-shadow: 0 8px 24px rgba(166, 140, 242, 0.15); /* Sombra lila hermosa */
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--munaq-ocean);
-  color: var(--munaq-text);
+  font-family: 'Alegreya Sans', 'Trebuchet MS', sans-serif;
+  background-color: var(--mq-bg);
+  color: var(--mq-text-main);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-html,
-body {
-  overscroll-behavior-y: none;
+/* =========================================
+   CLASES GLOBALES REUTILIZABLES
+========================================= */
+.mq-card {
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
+  box-shadow: var(--mq-shadow);
+  border: 1px solid var(--mq-border);
+  padding: 1.5rem;
 }
 
-.app-shell {
-  width: 100%;
-  min-height: 100vh;
-  transition:
-    width 0.3s ease,
-    margin-right 0.3s ease;
-}
-
-.app-shell.nav-cuenta-abierto {
-  width: calc(100% - min(200px, 85vw));
-  margin-right: min(200px, 85vw);
-}
-
+/* Botones Accesibles (Cumpliendo el RNF) */
 .btn-primary {
-  --bs-btn-bg: #1b4d3e;
-  --bs-btn-border-color: #1b4d3e;
-  --bs-btn-hover-bg: #2e8b57;
-  --bs-btn-hover-border-color: #2e8b57;
-  --bs-btn-active-bg: #2e8b57;
-  --bs-btn-active-border-color: #2e8b57;
+  background-color: var(--mq-purple);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  min-height: 44px; /* Botón grande para móviles */
+  padding: 0 24px;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(166, 140, 242, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-outline-primary {
-  --bs-btn-color: #1b4d3e;
-  --bs-btn-border-color: #2e8b57;
-  --bs-btn-hover-bg: #2e8b57;
-  --bs-btn-hover-border-color: #2e8b57;
+.btn-primary:hover {
+  background-color: var(--mq-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(166, 140, 242, 0.4);
 }
 
-.btn-success {
-  --bs-btn-bg: #1b4d3e;
-  --bs-btn-border-color: #1b4d3e;
-  --bs-btn-hover-bg: #2e8b57;
-  --bs-btn-hover-border-color: #2e8b57;
+.btn-secondary {
+  background-color: var(--mq-pink-light);
+  color: var(--mq-purple-dark);
+  border: 1px solid var(--mq-purple);
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 0 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.btn-danger,
-.btn-warning,
-.btn-info {
-  --bs-btn-bg: #2e8b57;
-  --bs-btn-border-color: #2e8b57;
-  --bs-btn-color: #ffffff;
-  --bs-btn-hover-bg: #1b4d3e;
-  --bs-btn-hover-border-color: #1b4d3e;
-  --bs-btn-hover-color: #ffffff;
-}
-
-.btn-outline-secondary {
-  --bs-btn-color: #1b4d3e;
-  --bs-btn-border-color: #2e8b57;
-  --bs-btn-hover-bg: #40e0d0;
-  --bs-btn-hover-border-color: #40e0d0;
-  --bs-btn-hover-color: #1b4d3e;
-}
-
-.btn-light {
-  --bs-btn-bg: #a3e4d7;
-  --bs-btn-border-color: #2e8b57;
-  --bs-btn-color: #1b4d3e;
-  --bs-btn-hover-bg: #40e0d0;
-  --bs-btn-hover-border-color: #2e8b57;
-  --bs-btn-hover-color: #1b4d3e;
-}
-
-.card,
-.list-group-item {
-  --bs-card-bg: #a3e4d7;
-  background-color: #a3e4d7;
-  color: #1b4d3e;
-}
-
-.card-header {
-  background-color: #2e8b57;
+.btn-secondary:hover {
+  background-color: var(--mq-purple);
   color: #ffffff;
 }
 
-.form-control,
-.form-select {
-  border-color: #2e8b57;
-  background-color: #a3e4d7;
-  color: #1b4d3e;
+/* Inputs de formularios */
+.form-control {
+  width: 100%;
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  background-color: #ffffff;
+  transition: border-color 0.3s ease;
+  min-height: 44px;
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: #40e0d0;
-  box-shadow: 0 0 0 0.25rem rgba(64, 224, 208, 0.25);
+.form-control:focus {
+  outline: none;
+  border-color: var(--mq-purple);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
 }
 
-.spinner-border {
-  --bs-spinner-width: 2rem;
-  --bs-spinner-height: 2rem;
-  color: #2e8b57 !important;
+/* =========================================
+   ESTADOS GLOBALES (TAREA 4.5)
+   Un solo look de cargando / error / vacío para todas las pantallas.
+========================================= */
+.mq-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  border-radius: var(--mq-radius);
+  text-align: center;
 }
 
-.text-success,
-.text-danger,
-.text-warning,
-.text-info {
-  color: var(--munaq-deep) !important;
+.mq-estado--cargando {
+  color: var(--mq-text-muted);
 }
 
-.bg-success,
-.text-bg-success,
-.text-bg-secondary,
-.badge.text-bg-light {
-  background-color: var(--munaq-foam) !important;
-  color: var(--munaq-deep) !important;
+.mq-estado--error {
+  background-color: #fde2e1;
+  color: #a52a26;
+  border: 1px solid #f5b7b4;
 }
 
-.alert-danger,
-.alert-warning,
-.alert-info,
-.alert-success {
-  border-color: var(--munaq-sea);
-  background-color: var(--munaq-foam);
-  color: var(--munaq-deep);
+.mq-estado--vacio {
+  background-color: var(--mq-pink-light);
+  color: var(--mq-text-muted);
+  border: 1px dashed var(--mq-purple);
 }
 
-.border,
-.border-top {
-  border-color: #2e8b57 !important;
+/* Foco visible en toda la app (RNF accesibilidad) */
+:focus-visible {
+  outline: 3px solid var(--mq-purple-dark);
+  outline-offset: 2px;
 }
 
-.btn:not(:disabled):hover,
-.register-button:hover,
-.register-button-link:hover,
-.logout-button:hover,
-.btn-cerrar:hover,
-.btn-receta:hover {
-  border-color: #40e0d0 !important;
-  background-color: #40e0d0 !important;
-  color: #1b4d3e !important;
+/* Navbar / layout responsivo base (TAREA 4.4) */
+.navbar {
+  background-color: var(--mq-white);
+  border-bottom: 1px solid var(--mq-border);
 }
 
-img,
-svg,
-video {
-  max-width: 100%;
-}
-
-@media (max-width: 1023.98px) {
-  .tabla {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
-  button,
-  input,
-  select,
-  textarea {
-    max-width: 100%;
+  .navbar-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

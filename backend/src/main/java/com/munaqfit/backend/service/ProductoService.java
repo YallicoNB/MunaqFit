@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.dto.ProductoRequestDTO;
 import com.munaqfit.backend.model.Categoria;
 import com.munaqfit.backend.model.Producto;
@@ -9,9 +11,11 @@ import com.munaqfit.backend.repository.CategoriaRepository;
 import com.munaqfit.backend.repository.ProductoProveedorRepository;
 import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.repository.ProveedorRepository;
+import com.munaqfit.backend.util.Sanitizacion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class ProductoService {
 
@@ -34,7 +38,7 @@ public class ProductoService {
     public Producto crearProducto(ProductoRequestDTO request) {
         Producto producto = new Producto();
         
-        producto.setNombre(request.getNombre());
+        producto.setNombre(Sanitizacion.texto(request.getNombre()));
         producto.setStockActual(request.getStockActual());
         producto.setStockMinimo(request.getStockMinimo());
         producto.setStockCritico(request.getStockCritico());
@@ -71,6 +75,7 @@ public class ProductoService {
             }
         }
 
+        log.info("Producto creado: id={} nombre={}", productoGuardado.getId(), productoGuardado.getNombre());
         return productoGuardado;
     }
 
@@ -79,7 +84,7 @@ public class ProductoService {
         Producto producto = productoRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
             
-        producto.setNombre(request.getNombre());
+        producto.setNombre(Sanitizacion.texto(request.getNombre()));
         producto.setStockActual(request.getStockActual());
         producto.setStockMinimo(request.getStockMinimo());
         producto.setStockCritico(request.getStockCritico());
@@ -118,6 +123,7 @@ public class ProductoService {
             }
         }
 
+        log.info("Producto actualizado: id={} nombre={}", productoActualizado.getId(), productoActualizado.getNombre());
         return productoActualizado;
     }
 
@@ -128,5 +134,6 @@ public class ProductoService {
             
         productoProveedorRepository.deleteAll(producto.getProductoProveedores());
         productoRepository.deleteById(id);
+        log.info("Producto eliminado: id={}", id);
     }
 }

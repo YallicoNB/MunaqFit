@@ -1,5 +1,10 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.Valid;
+
 import com.munaqfit.backend.dto.PagoRequest;
 import com.munaqfit.backend.dto.PagoResponseDTO;
 import com.munaqfit.backend.dto.VentaRequest;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/empleado/ventas")
 // Si se configura CORS globalmente no se necesita esto, pero ayuda para pruebas locales con el frontend
 @CrossOrigin(origins = "*")
+@Tag(name = "Ventas y pagos (empleado)")
 public class EmpleadoVentaController {
 
     @Autowired
@@ -31,8 +37,9 @@ public class EmpleadoVentaController {
     private UsuarioRepository usuarioRepository;
 
     // Tomar un nuevo pedido
+    @Operation(summary = "Registra una venta con sus detalles")
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarVenta(@RequestBody VentaRequest request, Authentication authentication) {
+    public ResponseEntity<?> registrarVenta(@Valid @RequestBody VentaRequest request, Authentication authentication) {
         try {
             // La venta siempre la registra el empleado que viene en el token
             Usuario empleado = usuarioRepository.findByDni(authentication.getName())
@@ -59,8 +66,9 @@ public class EmpleadoVentaController {
     }
 
     // Se registra el pago, se guarda en la base de datos y la venta pasa a PAGADO
+    @Operation(summary = "Registra el pago de una venta")
     @PostMapping("/pago")
-    public ResponseEntity<?> procesarPago(@RequestBody PagoRequest request) {
+    public ResponseEntity<?> procesarPago(@Valid @RequestBody PagoRequest request) {
         try {
             PagoResponseDTO resultado = pagoService.registrarPago(request);
             return ResponseEntity.ok(resultado);
@@ -73,6 +81,7 @@ public class EmpleadoVentaController {
     }
 
     // Solo calcula el vuelto, sin registrar nada (util para el simulacro en el frontend)
+    @Operation(summary = "Calcula el vuelto sin registrar el pago")
     @PostMapping("/vuelto")
     public ResponseEntity<?> calcularVuelto(@RequestBody java.util.Map<String, java.math.BigDecimal> request) {
         try {

@@ -10,8 +10,8 @@
     <span><b>ML</b> = mililitros almacenados.</span>
   </aside>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-  <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
+  <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+  <p *ngIf="mensaje" class="exito" role="status">{{ mensaje }}</p>
 
   <div class="alertas" *ngIf="criticos.length || bajos.length">
     <div class="alerta critica" *ngIf="criticos.length">
@@ -23,63 +23,69 @@
     </div>
   </div>
 
-  <p *ngIf="cargando" class="cargando">Cargando inventario...</p>
-
-  <label class="buscador" *ngIf="!cargando">
-    Buscar insumo
+  <div class="buscador">
+    <label for="busqueda-inventario">Buscar insumo</label>
     <input
+      id="busqueda-inventario"
       type="search"
       [(ngModel)]="busqueda"
+      (keyup.enter)="buscar()"
       placeholder="Escribe el nombre del insumo"
       aria-label="Buscar insumo por nombre"
     />
-  </label>
-
-  <table class="tabla" *ngIf="!cargando && productosFiltrados.length">
-    <thead>
-      <tr>
-        <th>Insumo</th>
-        <th>Stock</th>
-        <th>Minimo</th>
-        <th>Punto crítico (≤)</th>
-        <th>Estado</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of productosFiltrados">
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.stockActual | number: '1.0-2' }}{{ abreviarUnidad(p.unidadMedida) }}</td>
-        <td>{{ p.stockMinimo | number: '1.2-2' }}</td>
-        <td>{{ p.stockCritico | number: '1.0-0' }}</td>
-        <td><span [ngClass]="'nivel ' + nivel(p)">{{ nivel(p) }}</span></td>
-        <td>
-          <button class="btn" (click)="abrirFormulario(p)">Reabastecer</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p *ngIf="!cargando && !productos.length" class="vacio">No hay insumos en el inventario.</p>
-  <p *ngIf="!cargando && productos.length && !productosFiltrados.length" class="vacio">
-    No se encontraron insumos con ese nombre.
-  </p>
-
-  <div class="formulario" *ngIf="mostrarFormulario">
-    <h2>Reabastecer insumo</h2>
-    <label>
-      Cantidad
-      <input type="number" [(ngModel)]="cantidad" min="0" step="0.01" />
-    </label>
-    <label>
-      Motivo
-      <input type="text" [(ngModel)]="motivo" />
-    </label>
-    <div class="acciones">
-      <button class="btn" (click)="reabastecer()" [disabled]="guardando">
-        {{ guardando ? 'Guardando...' : 'Confirmar' }}
-      </button>
-      <button class="btn secundario" (click)="mostrarFormulario = false">Cancelar</button>
-    </div>
+    <app-boton tamano="sm" (accion)="buscar()">Buscar</app-boton>
   </div>
+
+  <app-tabla
+    [columnas]="columnas"
+    [filas]="productos"
+    [cargando]="cargando"
+    [error]="error"
+    [tituloVacio]="'Sin insumos'"
+    [mensajeVacio]="'No hay insumos en el inventario con los filtros actuales.'"
+    [mostrarAcciones]="true"
+    [textoAccion]="'Reabastecer'"
+    (accion)="abrirFormulario($event)"
+    ariaLabel="Inventario de insumos"
+  >
+  </app-tabla>
+
+  <nav class="paginacion" *ngIf="totalPaginas > 1" aria-label="Paginación de inventario">
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual === 0" (accion)="irPagina(paginaActual - 1)">
+      Anterior
+    </app-boton>
+    <span>Página {{ paginaActual + 1 }} de {{ totalPaginas }}</span>
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual + 1 >= totalPaginas" (accion)="irPagina(paginaActual + 1)">
+      Siguiente
+    </app-boton>
+  </nav>
+
+  <app-modal [abierto]="mostrarFormulario" titulo="Reabastecer insumo" (cerrar)="mostrarFormulario = false">
+    <form [formGroup]="formReabastecer" (ngSubmit)="reabastecer()">
+      <app-input
+        label="Cantidad"
+        tipo="number"
+        formControlName="cantidad"
+        [min]="0.01"
+        step="0.01"
+        [sufijo]="productoSeleccionado?.unidadMedida || ''"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Motivo"
+        tipo="text"
+        formControlName="motivo"
+        placeholder="Motivo del reabastecimiento"
+        [requerido]="true"
+      ></app-input>
+
+      <div acciones>
+        <app-boton type="submit" [cargando]="guardando">
+          {{ guardando ? 'Guardando...' : 'Confirmar' }}
+        </app-boton>
+        <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
+      </div>
+    </form>
+  </app-modal>
 </div>

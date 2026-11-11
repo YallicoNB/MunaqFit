@@ -1,5 +1,7 @@
 package com.munaqfit.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Credenciales de inicio de sesion (DNI y contrasena).")
 public class LoginRequest {
 
     @NotBlank(message = "El DNI es obligatorio")

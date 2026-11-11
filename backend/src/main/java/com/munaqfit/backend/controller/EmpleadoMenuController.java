@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.munaqfit.backend.model.Bebida;
 import com.munaqfit.backend.model.Receta;
 import com.munaqfit.backend.repository.BebidaRepository;
@@ -13,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/empleado/menu")
 @CrossOrigin(origins = "*") 
+@Tag(name = "Menu (empleado)")
 public class EmpleadoMenuController {
 
     @Autowired
@@ -22,9 +26,10 @@ public class EmpleadoMenuController {
     private RecetaRepository recetaRepository;
 
     // 1. Ver catálogo de bebidas
+    @Operation(summary = "Lista el menu de bebidas activas")
     @GetMapping("/bebidas")
     public ResponseEntity<List<Bebida>> obtenerMenuBebidas() {
-        List<Bebida> bebidas = (List<Bebida>) bebidaRepository.findAll();
+        List<Bebida> bebidas = bebidaRepository.findByActivoTrue();
         if (bebidas.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -32,6 +37,7 @@ public class EmpleadoMenuController {
     }
 
     // 2. Consultar recetas de una bebida específica (para preparación)
+    @Operation(summary = "Consulta la receta de una bebida")
     @GetMapping("/receta/{bebidaId}")
     public ResponseEntity<?> consultarRecetaPorBebida(@PathVariable Long bebidaId) {
         // Ojo: se busca por bebidaId y no por id, porque una bebida tiene

@@ -1,0 +1,33 @@
+<div class="mq-field">
+  <label *ngIf="label" class="mq-field__label" [for]="id">
+    {{ label }}
+    <span *ngIf="requerido" class="mq-field__req" aria-hidden="true">*</span>
+  </label>
+
+  <div class="mq-field__control">
+    <input
+      class="form-control mq-field__input"
+      [id]="id"
+      [type]="tipo"
+      [value]="valor"
+      [placeholder]="placeholder"
+      [attr.autocomplete]="autocomplete"
+      [attr.aria-invalid]="mostrarError() ? 'true' : null"
+      [attr.aria-describedby]="descritoPor"
+      [attr.aria-required]="requerido ? 'true' : null"
+      [attr.min]="min"
+      [attr.max]="max"
+      [attr.step]="step"
+      [disabled]="deshabilitado"
+      [class.is-invalid]="!!mostrarError()"
+      (input)="alCambiar($event)"
+      (blur)="alSalir()"
+    />
+    <span *ngIf="sufijo" class="mq-field__sufijo" aria-hidden="true">{{ sufijo }}</span>
+  </div>
+
+  <small *ngIf="ayuda && !mostrarError()" class="mq-field__ayuda" [id]="idAyuda">{{ ayuda }}</small>
+  <small *ngIf="mostrarError()" class="mq-field__error" [id]="idError" role="alert">
+    {{ mostrarError() }}
+  </small>
+</div>

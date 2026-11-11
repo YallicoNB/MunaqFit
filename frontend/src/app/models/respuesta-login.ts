@@ -1,10 +1,11 @@
 export interface RespuestaLogin {
   token: string;
-  tokenType: string;
-  id: number;
+  refreshToken: string;
+  tipo: string;
+  idUsuario: number;
   dni: string;
   nombreCompleto: string;
   email: string;
   rol: string;
-  expirationMs: number;
+  expiraEn: number;
 }

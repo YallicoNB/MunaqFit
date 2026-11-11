@@ -18,6 +18,10 @@ public class JwtConfig {
     @Value("${app.jwt.expiration-ms}")
     private long expirationMs;
 
+    /** Vida del refresh token (7 dias por defecto). */
+    @Value("${app.jwt.refresh-expiration-ms:604800000}")
+    private long refreshExpirationMs;
+
     @Bean
     public SecretKey jwtSecretKey() {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
@@ -29,5 +33,9 @@ public class JwtConfig {
 
     public long getExpirationMs() {
         return expirationMs;
+    }
+
+    public long getRefreshExpirationMs() {
+        return refreshExpirationMs;
     }
 }

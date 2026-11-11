@@ -27,7 +27,7 @@ export class Ordenes implements OnInit {
     this.cargando = true;
     this.ventaService.historial().subscribe({
       next: (ordenes) => {
-        this.ordenes = ordenes;
+        this.ordenes = ordenes ?? [];
         this.cargando = false;
       },
       error: () => {

@@ -1,0 +1,12 @@
+<div class="mq-vacio" role="status">
+  <span class="mq-vacio__icono" aria-hidden="true">{{ icono }}</span>
+  <h3 class="mq-vacio__titulo">{{ titulo }}</h3>
+  <p class="mq-vacio__mensaje">{{ mensaje }}</p>
+  <app-boton
+    *ngIf="accionTexto"
+    tipo="secondary"
+    tamano="sm"
+    (accion)="accion.emit()"
+  >{{ accionTexto }}</app-boton>
+  <ng-content></ng-content>
+</div>

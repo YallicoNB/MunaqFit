@@ -1,222 +1,278 @@
+/* =========================================
+   MUNAQFIT - INVENTARIO PASTEL (TAREA 4.3)
+========================================= */
+
 .inventario {
-  font-family: Arial, sans-serif;
-  color: #1b4d3e;
   padding: 24px;
+  background-color: var(--mq-bg);
+  min-height: calc(100vh - 68px);
 }
 
 .titulo {
-  margin: 0 0 20px;
-  font-size: 26px;
-  color: #1b4d3e;
+  color: var(--mq-text-main);
+  font-weight: 800;
+  font-size: 1.75rem;
+  margin-bottom: 24px;
 }
 
+/* --- GUÍA DE UNIDADES --- */
 .guia-unidades {
+  background-color: var(--mq-pink-frame);
+  border: 1px solid var(--mq-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-bottom: 18px;
-  padding: 12px 16px;
-  border: 1px solid #2e8b57;
-  border-radius: 10px;
-  background: #a3e4d7;
-  color: #1b4d3e;
-  font-size: 13px;
+  gap: 16px;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--mq-text-main);
 }
 
-.guia-unidades strong,
-.guia-unidades b {
-  color: #1b4d3e;
+.guia-unidades strong {
+  color: var(--mq-purple-dark);
+  font-weight: 800;
+}
+
+/* --- ESTADOS GLOBALES Y ALERTAS --- */
+.error {
+  background-color: #fff0f4;
+  border: 1px solid #ffb3c6;
+  border-left: 4px solid #ff4f8a;
+  color: #d62852;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.exito {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #22c55e;
+  color: #166534;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.cargando, .vacio {
+  text-align: center;
+  padding: 2rem;
+  color: var(--mq-text-muted);
+  font-weight: 700;
+  background: var(--mq-white);
+  border-radius: var(--mq-radius);
+  border: 2px dashed var(--mq-border);
+  margin-bottom: 24px;
 }
 
 .alertas {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .alerta {
-  padding: 11px 14px;
+  padding: 12px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .alerta.critica {
-  background: #a3e4d7;
-  color: #1b4d3e;
+  background-color: #fff0f4;
+  color: #d62852;
+  border: 1px solid #ffb3c6;
 }
 
 .alerta.baja {
-  background: #40e0d0;
-  color: #1b4d3e;
+  background-color: #fff8e6;
+  color: #d97706;
+  border: 1px solid #fde68a;
 }
 
+/* --- BUSCADOR --- */
 .buscador {
-  display: block;
-  max-width: 420px;
-  margin-bottom: 14px;
-  color: #1b4d3e;
-  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--mq-text-main);
+  margin-bottom: 24px;
+  max-width: 400px;
 }
 
 .buscador input {
-  display: block;
-  width: 100%;
-  padding: 9px 11px;
-  margin-top: 5px;
-  border: 1px solid #2e8b57;
-  border-radius: 8px;
-  font-size: 14px;
-  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  background-color: var(--mq-white);
+  transition: all 0.3s ease;
+  font-family: inherit;
+  min-height: 44px;
 }
 
+.buscador input:focus {
+  outline: none;
+  border-color: var(--mq-purple);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
+}
+
+/* --- TABLA DE INVENTARIO --- */
 .tabla {
   width: 100%;
   border-collapse: collapse;
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
   overflow: hidden;
-  font-size: 14px;
-}
-
-.tabla th,
-.tabla td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid #40e0d0;
+  box-shadow: var(--mq-shadow);
+  margin-bottom: 24px;
 }
 
 .tabla th {
-  background: #2e8b57;
-  color: #ffffff;
-  font-size: 12px;
-  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--mq-white);
+  background-color: var(--mq-purple); /* Cabecera morada para destacar */
+  padding: 14px 16px;
+  text-align: left;
 }
 
+.tabla td {
+  padding: 14px 16px;
+  color: var(--mq-text-main);
+  font-weight: 600;
+  border-bottom: 1px solid var(--mq-border);
+  vertical-align: middle;
+}
+
+.tabla tbody tr:hover td {
+  background-color: var(--mq-pink-light);
+}
+
+/* --- ETIQUETAS DE ESTADO (.nivel) --- */
 .nivel {
-  padding: 3px 9px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.nivel.normal {
-  background: #a3e4d7;
-  color: #1b4d3e;
-}
-
-.nivel.bajo {
-  background: #40e0d0;
-  color: #1b4d3e;
-}
-
-.nivel.critico {
-  background: #2e8b57;
-  color: #ffffff;
-}
-
-.btn {
   padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #1b4d3e;
-  color: #ffffff;
-  font-size: 12px;
-  cursor: pointer;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
+  letter-spacing: 0.5px;
 }
 
-.btn.secundario {
-  background: #2e8b57;
+/* Ajusta los nombres de las clases según lo que retorne el backend/TS */
+.nivel.Normal {
+  background-color: #d1fae5;
+  color: #059669;
+}
+.nivel.Bajo {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+.nivel.Critico {
+  background-color: #ffe4e6;
+  color: #e11d48;
 }
 
+/* --- FORMULARIO REABASTECIMIENTO --- */
 .formulario {
-  margin-top: 20px;
-  background: #a3e4d7;
-  border: 1px solid #2e8b57;
-  border-radius: 12px;
-  padding: 20px;
-  max-width: 420px;
+  background-color: var(--mq-white);
+  border-radius: var(--mq-radius);
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(166, 140, 242, 0.2); /* Sombra más fuerte para que flote */
+  border: 1px solid var(--mq-border);
+  max-width: 400px;
+  margin-top: 24px;
 }
 
 .formulario h2 {
-  margin: 0 0 14px;
-  font-size: 16px;
-  color: #1b4d3e;
+  margin-top: 0;
+  color: var(--mq-purple-dark);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--mq-pink-light);
+  padding-bottom: 8px;
 }
 
 .formulario label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: #1b4d3e;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--mq-text-main);
+  margin-bottom: 16px;
 }
 
 .formulario input {
-  width: 100%;
-  padding: 9px 11px;
-  margin-top: 5px;
-  border: 1px solid #2e8b57;
-  border-radius: 8px;
-  font-size: 14px;
-  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 2px solid var(--mq-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--mq-text-main);
+  min-height: 44px;
+}
+
+.formulario input:focus {
+  outline: none;
+  border-color: var(--mq-purple);
+  box-shadow: 0 0 0 3px rgba(166, 140, 242, 0.2);
 }
 
 .acciones {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-.cargando,
-.vacio {
-  color: #2e8b57;
-  font-size: 14px;
+.btn {
+  background-color: var(--mq-purple);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 0 20px;
+  font-weight: 700;
+  min-height: 44px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
 }
 
-.error {
-  background: #a3e4d7;
-  color: #1b4d3e;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+.btn:hover:not(:disabled) {
+  background-color: var(--mq-purple-dark);
 }
 
-.exito {
-  background: #40e0d0;
-  color: #1b4d3e;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+.btn.secundario {
+  background-color: var(--mq-bg);
+  color: var(--mq-text-muted);
+  border: 1px solid var(--mq-border);
 }
 
-@media (max-width: 767.98px) {
-  .inventario {
-    padding: 20px 16px;
+.btn.secundario:hover {
+  background-color: var(--mq-pink-light);
+  color: var(--mq-purple);
+  border-color: var(--mq-purple);
+}
+
+/* =========================================
+   RESPONSIVO MÓVIL (TAREA 4.4)
+========================================= */
+@media (max-width: 768px) {
+  .tabla {
+    display: block;
+    overflow-x: auto; /* Scroll horizontal si no cabe en pantalla */
+    white-space: nowrap;
   }
-
-  .guia-unidades {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .formulario {
-    max-width: none;
-    padding: 16px;
-  }
-
   .acciones {
     flex-direction: column;
-  }
-
-  .acciones .btn {
-    width: 100%;
-    padding: 10px 12px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023.98px) {
-  .inventario {
-    padding: 24px 20px;
   }
 }

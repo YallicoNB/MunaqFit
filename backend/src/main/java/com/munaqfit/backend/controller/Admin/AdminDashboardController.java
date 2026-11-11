@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller.Admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.munaqfit.backend.dto.DashboardMetricsDTO;
 import com.munaqfit.backend.model.Venta.EstadoVenta;
 import com.munaqfit.backend.repository.ClienteFidelidadRepository;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/admin/dashboard")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin - Dashboard")
 public class AdminDashboardController {
 
     @Autowired
@@ -30,6 +34,7 @@ public class AdminDashboardController {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @Operation(summary = "Metricas del dashboard: ventas de hoy, clientes, productos y alertas")
     @GetMapping("/metricas")
     public ResponseEntity<DashboardMetricsDTO> obtenerMetricas() {
         // Calcular inicio y fin del dia actual

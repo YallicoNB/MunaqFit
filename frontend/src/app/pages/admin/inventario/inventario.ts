@@ -1,20 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminService } from '../../../service/admin.service';
-import { ProductoInventario } from '../../../models/admin';
+import { ProductoInventario, PageResponse } from '../../../models/admin';
+import { Tabla, ColumnaTabla } from '../../../shared/tabla/tabla';
+import { Boton } from '../../../shared/boton/boton';
+import { Modal } from '../../../shared/modal/modal';
+import { CampoInput } from '../../../shared/input/input';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, DecimalPipe, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, Tabla, Boton, Modal, CampoInput],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
 export class Inventario implements OnInit {
-  productos: ProductoInventario[] = [];
+  pagina: PageResponse<ProductoInventario> | null = null;
   criticos: ProductoInventario[] = [];
   bajos: ProductoInventario[] = [];
   busqueda = '';
+  paginaActual = 0;
+  tamano = 20;
   cargando = true;
   error = '';
   mensaje = '';
@@ -22,19 +28,38 @@ export class Inventario implements OnInit {
   // Formulario de reabastecimiento
   mostrarFormulario = false;
   productoId = 0;
-  cantidad = 0;
-  motivo = '';
+  productoSeleccionado: ProductoInventario | null = null;
   guardando = false;
+  formReabastecer: FormGroup;
 
-  constructor(private adminService: AdminService) {}
+  columnas: ColumnaTabla[] = [
+    { clave: 'nombre', titulo: 'Insumo' },
+    { clave: 'categoria', titulo: 'Categoría' },
+    { clave: 'stockActual', titulo: 'Stock', alineacion: 'centro' },
+    { clave: 'stockMinimo', titulo: 'Mín.', alineacion: 'centro' },
+    { clave: 'stockCritico', titulo: 'Crítico', alineacion: 'centro' },
+    { clave: 'unidadMedida', titulo: 'Unidad', alineacion: 'centro' },
+    { clave: 'costoUnitario', titulo: 'Costo', alineacion: 'derecha' },
+    { clave: 'ultimaReposicion', titulo: 'Últ. reposición' },
+  ];
+
+  constructor(private fb: FormBuilder, private adminService: AdminService) {
+    this.formReabastecer = this.fb.group({
+      cantidad: [0, [Validators.required, Validators.min(0.01)]],
+      motivo: ['', [Validators.required, Validators.minLength(3)]],
+    });
+  }
+
+  get productos(): ProductoInventario[] {
+    return this.pagina?.contenido ?? [];
+  }
+
+  get totalPaginas(): number {
+    return this.pagina?.totalPaginas ?? 0;
+  }
 
   get productosFiltrados(): ProductoInventario[] {
-    const termino = this.busqueda.trim().toLocaleLowerCase();
-    if (!termino) return this.productos;
-
-    return this.productos.filter((producto) =>
-      producto.nombre.toLocaleLowerCase().includes(termino),
-    );
+    return this.productos;
   }
 
   abreviarUnidad(unidad: string): string {
@@ -47,10 +72,11 @@ export class Inventario implements OnInit {
 
   cargar(): void {
     this.cargando = true;
+    this.error = '';
 
-    this.adminService.inventario().subscribe({
+    this.adminService.inventario(this.paginaActual, this.tamano, this.busqueda).subscribe({
       next: (p) => {
-        this.productos = p;
+        this.pagina = p;
         this.cargando = false;
       },
       error: () => {
@@ -63,10 +89,21 @@ export class Inventario implements OnInit {
     this.adminService.stockBajo().subscribe((p) => (this.bajos = p));
   }
 
+  buscar(): void {
+    this.paginaActual = 0;
+    this.cargar();
+  }
+
+  irPagina(p: number): void {
+    if (p < 0 || p >= this.totalPaginas) return;
+    this.paginaActual = p;
+    this.cargar();
+  }
+
   /** Nivel de stock de un producto: critico, bajo o normal. */
   nivel(p: ProductoInventario): 'critico' | 'bajo' | 'normal' {
-    if (p.stockActual <= p.stockCritico) return 'critico';
-    if (p.stockActual <= p.stockMinimo) return 'bajo';
+    if (p.estadoStock === 'CRITICO' || p.stockActual <= p.stockCritico) return 'critico';
+    if (p.estadoStock === 'BAJO' || p.stockActual <= p.stockMinimo) return 'bajo';
     return 'normal';
   }
 
@@ -76,16 +113,20 @@ export class Inventario implements OnInit {
   }
 
   abrirFormulario(producto: ProductoInventario): void {
+    this.productoSeleccionado = producto;
     this.productoId = producto.id;
-    this.cantidad = 0;
-    this.motivo = `Reabastecimiento de ${producto.nombre}`;
+    this.formReabastecer.reset({
+      cantidad: 0,
+      motivo: `Reabastecimiento de ${producto.nombre}`,
+    });
     this.mostrarFormulario = true;
     this.mensaje = '';
+    this.error = '';
   }
 
   reabastecer(): void {
-    if (this.cantidad <= 0) {
-      this.error = 'La cantidad debe ser mayor a cero';
+    if (this.formReabastecer.invalid) {
+      this.formReabastecer.markAllAsTouched();
       return;
     }
 
@@ -93,8 +134,10 @@ export class Inventario implements OnInit {
     this.error = '';
     this.mensaje = '';
 
+    const { cantidad, motivo } = this.formReabastecer.value;
+
     this.adminService
-      .reabastecer({ productoId: this.productoId, cantidad: this.cantidad, motivo: this.motivo })
+      .reabastecer({ productoId: this.productoId, cantidad, motivo })
       .subscribe({
         next: (respuesta) => {
           this.mensaje = respuesta || 'Stock actualizado';

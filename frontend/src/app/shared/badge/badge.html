@@ -1,0 +1,5 @@
+<span class="mq-badge" [ngClass]="'mq-badge--' + tono">
+  <span *ngIf="punto" class="mq-badge__punto" aria-hidden="true"></span>
+  <span *ngIf="texto; else proyectado">{{ texto }}</span>
+  <ng-template #proyectado><ng-content></ng-content></ng-template>
+</span>

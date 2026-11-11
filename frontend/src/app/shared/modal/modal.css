@@ -1,0 +1,106 @@
+.mq-modal__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(74, 63, 105, 0.45);
+  backdrop-filter: blur(2px);
+  animation: mq-fade-in 0.15s ease;
+}
+
+.mq-modal__dialogo {
+  width: min(100%, 640px);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mq-white, #ffffff);
+  border-radius: var(--mq-radius, 16px);
+  box-shadow: 0 24px 60px rgba(74, 63, 105, 0.25);
+  overflow: hidden;
+}
+
+.mq-modal__dialogo--sm {
+  width: min(100%, 420px);
+}
+
+.mq-modal__dialogo--lg {
+  width: min(100%, 960px);
+}
+
+.mq-modal__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--mq-border, #f0e1f7);
+}
+
+.mq-modal__titulo {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--mq-text-main, #4a3f69);
+}
+
+.mq-modal__cerrar {
+  margin-left: auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--mq-pink-light, #fbe6ff);
+  color: var(--mq-purple-dark, #8c6fe6);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mq-modal__cerrar:focus-visible {
+  outline: 3px solid var(--mq-purple, #a68cf2);
+  outline-offset: 2px;
+}
+
+.mq-modal__cuerpo {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.mq-modal__pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--mq-border, #f0e1f7);
+}
+
+.mq-modal__pie:empty {
+  display: none;
+}
+
+@keyframes mq-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .mq-modal__fondo {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .mq-modal__dialogo {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+  }
+}

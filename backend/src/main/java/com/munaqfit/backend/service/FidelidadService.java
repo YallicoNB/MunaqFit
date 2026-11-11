@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.model.ClienteFidelidad;
 import com.munaqfit.backend.model.VisitaCliente;
 import com.munaqfit.backend.repository.ClienteFidelidadRepository;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class FidelidadService {
 
@@ -40,6 +43,7 @@ public class FidelidadService {
             historialVisita.setClienteFidelidad(cliente);
             historialVisita.setFechaVisita(LocalDateTime.now());
             visitaClienteRepository.save(historialVisita);
+            log.info("Visita registrada: cliente={} total={}", clienteId, nuevasVisitas);
             
             if (nuevasVisitas >= cliente.getUmbralPremio()) {
                 cliente.setVisitas(0); // Se le da el premio y reiniciamos el contador

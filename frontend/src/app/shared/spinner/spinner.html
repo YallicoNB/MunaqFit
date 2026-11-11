@@ -1,0 +1,11 @@
+<span
+  class="mq-spinner"
+  [class.mq-spinner--sm]="tamano === 'sm'"
+  [class.mq-spinner--lg]="tamano === 'lg'"
+  [class.mq-spinner--centrado]="centrado"
+  role="status"
+  [attr.aria-label]="etiqueta"
+>
+  <span class="mq-spinner__aro" aria-hidden="true"></span>
+  <span class="visually-hidden">{{ etiqueta }}</span>
+</span>

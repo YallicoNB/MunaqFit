@@ -1,0 +1,43 @@
+.mq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.mq-badge__punto {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.mq-badge--success {
+  background-color: #d9f5e4;
+  color: #1d6b3c;
+}
+
+.mq-badge--danger {
+  background-color: #fde2e1;
+  color: #a52a26;
+}
+
+.mq-badge--warning {
+  background-color: #fff1cc;
+  color: #7a5600;
+}
+
+.mq-badge--info {
+  background-color: #e3e9ff;
+  color: #2f4b9b;
+}
+
+.mq-badge--neutral {
+  background-color: var(--mq-pink-light, #fbe6ff);
+  color: var(--mq-purple-dark, #8c6fe6);
+}

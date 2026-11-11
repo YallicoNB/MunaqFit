@@ -1,5 +1,7 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.dto.PagoRequest;
 import com.munaqfit.backend.dto.PagoResponseDTO;
 import com.munaqfit.backend.model.Pago;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class PagoService {
 
@@ -101,6 +104,8 @@ public class PagoService {
         // La venta queda pagada
         venta.setEstado(Venta.EstadoVenta.PAGADO);
         ventaRepository.save(venta);
+        log.info("Pago registrado: venta={} tipo={} monto={} vuelto={}",
+                venta.getNumeroPedido(), tipoPago, request.getMontoPagado(), cambio);
 
         PagoResponseDTO response = new PagoResponseDTO();
         response.setPagoId(guardado.getId());

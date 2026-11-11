@@ -1,3 +1,11 @@
+export interface PageResponse<T> {
+  contenido: T[];
+  pagina: number;
+  tamano: number;
+  totalElementos: number;
+  totalPaginas: number;
+}
+
 export type Rol = 'ADMIN' | 'EMPLEADO';
 
 export interface Usuario {
@@ -28,12 +36,22 @@ export interface CambiarRolRequest {
 export interface ProductoInventario {
   id: number;
   nombre: string;
+  categoria?: string | null;
+  categoriaId?: number | null;
   stockActual: number;
   stockMinimo: number;
   stockCritico: number;
   unidadMedida: string;
   costoUnitario: number;
   fechaCaducidad: string | null;
+  ultimaReposicion?: string | null;
+  estadoStock?: 'CRITICO' | 'BAJO' | 'OK';
+  proveedores?: {
+    id: number;
+    nombre: string;
+    precioUnitario: number | null;
+    principal: boolean;
+  }[];
 }
 
 export interface ReabastecerRequest {

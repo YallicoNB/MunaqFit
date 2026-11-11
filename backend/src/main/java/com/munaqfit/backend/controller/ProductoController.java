@@ -6,9 +6,13 @@ import com.munaqfit.backend.model.Producto;
 import com.munaqfit.backend.model.ProductoProveedor;
 import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.service.ProductoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +28,8 @@ import java.util.List;
 
 /**
  * Rutas de productos (insumos) para el frontend.
- * Requieren token JWT valido.
+ * Requieren token JWT valido y rol ADMIN: un empleado no debe crear ni
+ * borrar insumos, aunque si puede consultar el menu y las recetas.
  *
  * Devuelven ProductoResponseDTO, no la entidad: desde la N-N un insumo
  * puede tener varios proveedores y el JSON no debe arrastrar relaciones
@@ -32,6 +37,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/productos")
+@PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Productos (insumos)", description = "CRUD de insumos; solo ADMIN")
 public class ProductoController {
 
     private final ProductoRepository productoRepository;
@@ -42,28 +49,29 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-    /** Lista todos los productos. */
+    @Operation(summary = "Lista todos los insumos")
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> listar() {
         return ResponseEntity.ok(
                 productoRepository.findAll().stream().map(this::aResponse).toList());
     }
 
-    /** Lista los productos de una categoria. */
+    @Operation(summary = "Lista los insumos de una categoria")
     @GetMapping("/categoria/{categoriaId}")
     public ResponseEntity<List<ProductoResponseDTO>> listarPorCategoria(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(
                 productoRepository.findByCategoriaId(categoriaId).stream().map(this::aResponse).toList());
     }
 
-    /** Busca productos por nombre (coincidencia parcial). */
+    @Operation(summary = "Busca insumos por nombre (coincidencia parcial)")
     @GetMapping("/buscar")
     public ResponseEntity<List<ProductoResponseDTO>> buscar(@RequestParam("nombre") String nombre) {
         return ResponseEntity.ok(
                 productoRepository.findByNombreContainingIgnoreCase(nombre).stream().map(this::aResponse).toList());
     }
 
-    /** Obtiene un producto por su id. */
+    @Operation(summary = "Obtiene un insumo por id")
+    @ApiResponse(responseCode = "404", description = "Insumo no encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable Long id) {
         return productoRepository.findById(id)
@@ -71,30 +79,33 @@ public class ProductoController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /* Parte nueva de POST, PUT, DELETE */
-    /** Crea un nuevo producto */
+    @Operation(summary = "Crea un insumo")
+    @ApiResponse(responseCode = "201", description = "Insumo creado")
+    @ApiResponse(responseCode = "400", description = "Datos invalidos")
     @PostMapping
-    public ResponseEntity crearProducto(@Valid @RequestBody ProductoRequestDTO request) {
-        // Delegamos la lógica compleja al Service
-        Producto p = productoService.crearProducto(request); 
+    public ResponseEntity<ProductoResponseDTO> crearProducto(@Valid @RequestBody ProductoRequestDTO request) {
+        Producto p = productoService.crearProducto(request);
         return new ResponseEntity<>(aResponse(p), HttpStatus.CREATED);
     }
 
-    /** Actualiza un producto existente */
+    @Operation(summary = "Actualiza un insumo existente")
+    @ApiResponse(responseCode = "200", description = "Insumo actualizado")
+    @ApiResponse(responseCode = "404", description = "Insumo no encontrado")
     @PutMapping("/{id}")
-    public ResponseEntity actualizarProducto(@PathVariable Long id, @Valid @RequestBody ProductoRequestDTO request) {
+    public ResponseEntity<ProductoResponseDTO> actualizarProducto(@PathVariable Long id,
+                                                                  @Valid @RequestBody ProductoRequestDTO request) {
         Producto p = productoService.actualizarProducto(id, request);
         return ResponseEntity.ok(aResponse(p));
     }
 
-    /** Elimina un producto */
+    @Operation(summary = "Elimina un insumo")
+    @ApiResponse(responseCode = "204", description = "Insumo eliminado")
+    @ApiResponse(responseCode = "404", description = "Insumo no encontrado")
     @DeleteMapping("/{id}")
-    public ResponseEntity eliminarProducto(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
-
-    /* FIN DE PARTE DE POST, PUT, DELETE */
 
     /** Convierte la entidad al DTO que consume el frontend. */
     private ProductoResponseDTO aResponse(Producto p) {
@@ -110,10 +121,8 @@ public class ProductoController {
         List<ProductoResponseDTO.ProveedorInfo> proveedores = new ArrayList<>();
         for (ProductoProveedor pp : p.getProductoProveedores()) {
             proveedores.add(new ProductoResponseDTO.ProveedorInfo(
-                    pp.getProveedor().getId(),
-                    pp.getProveedor().getNombre(),
-                    pp.getPrecioUnitario(),
-                    Boolean.TRUE.equals(pp.getEsPrincipal())));
+                    pp.getProveedor().getId(), pp.getProveedor().getNombre(),
+                    pp.getPrecioUnitario(), Boolean.TRUE.equals(pp.getEsPrincipal())));
         }
         dto.setProveedores(proveedores);
 

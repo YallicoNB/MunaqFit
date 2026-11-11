@@ -1,5 +1,7 @@
 package com.munaqfit.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
  * y el estado en que quedo la venta.
  */
 @Data
+@Schema(description = "Resultado del pago: monto, vuelto y estados.")
 public class PagoResponseDTO {
 
     private Long pagoId;

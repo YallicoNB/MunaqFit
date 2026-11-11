@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, map, of } from 'rxjs';
 import { API_URL } from '../../core/api';
+import { RespuestaLogin } from '../../models/respuesta-login';
 import { Token } from './token';
 
 export interface RespuestaValidarToken {
@@ -24,7 +25,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private token: Token
-  ) {}
+  ) { }
 
   /**
    * Le pregunta al backend si el token guardado sigue siendo valido.
@@ -46,6 +47,23 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  recuperarPassword(correo: string) {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email: correo });
+  }
+
+  resetearPassword(token: string, nuevaPassword: string) {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword: nuevaPassword });
+  }
+
+  /**
+   * Canjea el refresh token (7 dias) por un access token nuevo. El backend
+   * tambien rota el refresh. Lo usa el interceptor cuando una peticion
+   * responde 401 por access token vencido.
+   */
+  refrescarToken(refreshToken: string) {
+    return this.http.post<RespuestaLogin>(`${this.apiUrl}/refresh`, { refreshToken });
   }
 
   cerrarSesion(): void {

@@ -14,7 +14,7 @@ export class CardHomeMenu {
   readonly imagenPredeterminada = '/assets/bebidas frias.jpg';
 
   get imagen(): string {
-    return this.bebida.imagenUrl?.trim() || this.imagenPredeterminada;
+    return this.bebida.imagenUrl?.trim() || '';
   }
 
   manejarErrorImagen(evento: Event): void {

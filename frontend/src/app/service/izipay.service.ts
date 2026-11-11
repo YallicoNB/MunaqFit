@@ -55,6 +55,23 @@ export class IzipayService {
    * data del callback: Code "00" = pago aprobado.
    */
   async abrirFormulario(token: TokenIzipay): Promise<ResultadoIzipay> {
+    // Modo simulacion local: el backend responde keyRSA "MOCK" y sin
+    // scriptUrl. Se simula la aprobacion para poder demostrar el flujo
+    // completo sin credenciales reales de Izipay.
+    if (token.keyRSA === 'MOCK' || !token.scriptUrl) {
+      return new Promise<ResultadoIzipay>((resolve) => {
+        setTimeout(
+          () =>
+            resolve({
+              Code: '00',
+              Message: 'Pago simulado aprobado (modo demostración)',
+              Transactionid: `MOCK-${Date.now()}`,
+            }),
+          1200,
+        );
+      });
+    }
+
     await this.cargarScript(token.scriptUrl);
 
     const iziConfig = {

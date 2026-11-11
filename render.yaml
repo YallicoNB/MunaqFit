@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: munaqfit-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_JWT_EXPIRATION_MS
+        value: "900000"
+      - key: APP_JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: APP_CORS_ALLOW_ALL
+        value: "false"
+      - key: APP_RATE_LIMIT_LOGIN_MAX
+        value: "10"
+      - key: APP_RATE_LIMIT_LOGIN_WINDOW
+        value: "60"
+      - key: SWAGGER_ENABLED
+        value: "false"
+      - key: SPRING_JPA_SHOW_SQL
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      # Demo publica sin credenciales sandbox: el flujo de tarjeta se simula.
+      # Cuando lleguen las credenciales reales, cambiar a "false" y agregar
+      # las variables IZIPAY_* desde el dashboard de Render.
+      - key: IZIPAY_MOCK
+        value: "true"

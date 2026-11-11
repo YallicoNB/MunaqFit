@@ -1,6 +1,9 @@
 package com.munaqfit.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.munaqfit.backend.model.DetalleVenta;
+import com.munaqfit.backend.model.Bebida;
 import com.munaqfit.backend.model.MovimientoInventario;
 import com.munaqfit.backend.model.Parametro;
 import com.munaqfit.backend.model.Producto;
@@ -11,6 +14,7 @@ import com.munaqfit.backend.repository.ParametroRepository;
 import com.munaqfit.backend.repository.ProductoRepository;
 import com.munaqfit.backend.repository.RecetaRepository;
 import com.munaqfit.backend.repository.VentaRepository;
+import com.munaqfit.backend.repository.BebidaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class VentaService {
 
@@ -39,6 +44,9 @@ public class VentaService {
 
     @Autowired
     private VentaRepository ventaRepository;
+
+    @Autowired
+    private BebidaRepository bebidaRepository;
 
     @Autowired
     private ParametroRepository parametroRepository;
@@ -85,10 +93,14 @@ public class VentaService {
                 throw new IllegalArgumentException("La cantidad de cada producto debe ser mayor a cero");
             }
 
-            // Si el frontend no manda el precio, se toma el del catalogo
-            BigDecimal precioUnitario = detalle.getPrecioUnitario() != null
-                    ? detalle.getPrecioUnitario()
-                    : detalle.getBebida().getPrecio();
+            // El precio SIEMPRE sale del catalogo: el frontend solo manda el
+            // id de la bebida. Asi un cliente no puede alterar el precio.
+            Bebida bebida = bebidaRepository.findById(detalle.getBebida().getId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Bebida no encontrada con id " + detalle.getBebida().getId()));
+            detalle.setBebida(bebida);
+
+            BigDecimal precioUnitario = bebida.getPrecio();
 
             detalle.setPrecioUnitario(precioUnitario);
             detalle.setSubtotal(precioUnitario.multiply(BigDecimal.valueOf(detalle.getCantidad())));
@@ -124,7 +136,10 @@ public class VentaService {
         // ---- 4. Descontar stock de los insumos y registrar en el kardex ----
         descontarInventario(guardada, detalles);
 
-        return ventaRepository.save(guardada);
+        Venta confirmada = ventaRepository.save(guardada);
+        log.info("Venta {} registrada por {} por S/ {}", confirmada.getNumeroPedido(),
+                confirmada.getUsuario().getDni(), confirmada.getTotal());
+        return confirmada;
     }
 
     /**

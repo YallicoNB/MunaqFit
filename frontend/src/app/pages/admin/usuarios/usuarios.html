@@ -1,12 +1,33 @@
 <div class="usuarios">
   <div class="cabecera">
     <h1 class="titulo">Usuarios</h1>
-    <button class="btn" (click)="abrirFormulario()">Nuevo empleado</button>
+    <app-boton (accion)="abrirFormulario()">Nuevo empleado</app-boton>
   </div>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-  <p *ngIf="mensaje" class="exito">{{ mensaje }}</p>
-  <p *ngIf="cargando" class="cargando">Cargando usuarios...</p>
+  <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+  <p *ngIf="mensaje" class="exito" role="status">{{ mensaje }}</p>
+
+  <div class="filtros" *ngIf="!cargando" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+    <input
+      type="text"
+      placeholder="Buscar por DNI o Nombre..."
+      [(ngModel)]="terminoBusqueda"
+      (keyup.enter)="aplicarFiltros()"
+      style="flex: 1; padding: 0.5rem;"
+    />
+    <select
+      [(ngModel)]="estadoFiltro"
+      (ngModelChange)="aplicarFiltros()"
+      style="padding: 0.5rem;"
+    >
+      <option value="">Todos los estados</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+    </select>
+    <app-boton tamano="sm" (accion)="aplicarFiltros()">Buscar</app-boton>
+  </div>
+
+  <app-spinner *ngIf="cargando" [centrado]="true" etiqueta="Cargando usuarios…"></app-spinner>
 
   <table class="tabla" *ngIf="!cargando && usuarios.length">
     <thead>
@@ -16,6 +37,7 @@
         <th>Email</th>
         <th>Rol</th>
         <th>Estado</th>
+        <th>Último Acceso</th>
         <th></th>
       </tr>
     </thead>
@@ -39,45 +61,82 @@
         <td>
           <span class="estado" [class.inactivo]="u.estado === 'INACTIVO'">{{ u.estado }}</span>
         </td>
+        <td class="fecha-login">
+          {{ u.ultimoLogin ? (u.ultimoLogin | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
+        </td>
         <td>
-          <button
-            class="btn peligro"
+          <app-boton
             *ngIf="u.estado === 'ACTIVO'"
-            (click)="desactivar(u)"
+            tamano="sm"
+            tipo="danger"
+            (accion)="desactivar(u)"
           >
             Inactivar
-          </button>
+          </app-boton>
         </td>
       </tr>
     </tbody>
   </table>
 
-  <p *ngIf="!cargando && !usuarios.length" class="vacio">No hay usuarios registrados.</p>
+  <app-estado-vacio
+    *ngIf="!cargando && !usuarios.length"
+    titulo="Sin usuarios"
+    mensaje="No hay usuarios que coincidan con la búsqueda."
+  ></app-estado-vacio>
 
-  <div class="formulario" *ngIf="mostrarFormulario">
-    <h2>Nuevo empleado</h2>
-    <label>
-      DNI
-      <input type="text" [(ngModel)]="dni" maxlength="8" />
-    </label>
-    <label>
-      Nombre completo
-      <input type="text" [(ngModel)]="nombreCompleto" />
-    </label>
-    <label>
-      Email
-      <input type="email" [(ngModel)]="email" />
-    </label>
-    <label>
-      Contrasena
-      <input type="password" [(ngModel)]="password" />
-    </label>
-    <p class="nota">El usuario se creara con el rol EMPLEADO.</p>
-    <div class="acciones">
-      <button class="btn" (click)="crear()" [disabled]="guardando">
-        {{ guardando ? 'Guardando...' : 'Crear' }}
-      </button>
-      <button class="btn secundario" (click)="mostrarFormulario = false">Cancelar</button>
-    </div>
-  </div>
+  <nav class="paginacion" *ngIf="totalPaginas > 1" aria-label="Paginación de usuarios">
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual === 0" (accion)="irPagina(paginaActual - 1)">
+      Anterior
+    </app-boton>
+    <span>Página {{ paginaActual + 1 }} de {{ totalPaginas }}</span>
+    <app-boton tamano="sm" tipo="secondary" [deshabilitado]="paginaActual + 1 >= totalPaginas" (accion)="irPagina(paginaActual + 1)">
+      Siguiente
+    </app-boton>
+  </nav>
+
+  <app-modal [abierto]="mostrarFormulario" titulo="Nuevo empleado" (cerrar)="mostrarFormulario = false">
+    <form [formGroup]="formularioUsuario" (ngSubmit)="crear()">
+      <app-input
+        label="DNI"
+        tipo="text"
+        formControlName="dni"
+        placeholder="8 dígitos"
+        ayuda="Documento de identidad, solo números"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Nombre completo"
+        tipo="text"
+        formControlName="nombreCompleto"
+        placeholder="Nombres y apellidos"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Email"
+        tipo="email"
+        formControlName="email"
+        placeholder="correo@ejemplo.com"
+        [requerido]="true"
+      ></app-input>
+
+      <app-input
+        label="Contraseña"
+        tipo="password"
+        formControlName="password"
+        placeholder="Mínimo 8 caracteres"
+        [requerido]="true"
+      ></app-input>
+
+      <p class="nota">El usuario se creará con el rol EMPLEADO.</p>
+
+      <div acciones>
+        <app-boton type="submit" [cargando]="guardando">
+          {{ guardando ? 'Guardando...' : 'Crear' }}
+        </app-boton>
+        <app-boton tipo="ghost" (accion)="mostrarFormulario = false">Cancelar</app-boton>
+      </div>
+    </form>
+  </app-modal>
 </div>

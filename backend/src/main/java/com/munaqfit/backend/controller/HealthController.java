@@ -1,5 +1,8 @@
 package com.munaqfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,9 +25,11 @@ import java.util.Map;
  * all" automatico mientras la instancia duerme, y esa peticion no la despierta.
  */
 @RestController
+@Tag(name = "Salud")
 public class HealthController {
 
     /** Publico: el cron que mantiene Render despierto no envia credenciales. */
+    @Operation(summary = "Health-check publico para Render")
     @SecurityRequirements
     @GetMapping("/api/health")
     public Map<String, String> health() {

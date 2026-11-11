@@ -1,0 +1,68 @@
+.mq-tabla-contenedor {
+  width: 100%;
+}
+
+.mq-tabla__scroll {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--mq-border, #f0e1f7);
+}
+
+.mq-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  min-width: 640px;
+}
+
+.mq-tabla thead th {
+  background-color: var(--mq-pink-light, #fbe6ff);
+  color: var(--mq-text-main, #4a3f69);
+  font-weight: 800;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  white-space: nowrap;
+}
+
+.mq-tabla tbody td {
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--mq-border, #f0e1f7);
+  color: var(--mq-text-main, #4a3f69);
+}
+
+.mq-tabla tbody tr:hover {
+  background-color: #fdf8ff;
+}
+
+.mq-tabla__fila--click {
+  cursor: pointer;
+}
+
+.mq-tabla__fila--click:focus-within {
+  outline: 2px solid var(--mq-purple, #a68cf2);
+  outline-offset: -2px;
+}
+
+.mq-tabla__error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background-color: #fde2e1;
+  color: #a52a26;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .mq-tabla {
+    min-width: 560px;
+    font-size: 0.9rem;
+  }
+
+  .mq-tabla thead th,
+  .mq-tabla tbody td {
+    padding: 0.65rem 0.75rem;
+  }
+}

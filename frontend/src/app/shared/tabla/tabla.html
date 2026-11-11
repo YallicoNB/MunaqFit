@@ -1,0 +1,53 @@
+<div class="mq-tabla-contenedor">
+  <app-spinner *ngIf="cargando" [centrado]="true" etiqueta="Cargando datos…"></app-spinner>
+
+  <div *ngIf="!cargando && error" class="mq-tabla__error" role="alert">
+    <strong>No se pudieron cargar los datos.</strong>
+    <span>{{ error }}</span>
+  </div>
+
+  <app-estado-vacio
+    *ngIf="!cargando && !error && filas.length === 0"
+    [titulo]="tituloVacio"
+    [mensaje]="mensajeVacio"
+  ></app-estado-vacio>
+
+  <div *ngIf="!cargando && !error && filas.length > 0" class="mq-tabla__scroll">
+    <table class="mq-tabla" [attr.aria-label]="ariaLabel">
+      <caption class="visually-hidden">{{ ariaLabel }}</caption>
+      <thead>
+        <tr>
+          <th
+            *ngFor="let columna of columnas"
+            scope="col"
+            [style.text-align]="alineacion(columna)"
+            [style.width]="columna.ancho || null"
+          >
+            <ng-container *ngIf="columna">{{ columna.titulo }}</ng-container>
+          </th>
+          <th *ngIf="mostrarAcciones" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let fila of filas; trackBy: trackFila"
+          [class.mq-tabla__fila--click]="clickeable"
+          (click)="alClick(fila)"
+        >
+          <td
+            *ngFor="let columna of columnas"
+            [style.text-align]="alineacion(columna)"
+            [ngClass]="claseCelda(fila, columna)"
+          >
+            {{ valorCelda(fila, columna) }}
+          </td>
+          <td *ngIf="mostrarAcciones" class="mq-tabla__acciones">
+            <app-boton tamano="sm" tipo="secondary" (accion)="accion.emit(fila)">
+              {{ textoAccion }}
+            </app-boton>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
