@@ -1381,8 +1381,9 @@ Registro de cada visita de un cliente frecuente.
 ### 7.1 Links
 
 - **Figma (Prototipo):** [https://www.figma.com/design/Vj8R3Xdtw6Q0121bC870zC/Sin-t%C3%ADtulo](https://www.figma.com/design/Vj8R3Xdtw6Q0121bC870zC/Sin-t%C3%ADtulo?node-id=0-1&t=I55rtICYNDuEEnRK-1)
-- **Repositorio GitHub:** (pendiente)
-- **Documentación Técnica:** (pendiente)
+- **Repositorio GitHub:** [https://github.com/YallicoNB/MunaqFit](https://github.com/YallicoNB/MunaqFit)
+- **Documentación Técnica:** [README del repositorio](https://github.com/YallicoNB/MunaqFit#documentación-del-proyecto)
+- **Demo pública:** [https://munaq-fit-rho.vercel.app](https://munaq-fit-rho.vercel.app)
 
 ### 7.2 Tecnologías Propuestas
 

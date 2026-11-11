@@ -2,6 +2,12 @@
 
 Sistema de gestión para **Munaq Fit**, tienda de bebidas saludables (Ubicación: Av. Independencia 198, Ate).
 
+## Demo pública
+
+- **Frontend:** <https://munaq-fit-rho.vercel.app>
+- **API / health-check:** <https://munaqfit-backend.onrender.com/api/health>
+- **Credenciales demo:** admin `12345678` / `12345678`
+
 ## Documentación del proyecto
 
 | Documento | Contenido |
